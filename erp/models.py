@@ -20,7 +20,7 @@ class ArtState(models.Model): # Tiene solo 3 filas: 1. Active; 2. Inactive, 3. D
 
 class Perdida(models.Model):
     fecha = models.DateTimeField()
-    id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL) # *2
+    id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
 class DetallePerdida():
@@ -32,7 +32,7 @@ class DetallePerdida():
 
 class Venta(models.Model):
     fecha = models.DateTimeField()
-    id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL) # *2
+    id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
 class DetalleVenta():
@@ -45,7 +45,7 @@ class DetalleVenta():
 
 class Entrada(models.Model):
     fecha = models.DateTimeField()
-    id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL) # *2
+    id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
 
