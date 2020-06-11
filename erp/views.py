@@ -6,10 +6,6 @@ from erp.forms import FormVenta, FormCompra
 from erp.models import Article
 from erp.functions import stock_total
 
-# Esta es una funcion comun, no es una view.
-
-
-
 def index(request):
     template = loader.get_template('index.html')
     miFormulario = FormVenta({'cantidad': 1})
@@ -41,7 +37,6 @@ def index(request):
                 ctx['inexistente'] = 'Artículo inexistente'
 
             miFormulario = FormVenta({'cantidad': 1})
-            
             return HttpResponse(template.render(ctx, request))
     else:
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a vender es 1.
@@ -77,6 +72,7 @@ def compra(request):
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
             except ObjectDoesNotExist as DoesNotExist:
                 new_article = Article.objects.create(codigo=infForm['codigo'], descripcion=infForm['descripcion'], precio=infForm['precio'], costo=infForm['costo'], seccion=infForm['seccion'], stock=infForm['cantidad'])
+                ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
 
             lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
             miFormulario = FormCompra({'cantidad': 1})
