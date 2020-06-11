@@ -4,21 +4,10 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist
 from erp.forms import FormVenta, FormCompra
 from erp.models import Article
+from erp.functions import stock_total
 
 # Esta es una funcion comun, no es una view.
-def stock_total():
-    cantidad_total = 0
-    diferentes_productos = 0
-    try:
-        query_set = Article.objects.all()
-        for i in query_set:
-            cantidad_total += query_set[diferentes_productos].stock
-            diferentes_productos += 1
-    except UnboundLocalError:
-        cantidad_total = 0
-        diferentes_productos = 0
-    resultado = [cantidad_total, diferentes_productos]
-    return resultado
+
 
 
 def index(request):
