@@ -9,3 +9,13 @@
 5. **'Active' condicional:** Corrección de bug estético que no resaltaba la pestaña que estaba activa en el sidebar.
 6. **Panel de Administracion:** Pequeños cambios en el '/admin'.
 7. **Version.md:** Creación de archivo para registrar los cambios realizados en cada versión.
+
+## Cambios en la versión 1.2
+
+1. **Repositorio:** Migración a un nuevo repositorio, ignorando pycache, librerías, y datos sensibles.
+2. **Settings:** El archivo settings.py ahora es un package que contiene las configuraciones adaptables para correr en local o en producción.
+
+
+## Cambios en la versión 2.0
+
+1. **Bug fixed:** No se actualizan las existencias cuando se agrega un nuevo artículo.
