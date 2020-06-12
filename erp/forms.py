@@ -4,10 +4,9 @@ class FormVenta(forms.Form): # Sirve también para la actualización de compra
     codigo = forms.IntegerField()
     cantidad = forms.IntegerField()
 
-class FormCompra(forms.Form):
+class FormNuevoArticulo(forms.Form):
     codigo = forms.IntegerField()
     descripcion = forms.CharField(required=False)
     costo = forms.DecimalField(max_digits=10, decimal_places=2)
     precio = forms.DecimalField(max_digits=10, decimal_places=2)
     seccion = forms.CharField(required=False)
-    cantidad = forms.IntegerField()

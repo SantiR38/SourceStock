@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist
-from erp.forms import FormVenta, FormCompra
+from erp.forms import FormVenta, FormNuevoArticulo
 from erp.models import Article
 from erp.functions import stock_total
 
@@ -45,9 +45,9 @@ def index(request):
     return HttpResponse(template.render(ctx, request))
 
 
-def compra(request):
-    template = loader.get_template('compra.html')
-    miFormulario = FormCompra({'cantidad': 1})
+def agregar_modificar(request):
+    template = loader.get_template('agregar_modificar.html')
+    miFormulario = FormNuevoArticulo()
     lista = []
     ctx = {
         "articulo_a_agregar": lista, 
@@ -56,7 +56,7 @@ def compra(request):
     }
     # Manejo del formulario de compra
     if request.method == "POST":
-        miFormulario = FormCompra(request.POST)
+        miFormulario = FormNuevoArticulo(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data
             try:
@@ -67,19 +67,18 @@ def compra(request):
                 new_article.precio = infForm['precio']
                 if infForm['seccion'] != "":
                     new_article.seccion = infForm['seccion']
-                new_article.stock += infForm['cantidad'] # Actualizamos el stock disponible
                 new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
             except ObjectDoesNotExist as DoesNotExist:
-                new_article = Article.objects.create(codigo=infForm['codigo'], descripcion=infForm['descripcion'], precio=infForm['precio'], costo=infForm['costo'], seccion=infForm['seccion'], stock=infForm['cantidad'])
+                new_article = Article.objects.create(codigo=infForm['codigo'], descripcion=infForm['descripcion'], precio=infForm['precio'], costo=infForm['costo'], seccion=infForm['seccion'], stock=0)
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
 
             lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
-            miFormulario = FormCompra({'cantidad': 1})
+            miFormulario = FormNuevoArticulo()
 
             return HttpResponse(template.render(ctx, request))
     else:
-        miFormulario = FormCompra({'cantidad': 1})
+        miFormulario = FormNuevoArticulo()
 
     return HttpResponse(template.render(ctx, request))
 
@@ -120,3 +119,6 @@ def compra_simple(request):
         miFormulario = FormVenta({'cantidad': 1})
 
     return HttpResponse(template.render(ctx, request))
+
+def entrada(request):
+    pass
