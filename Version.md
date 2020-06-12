@@ -18,4 +18,7 @@
 
 ## Cambios en la versión 2.0
 
-1. **Bug fixed:** No se actualizan las existencias cuando se agrega un nuevo artículo.
+1. **Bug fixed:** 
+    * No se actualizan las existencias cuando se agrega un nuevo artículo.
+    * Error cuando la base de datos esta vacía
+2. **Favicon agregado**
