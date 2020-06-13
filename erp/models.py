@@ -23,7 +23,7 @@ class Perdida(models.Model):
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
-class DetallePerdida():
+class DetallePerdida(models.Model):
     id_perdida = models.ForeignKey('Perdida', on_delete=models.CASCADE) # *1
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
@@ -35,7 +35,7 @@ class Venta(models.Model):
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
-class DetalleVenta():
+class DetalleVenta(models.Model):
     id_venta = models.ForeignKey('Venta', on_delete=models.CASCADE) # *1
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
@@ -49,7 +49,7 @@ class Entrada(models.Model):
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
 
-class DetalleEntrada():
+class DetalleEntrada(models.Model):
     id_entrada = models.ForeignKey('Entrada', on_delete=models.CASCADE) # *1
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
