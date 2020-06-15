@@ -18,10 +18,15 @@ class Article(models.Model):
 class ArtState(models.Model): # Tiene solo 3 filas: 1. Active; 2. Inactive, 3. Deleted.
     nombre = models.CharField(max_length=10)
 
+    def __str__(self):
+        return self.nombre
+
+
 class Perdida(models.Model):
     fecha = models.DateField()
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
+
 
 class DetallePerdida(models.Model):
     id_perdida = models.ForeignKey('Perdida', on_delete=models.CASCADE) # *1
@@ -35,6 +40,7 @@ class Venta(models.Model):
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
+
 class DetalleVenta(models.Model):
     id_venta = models.ForeignKey('Venta', on_delete=models.CASCADE) # *1
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
@@ -47,6 +53,9 @@ class Entrada(models.Model):
     fecha = models.DateField()
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return '%s (%s)' % (self.fecha, self.id)
 
 
 class DetalleEntrada(models.Model):
