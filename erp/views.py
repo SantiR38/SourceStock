@@ -134,21 +134,23 @@ def entrada(request):
         miFormulario = FormEntrada(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            estado = ArtState.objects.get(id=1)
+            estado = ArtState.objects.only('id').get(id=1) # Creamos un ArtState instance para que no tire error al referir la foreign key
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
 
                 try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_entrada a su id
-                    nueva_venta = Entrada.objects.get(id_state=estado.id)
+                    nueva_venta = Entrada.objects.get(id_state=estado)
                 except ObjectDoesNotExist as DoesNotExist:
-                    nueva_venta = Entrada.objects.create(fecha=infForm['fecha'], id_state=estado.id, total=0) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
+                    nueva_venta = Entrada.objects.create(fecha=infForm['fecha'], id_state=estado, total=0) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
 
+                id_nueva_venta = Entrada.objects.only('id').get(id_state=estado) # Creamos una Entrada instance para que no tire error al referir la foreign key
+                id_new_article = Article.objects.only('id').get(codigo=infForm['codigo']) # Creamos un Article instance para que no tire error al referir la foreign key
                 # Iniciar un objeto de tipo detalle_entrada
-                producto_leido = DetalleEntrada.objects.create(id_entrada=nueva_venta.id, costo_unitario=infForm['costo'], id_producto=nueva_venta.id, cantidad=infForm['cantidad'])
+                producto_leido = DetalleEntrada.objects.create(id_entrada=id_nueva_venta, costo_unitario=infForm['costo'], id_producto=id_new_article, cantidad=infForm['cantidad'])
 
                 # Utilizar el metodo objects.filter() para traer una lista de los detalle_entrada que tienen como clave foranea la id de la entrada activa
-                lista = DetalleEntrada.objects.filter(id=nueva_venta.id)
+                lista = DetalleEntrada.objects.filter(id=id_nueva_venta)
 
                 '''
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
