@@ -52,14 +52,12 @@ Compra
         </div>
         <div class="card-body">
           <div style=" width: 100%;">
-
-            <p>Artículo: {{ articulo_a_comprar.0.descripcion }}</p>
-            <p>Sección: {{ articulo_a_comprar.0.seccion }}</p>
-            <p>Precio: {{ articulo_a_comprar.0.precio }}</p>
-            <p>Stock: {{ articulo_a_comprar.0.stock }}</p>
-            <p style= "color:#A91400"><strong>{{ inexistente }}</strong></p>
-            <p style= "color:#A91400"><strong>{{ stock_insuficiente }}</strong></p>
-
+            {% for i in articulo_a_comprar%}
+            <p>ID Entrada: {{ i.id_entrada }}</p>
+            <p>ID Producto: {{ i.id_producto }}</p>
+            <p>Costo: {{ i.costo_unitario }}</p>
+            <p>Cantidad: {{ i.cantidad }}</p>
+            {% endfor %}
             <input type="submit" value="Hacer Compra">
 
           </div>
