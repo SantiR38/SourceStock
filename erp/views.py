@@ -154,8 +154,12 @@ def entrada(request):
                                                                id_entrada=id_nueva_venta,
                                                                id_producto=id_new_article)
 
+                                                               
+                nueva_venta.total += (producto_leido.costo_unitario * producto_leido.cantidad) # Se suman los precios unitarios al precio total de la compra
+                nueva_venta.save()
+
                 # Utilizar el metodo objects.filter() para traer una lista de los detalle_entrada que tienen como clave foranea la id de la entrada activa
-                lista = DetalleEntrada.objects.filter(id=nueva_venta.id)
+                lista = DetalleEntrada.objects.filter(id_entrada=nueva_venta.id)
 
                 '''
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
