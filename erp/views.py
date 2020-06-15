@@ -146,20 +146,18 @@ def entrada(request):
                                                          total=0,
                                                          id_state=estado) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
 
-                id_nueva_venta = Entrada.objects.get(id_state=estado) # Creamos una Entrada instance para que no tire error al referir la foreign key
-                id_new_article = Article.objects.get(codigo=infForm['codigo']) # Creamos un Article instance para que no tire error al referir la foreign key
-                # Iniciar un objeto de tipo detalle_entrada
-                producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], 
+                
+                producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], # Iniciar un objeto de tipo detalle_entrada
                                                                cantidad=infForm['cantidad'],
-                                                               id_entrada=id_nueva_venta,
-                                                               id_producto=id_new_article)
-
-                                                               
-                nueva_venta.total += (producto_leido.costo_unitario * producto_leido.cantidad) # Se suman los precios unitarios al precio total de la compra
+                                                               id_entrada=Entrada.objects.get(id_state=estado),
+                                                               id_producto=Article.objects.get(codigo=infForm['codigo']))
+            # Se suman los precios unitarios al precio total de la compra
+                lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
+                nueva_venta.total = 0
+                for i in lista:
+                    nueva_venta.total += (i.costo_unitario * i.cantidad)
                 nueva_venta.save()
 
-                # Utilizar el metodo objects.filter() para traer una lista de los detalle_entrada que tienen como clave foranea la id de la entrada activa
-                lista = DetalleEntrada.objects.filter(id_entrada=nueva_venta.id)
 
                 '''
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
