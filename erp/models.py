@@ -12,7 +12,7 @@ class Article(models.Model):
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return 'Artículo: %s  -  Precio: %s' % (self.descripcion, self.precio)
+        return self.descripcion
 
 
 class ArtState(models.Model): # Tiene solo 3 filas: 1. Active; 2. Inactive, 3. Deleted.

@@ -52,13 +52,11 @@ Compra
         </div>
         <div class="card-body">
           <div style=" width: 100%;">
-            {% for i in articulo_a_comprar%}
-            <!--<p>ID Entrada: {{ i.id_entrada }}</p>
-            <p>ID Producto: {{ i.id_producto }}</p>-->
-            <p>Costo: {{ i.costo_unitario }}</p>
-            <p>Cantidad: {{ i.cantidad }}</p>
+            {% for i in articulo_a_comprar %}
+              <p>{{ i.id_producto }}  -  Costo: ${{ i.costo_unitario }}  -  Cant: {{ i.cantidad }}</p>
             {% endfor %}
-            <input type="submit" value="Hacer Compra">
+            <p><strong>Total: ${{ total }}</strong></p>
+            <!--<input type="submit" value="Hacer Compra">-->
 
           </div>
         </div>

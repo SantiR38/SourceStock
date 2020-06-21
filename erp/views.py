@@ -157,12 +157,14 @@ def entrada(request):
                 for i in lista:
                     nueva_venta.total += (i.costo_unitario * i.cantidad)
                 nueva_venta.save()
+                ctx['total'] = nueva_venta.total
 
 
                 '''
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
                 '''
                 ctx['inexistente'] = ''
+                ctx['articulo_a_comprar'] = lista
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo"'
 
