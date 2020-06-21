@@ -120,6 +120,7 @@ def compra_simple(request):
 
     return HttpResponse(template.render(ctx, request))
 
+
 def entrada(request):
     template = loader.get_template('entrada.html')
     miFormulario = FormEntrada({'cantidad': 1})
@@ -175,4 +176,10 @@ def entrada(request):
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a comprar es 1.
         miFormulario = FormEntrada({'cantidad': 1})
 
+    return HttpResponse(template.render(ctx, request))
+
+
+def transaccion_exitosa(request):
+    template = loader.get_template('exito.html')
+    ctx = {}
     return HttpResponse(template.render(ctx, request))

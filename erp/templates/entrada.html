@@ -56,7 +56,8 @@ Compra
               <p>{{ i.id_producto }}  -  Costo: ${{ i.costo_unitario }}  -  Cant: {{ i.cantidad }}</p>
             {% endfor %}
             <p><strong>Total: ${{ total }}</strong></p>
-            <!--<input type="submit" value="Hacer Compra">-->
+            <a href="/transaccion_exitosa"><button>Confirmar compra</button></a>
+            <!--<a>Que sea un boton de redireccion en vez de submit</a>-->
 
           </div>
         </div>
