@@ -188,9 +188,9 @@ def transaccion_exitosa(request):
     estado = ArtState.objects.get(nombre="Active")
     nueva_venta = Entrada.objects.get(id_state=estado)
 
-    producto_leido = DetalleEntrada.objects.filter(id_entrada=nueva_venta)
+    producto_leido = DetalleEntrada.objects.filter(id_entrada=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
 
-    for i in producto_leido:
+    for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
         i.id_producto.costo = i.costo_unitario
         i.id_producto.stock += i.cantidad
         i.id_producto.save()
@@ -204,5 +204,9 @@ def cancelar(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Se ha cancelado la transacción.',
            'redireccion': 'Volviendo a la página de ventas...'}
-           
+    
+    estado = ArtState.objects.get(nombre="Active")
+    nueva_venta = Entrada.objects.get(id_state=estado)
+    nueva_venta.delete() # Se borra el registro de la entrada que está activa, y los detalles se borran automaticamente al estar en modo CASCADE (models.py)
+
     return HttpResponse(template.render(ctx, request))
