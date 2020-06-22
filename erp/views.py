@@ -128,7 +128,8 @@ def entrada(request):
     ctx = {
         "articulo_a_comprar": lista,
         "datos_generales": stock_total(),
-        "form": miFormulario
+        "form": miFormulario,
+        "total": 0
     }
 
     if request.method == "POST":
@@ -167,7 +168,7 @@ def entrada(request):
                 ctx['inexistente'] = ''
                 ctx['articulo_a_comprar'] = lista
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
-                ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo"'
+                ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la compra seguirá guardada.'
 
             miFormulario = FormEntrada({'cantidad': 1 })
             
@@ -180,8 +181,9 @@ def entrada(request):
 
 
 def transaccion_exitosa(request):
-    template = loader.get_template('exito.html')
-    ctx = {}
+    template = loader.get_template('mensaje.html')
+    ctx = {'mensaje': 'Su transacción fue un éxito.',
+           'redireccion': 'Volviendo a la página de ventas...'}
 
     estado = ArtState.objects.get(nombre="Active")
     nueva_venta = Entrada.objects.get(id_state=estado)
@@ -196,4 +198,11 @@ def transaccion_exitosa(request):
     nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
     nueva_venta.save()
     # Hacer que esa entrada pase a estar inactiva
+    return HttpResponse(template.render(ctx, request))
+
+def cancelar(request):
+    template = loader.get_template('mensaje.html')
+    ctx = {'mensaje': 'Se ha cancelado la transacción.',
+           'redireccion': 'Volviendo a la página de ventas...'}
+           
     return HttpResponse(template.render(ctx, request))
