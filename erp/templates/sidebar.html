@@ -26,8 +26,8 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
-          <li class="nav-item has-treeview menu-open">
-            <a href="#" class="nav-link active">
+          <li class="nav-item has-treeview {% if request.path == '/entrada' or request.path == '/' %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == '/entrada' or request.path == '/' %}active{% endif %}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
                 Operaciones
@@ -35,24 +35,55 @@
               </p>
             </a>
             <ul class="nav nav-treeview">
+
               <li class="nav-item">
                 <a href="{% url 'index' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Venta</p>
                 </a>
               </li>
+
               <li class="nav-item">
-                <a href="{% url 'compra_simple' %}" class="nav-link {% if request.path == '/compra_simple' %}active{% endif %}">
+                <a href="{% url 'entrada' %}" class="nav-link {% if request.path == '/entrada' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Compra</p>
                 </a>
               </li>
+
+            </ul>
+          </li>
+
+          <li class="nav-item has-treeview {% if request.path == '/compra_simple' or request.path == '/' or request.path == '/agregar_modificar' %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == '/compra_simple' or request.path == '/' or request.path == '/agregar_modificar' %}active{% endif %}">
+              <i class="nav-icon fas fa-tachometer-alt"></i>
+              <p>
+                Control de inventario
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview">
+
+              <li class="nav-item">
+                <a href="{% url 'compra_simple' %}" class="nav-link {% if request.path == '/compra_simple' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Entrada</p>
+                </a>
+              </li>
+              
+              <li class="nav-item">
+                <a href="{% url 'index' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                  <i class="far fa-circle nav-icon"></i>
+                  <p>Salida</p>
+                </a>
+              </li>
+
               <li class="nav-item">
                 <a href="./agregar_modificar" class="nav-link {% if request.path == '/agregar_modificar' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Agregar o modificar</p>
                 </a>
               </li>
+              
             </ul>
           </li>
 
