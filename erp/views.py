@@ -182,4 +182,18 @@ def entrada(request):
 def transaccion_exitosa(request):
     template = loader.get_template('exito.html')
     ctx = {}
+
+    estado = ArtState.objects.get(nombre="Active")
+    nueva_venta = Entrada.objects.get(id_state=estado)
+
+    producto_leido = DetalleEntrada.objects.filter(id_entrada=nueva_venta)
+
+    for i in producto_leido:
+        i.id_producto.costo = i.costo_unitario
+        i.id_producto.stock += i.cantidad
+        i.id_producto.save()
+    
+    nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
+    nueva_venta.save()
+    # Hacer que esa entrada pase a estar inactiva
     return HttpResponse(template.render(ctx, request))
