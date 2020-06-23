@@ -180,6 +180,20 @@ def entrada(request):
     return HttpResponse(template.render(ctx, request))
 
 
+def venta(request):
+    template = loader.get_template('index.html')
+    miFormulario = FormVenta({'cantidad': 1})
+    lista = []
+    ctx = {
+        "articulo_a_comprar": lista,
+        "datos_generales": stock_total(),
+        "form": miFormulario,
+        "total": 0
+    }
+
+    return HttpResponse(template.render(ctx, request))
+
+
 def transaccion_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',

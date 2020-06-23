@@ -37,7 +37,7 @@
             <ul class="nav nav-treeview">
 
               <li class="nav-item">
-                <a href="{% url 'index' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                <a href="{% url 'venta' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Venta</p>
                 </a>
@@ -53,8 +53,8 @@
             </ul>
           </li>
 
-          <li class="nav-item has-treeview {% if request.path == '/compra_simple' or request.path == '/' or request.path == '/agregar_modificar' %}menu-open{% endif %}">
-            <a href="#" class="nav-link {% if request.path == '/compra_simple' or request.path == '/' or request.path == '/agregar_modificar' %}active{% endif %}">
+          <li class="nav-item has-treeview {% if request.path == '/compra_simple' or request.path == '/salida' or request.path == '/agregar_modificar' %}menu-open{% endif %}">
+            <a href="#" class="nav-link {% if request.path == '/compra_simple' or request.path == '/salida' or request.path == '/agregar_modificar' %}active{% endif %}">
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
                 Control de inventario
@@ -71,7 +71,7 @@
               </li>
               
               <li class="nav-item">
-                <a href="{% url 'index' %}" class="nav-link {% if request.path == '/' %}active{% endif %}">
+                <a href="{% url 'salida' %}" class="nav-link {% if request.path == '/salida' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Salida</p>
                 </a>
