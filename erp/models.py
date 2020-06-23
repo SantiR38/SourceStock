@@ -43,8 +43,8 @@ class Venta(models.Model):
 
 class DetalleVenta(models.Model):
     id_venta = models.ForeignKey('Venta', on_delete=models.CASCADE) # *1
-    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # Si bien tanto este dato como el del precio estan en el objeto Article,
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2) # es mejor guardar el producto al precio que se vendió para mejor contabilidad
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
 

@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
 from erp.functions import stock_total
+from datetime import date
 
 def index(request):
     template = loader.get_template('index.html')
@@ -136,7 +137,7 @@ def entrada(request):
         miFormulario = FormEntrada(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para que no tire error al referir la foreign key
+            estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
@@ -181,15 +182,56 @@ def entrada(request):
 
 
 def venta(request):
-    template = loader.get_template('index.html')
+    template = loader.get_template('venta.html')
     miFormulario = FormVenta({'cantidad': 1})
     lista = []
     ctx = {
-        "articulo_a_comprar": lista,
+        "articulo_a_vender": lista,
         "datos_generales": stock_total(),
         "form": miFormulario,
         "total": 0
     }
+
+    if request.method == "POST":
+        miFormulario = FormVenta(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+            try: # Si el producto existe en la base de datos
+                new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
+                                                                            # el formulario y lo metemos como QuerySet en una variable.
+                try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
+                    nueva_venta = Venta.objects.get(id_state=estado)
+                except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
+                    nueva_venta = Venta.objects.create(fecha=date.today(),
+                                                         total=0,
+                                                         id_state=estado) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+
+                producto_leido = DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
+                                                               precio_unitario=new_article.precio,
+                                                               cantidad=infForm['cantidad'],
+                                                               id_venta=Venta.objects.get(id_state=estado),
+                                                               id_producto=Article.objects.get(codigo=infForm['codigo']))
+            # Se suman los precios unitarios al precio total de la venta
+                lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
+                nueva_venta.total = 0
+                for i in lista:
+                    nueva_venta.total += (i.precio_unitario * i.cantidad)
+                nueva_venta.save()
+                ctx['total'] = nueva_venta.total
+
+
+                ctx['inexistente'] = ''
+                ctx['articulo_a_vender'] = lista
+            except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
+                ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la venta seguirá guardada.'
+
+            miFormulario = FormVenta({'cantidad': 1 })
+            
+            return HttpResponse(template.render(ctx, request))
+    else:
+        # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a vender es 1.
+        miFormulario = FormVenta({'cantidad': 1})
 
     return HttpResponse(template.render(ctx, request))
 
@@ -200,18 +242,34 @@ def transaccion_exitosa(request):
            'redireccion': 'Volviendo a la página de ventas...'}
 
     estado = ArtState.objects.get(nombre="Active")
-    nueva_venta = Entrada.objects.get(id_state=estado)
+    try:
+        nueva_venta = Entrada.objects.get(id_state=estado)
 
-    producto_leido = DetalleEntrada.objects.filter(id_entrada=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
+        producto_leido = DetalleEntrada.objects.filter(id_entrada=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
 
-    for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
-        i.id_producto.costo = i.costo_unitario
-        i.id_producto.stock += i.cantidad
-        i.id_producto.save()
-    
-    nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
-    nueva_venta.save()
-    # Hacer que esa entrada pase a estar inactiva
+        for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
+            i.id_producto.costo = i.costo_unitario
+            i.id_producto.stock += i.cantidad
+            i.id_producto.save()
+        
+        nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
+        nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+    except ObjectDoesNotExist as DoesNotExist:
+        try:
+            nueva_venta = Venta.objects.get(id_state=estado)
+
+            producto_leido = DetalleVenta.objects.filter(id_entrada=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
+
+            for i in producto_leido: # Se actualiza  el stock de cada objeto Article
+                i.id_producto.stock -= i.cantidad
+                i.id_producto.save()
+            
+            nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
+            nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+        except ObjectDoesNotExist as DoesNotExist:
+            ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
+
+
     return HttpResponse(template.render(ctx, request))
 
 def cancelar(request):
@@ -220,7 +278,14 @@ def cancelar(request):
            'redireccion': 'Volviendo a la página de ventas...'}
     
     estado = ArtState.objects.get(nombre="Active")
-    nueva_venta = Entrada.objects.get(id_state=estado)
-    nueva_venta.delete() # Se borra el registro de la entrada que está activa, y los detalles se borran automaticamente al estar en modo CASCADE (models.py)
+    try:
+        nueva_venta = Entrada.objects.get(id_state=estado)
+        nueva_venta.delete() # Se borra el registro de la entrada que está activa, y los detalles se borran automaticamente al estar en modo CASCADE (models.py)
+    except ObjectDoesNotExist as DoesNotExist:
+        try:
+            nueva_venta = Venta.objects.get(id_state=estado)
+            nueva_venta.delete()
+        except ObjectDoesNotExist as DoesNotExist:
+            ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
 
     return HttpResponse(template.render(ctx, request))
