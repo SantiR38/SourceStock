@@ -16,9 +16,24 @@
 2. **Settings:** El archivo settings.py ahora es un package que contiene las configuraciones adaptables para correr en local o en producción.
 
 
-## Cambios en la versión 2.0
+## Cambios en la versión 1.3
 
 1. **Bug fixed:** 
     * No se actualizan las existencias cuando se agrega un nuevo artículo.
     * Error cuando la base de datos esta vacía
 2. **Favicon agregado**
+3. **Nuevas tablas en base de datos**:
+    * ArtState: Utilizada como foreign key para la tabla Article, Entrada, Venta y Perdida.
+    * Entrada: Registra cada compra o entrada de mercadería, Utilizada como foreign key de DetalleEntrada. 
+    * DetalleEntrada: Registra cada uno de los articulos de una Entrada.
+    * Venta: Registra cada venta de mercadería, Utilizada como foreign key de DetalleVenta. 
+    * DetalleVenta: Registra cada uno de los articulos de una Venta.
+    * Perdida (aun no utilizada)
+    * DetallePerdida (aun no utilizada)
+4. **Nuevas views**:
+    * Entrada
+    * Venta
+    * Transacción Exitosa
+    * Venta Exitosa
+    * Cancelar
+5. **Funcionalidades**: Ahora tanto la compra como la venta crean una lista a la derecha donde se van enumerando los productos que son parte de la transacción. La misma se puede confirmar o cancelar antes de afectar a la tabla principal 'Article'.

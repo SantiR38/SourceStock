@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Template, Context, loader
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
 from erp.functions import stock_total
@@ -191,7 +191,6 @@ def venta(request):
         "form": miFormulario,
         "total": 0
     }
-
     if request.method == "POST":
         miFormulario = FormVenta(request.POST)
         if miFormulario.is_valid():
@@ -219,8 +218,6 @@ def venta(request):
                     nueva_venta.total += (i.precio_unitario * i.cantidad)
                 nueva_venta.save()
                 ctx['total'] = nueva_venta.total
-
-
                 ctx['inexistente'] = ''
                 ctx['articulo_a_vender'] = lista
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
@@ -254,23 +251,35 @@ def transaccion_exitosa(request):
         
         nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
         nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+
     except ObjectDoesNotExist as DoesNotExist:
-        try:
-            nueva_venta = Venta.objects.get(id_state=estado)
-
-            producto_leido = DetalleVenta.objects.filter(id_entrada=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
-
-            for i in producto_leido: # Se actualiza  el stock de cada objeto Article
-                i.id_producto.stock -= i.cantidad
-                i.id_producto.save()
-            
-            nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
-            nueva_venta.save() # Hace que esa entrada pase a estar inactiva
-        except ObjectDoesNotExist as DoesNotExist:
-            ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
+        ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
 
 
     return HttpResponse(template.render(ctx, request))
+
+def venta_exitosa(request):
+    template = loader.get_template('mensaje.html')
+    ctx = {'mensaje': 'Su transacción fue un éxito.',
+           'redireccion': 'Volviendo a la página de ventas...'}
+
+    estado = ArtState.objects.get(nombre="Active")
+    try:
+        nueva_venta = Venta.objects.get(id_state=estado)
+
+        producto_leido = DetalleVenta.objects.filter(id_venta=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
+
+        for i in producto_leido: # Se actualiza  el stock de cada objeto Article
+            i.id_producto.stock -= i.cantidad
+            i.id_producto.save()
+        
+        nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
+        nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+    except ObjectDoesNotExist as DoesNotExist:
+        ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
+    
+    return HttpResponse(template.render(ctx, request))
+
 
 def cancelar(request):
     template = loader.get_template('mensaje.html')
