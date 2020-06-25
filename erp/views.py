@@ -124,7 +124,7 @@ def compra_simple(request):
 
 def entrada(request):
     template = loader.get_template('entrada.html')
-    miFormulario = FormEntrada({'cantidad': 1})
+    miFormulario = FormEntrada({'cantidad': 1, 'fecha':date.today()})
     lista = []
     ctx = {
         "articulo_a_comprar": lista,
@@ -151,6 +151,7 @@ def entrada(request):
 
                 
                 producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], # Iniciar un objeto de tipo detalle_entrada
+                                                               porcentaje_ganancia=infForm['porcentaje_ganancia'],
                                                                cantidad=infForm['cantidad'],
                                                                id_entrada=Entrada.objects.get(id_state=estado),
                                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
@@ -171,12 +172,12 @@ def entrada(request):
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la compra seguirá guardada.'
 
-            miFormulario = FormEntrada({'cantidad': 1 })
+            miFormulario = FormEntrada({'cantidad': 1, 'fecha':date.today()})
             
             return HttpResponse(template.render(ctx, request))
     else:
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a comprar es 1.
-        miFormulario = FormEntrada({'cantidad': 1})
+        miFormulario = FormEntrada({'cantidad': 1, 'fecha':date.today()})
 
     return HttpResponse(template.render(ctx, request))
 
@@ -246,6 +247,7 @@ def transaccion_exitosa(request):
 
         for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
             i.id_producto.costo = i.costo_unitario
+            i.id_producto.precio = i.costo_unitario + (i.costo_unitario * i.porcentaje_ganancia / 100)
             i.id_producto.stock += i.cantidad
             i.id_producto.save()
         
@@ -257,6 +259,7 @@ def transaccion_exitosa(request):
 
 
     return HttpResponse(template.render(ctx, request))
+
 
 def venta_exitosa(request):
     template = loader.get_template('mensaje.html')
