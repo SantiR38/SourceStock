@@ -14,6 +14,5 @@ class FormNuevoArticulo(forms.Form):
 class FormEntrada(forms.Form):
     codigo = forms.IntegerField()
     costo = forms.DecimalField(max_digits=10, decimal_places=2)
-    porcentaje_ganancia = forms.DecimalField(max_digits=10, decimal_places=2)
     cantidad = forms.IntegerField()
     fecha = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))

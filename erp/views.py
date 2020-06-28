@@ -152,7 +152,6 @@ def entrada(request):
 
                 
                 producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], # Iniciar un objeto de tipo detalle_entrada
-                                                               porcentaje_ganancia=infForm['porcentaje_ganancia'],
                                                                cantidad=infForm['cantidad'],
                                                                id_entrada=Entrada.objects.get(id_state=estado),
                                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
@@ -248,7 +247,7 @@ def transaccion_exitosa(request):
 
         for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
             i.id_producto.costo = i.costo_unitario
-            i.id_producto.precio = i.costo_unitario + (i.costo_unitario * i.porcentaje_ganancia / 100)
+            i.id_producto.precio = i.costo_unitario + (i.costo_unitario * i.id_producto.porcentaje_ganancia / 100)
             i.id_producto.stock += i.cantidad
             i.id_producto.save()
         
