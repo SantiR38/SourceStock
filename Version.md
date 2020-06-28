@@ -42,3 +42,6 @@
 
 1. **Bug fixed:** Se quitó el porcentaje_ganancia de la tabla DetalleEntrada y se lo colocó en la tabla Article. Se eliminó ese campo de la vista entrada y del formulario entrada, para que ahora esten en agregar_modificar.
 2. **Sidebar:** Las pestañas hijas ahora son mas pequeñas y tienen un margen mayor para distinguirlas de las pestañas contenedoras.
+3. **Documentación:** 
+    * Se cambió la escritura del Readme de HTML a Markdown.
+    * Se agregó una nueva imagen de la interfaz.

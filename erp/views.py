@@ -131,7 +131,8 @@ def entrada(request):
         "articulo_a_comprar": lista,
         "datos_generales": stock_total(),
         "form": miFormulario,
-        "total": 0
+        "total": 0,
+        "porcentaje_inexistente": ""
     }
 
     if request.method == "POST":
@@ -142,7 +143,8 @@ def entrada(request):
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
-
+                if new_article.porcentaje_ganancia == None:
+                    ctx["porcentaje_inexistente"] = "Este producto no tiene porcentaje de ganancia. Agrégalo en la sección 'Agregar o modificar' antes de continuar."
                 try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_entrada a su id
                     nueva_venta = Entrada.objects.get(id_state=estado)
                 except ObjectDoesNotExist as DoesNotExist:
@@ -245,14 +247,20 @@ def transaccion_exitosa(request):
 
         producto_leido = DetalleEntrada.objects.filter(id_entrada=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
 
-        for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
-            i.id_producto.costo = i.costo_unitario
-            i.id_producto.precio = i.costo_unitario + (i.costo_unitario * i.id_producto.porcentaje_ganancia / 100)
-            i.id_producto.stock += i.cantidad
-            i.id_producto.save()
-        
-        nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
-        nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+        try:
+            for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
+                i.id_producto.costo = i.costo_unitario
+                i.id_producto.precio = i.costo_unitario + (i.costo_unitario * i.id_producto.porcentaje_ganancia / 100)
+                i.id_producto.stock += i.cantidad
+                i.id_producto.save()
+            
+            nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
+            nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+        except TypeError:
+            ctx['mensaje'] = 'Error. Uno o varios artículos no poseen porcentaje de ganancia. Agregalos en "Agregar o Modificar" Luego registra nuevamente la compra.'
+            nueva_venta = Entrada.objects.get(id_state=estado)
+            nueva_venta.delete() # Se borra el registro de la entrada que está activa, y los detalles se borran automaticamente al estar en modo CASCADE (models.py)
+
 
     except ObjectDoesNotExist as DoesNotExist:
         ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'

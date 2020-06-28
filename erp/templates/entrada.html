@@ -56,6 +56,7 @@ Compra
               <p>{{ i.id_producto }}  -  Costo: ${{ i.costo_unitario }}  -  Cant: {{ i.cantidad }}</p>
             {% endfor %}
             <p style= "color:#A91400"><strong>{{ inexistente }}</strong></p>
+            <p style= "color:#A91400"><strong>{{ porcentaje_inexistente }}</strong></p>
             <p><strong>Total: ${{ total }}</strong></p>
             <span>
               <a href="/transaccion_exitosa"><button>Confirmar compra</button></a>
