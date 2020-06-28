@@ -24,7 +24,7 @@ Agregar o modificar Producto
         <div class="card-body">
           <div class="tab-content p-0">
             <!-- Morris chart - Sales -->
-            <div class="chart tab-pane active" id="revenue-chart" style="position: relative; height: 500px;">
+            <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
               {% include 'formulario_compra_venta.html' %}
             </div>
             <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
@@ -50,7 +50,7 @@ Agregar o modificar Producto
           <!-- /.card-tools -->
         </div>
         <div class="card-body">
-          <div style="height: 500px; width: 100%;">
+          <div style=" width: 100%;">
 
             <p>Artículo: {{ articulo_a_agregar.0.descripcion }}</p>
             <p>Sección: {{articulo_a_agregar.0.seccion}}</p>
