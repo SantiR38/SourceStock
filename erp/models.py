@@ -1,6 +1,9 @@
 from django.db import models
 
-# Create your models here.
+# *1: CASCADE, significa que cuando se borre un artículo de la tabla padre, el artículo de la
+#     tabla hija que tiene esa clave foranea, también se borra
+
+# *2: SET_NULL, cuando se borra el artículo, la tabla hija pone null como clave foranea.
 
 class Article(models.Model):
     codigo = models.BigIntegerField(unique=True)
@@ -64,9 +67,21 @@ class DetalleEntrada(models.Model):
     porcentaje_ganancia = models.DecimalField(max_digits=10, decimal_places=2)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
+'''
+class Cliente():
+    class ConcicionIva(models.TextChoices):
+        C_FINAL
+        R_INSCRIPTO
+        MONOTRIBUTISTA
+        EXENTO
+        NO_ALCANZADO
+    nombre = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50)
+    condicion_iva = models.CharField(max_length=50)
+    dni = models.PositiveIntegerField()
+    cuit
+    direccion
+    telefono
+    email
+'''
 
-
-    # *1: CASCADE, significa que cuando se borre un artículo de la tabla padre, el artículo de la
-    #     tabla hija que tiene esa clave foranea, también se borra
-
-    # *2: SET_NULL, cuando se borra el artículo, la tabla hija pone null como clave foranea.
