@@ -8,7 +8,7 @@ class FormNuevoArticulo(forms.Form):
     codigo = forms.IntegerField()
     descripcion = forms.CharField(required=False)
     costo = forms.DecimalField(max_digits=10, decimal_places=2)
-    precio = forms.DecimalField(max_digits=10, decimal_places=2)
+    porcentaje_ganancia = forms.DecimalField(max_digits=10, decimal_places=2)
     seccion = forms.CharField(required=False)
 
 class FormEntrada(forms.Form):

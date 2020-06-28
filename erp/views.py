@@ -65,7 +65,8 @@ def agregar_modificar(request):
                 if infForm['descripcion'] != "":
                     new_article.descripcion = infForm['descripcion']
                 new_article.costo = infForm['costo']
-                new_article.precio = infForm['precio']
+                new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
+                new_article.precio = infForm['costo'] + (infForm['costo'] * infForm['porcentaje_ganancia'] /100) # costo+(costo*porcentaje/100)
                 if infForm['seccion'] != "":
                     new_article.seccion = infForm['seccion']
                 new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
