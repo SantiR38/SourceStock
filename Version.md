@@ -37,3 +37,8 @@
     * Venta Exitosa
     * Cancelar
 5. **Funcionalidades**: Ahora tanto la compra como la venta crean una lista a la derecha donde se van enumerando los productos que son parte de la transacción. La misma se puede confirmar o cancelar antes de afectar a la tabla principal 'Article'.
+
+## Cambios en la versión 1.3.1
+
+1. **Bug fixed:** Se quitó el porcentaje_ganancia de la tabla DetalleEntrada y se lo colocó en la tabla Article. Se eliminó ese campo de la vista entrada y del formulario entrada, para que ahora esten en agregar_modificar.
+2. **Sidebar:** Las pestañas hijas ahora son mas pequeñas y tienen un margen mayor para distinguirlas de las pestañas contenedoras.
