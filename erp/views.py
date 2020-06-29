@@ -248,6 +248,8 @@ def transaccion_exitosa(request):
         producto_leido = DetalleEntrada.objects.filter(id_entrada=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
 
         try:
+            for j in producto_leido: # Esto es simplemente para que cancele la compra completa y no se actualicen el stock y precio solo de algunos productos
+                test_porcentaje = j.id_producto.porcentaje_ganancia * 1 # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
             for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
                 i.id_producto.costo = i.costo_unitario
                 i.id_producto.precio = i.costo_unitario + (i.costo_unitario * i.id_producto.porcentaje_ganancia / 100)
