@@ -324,3 +324,13 @@ def cliente(request):
     }
 
     return HttpResponse(template.render(ctx, request))
+
+
+def control_inventario(request):
+    template = loader.get_template('control_inventario.html')
+    ctx = {
+        "datos_generales": stock_total(),
+    }
+    ls = Article.objects.all()
+
+    return HttpResponse(template.render(ctx, request))
