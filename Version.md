@@ -47,6 +47,10 @@
     * Se agregó una nueva imagen de la interfaz.
 4. **Interfaz de Formulario:** Se quitaron los errorlist y se alineó el formulario como tabla (antes estaba como párrafo).
 
+## Cambios en la versión 1.3.2
+
+1. **Bug fixed:** En la sección 'Agregar o modificar' habia un KeyError, debido a que no se adaptó el formulario ni la funcionalidad de la vista a la nueva estructura del modelo Article.
+
 ## Cambios en la versión 1.4
 
 1. **FormCliente:** Se creó el formulario cliente para la futura emisión de recibos y facturas.

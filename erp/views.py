@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
-from erp.functions import stock_total
+from erp.functions import stock_total, porcentaje_ganancia
 from datetime import date
 
 def index(request):
@@ -66,13 +66,19 @@ def agregar_modificar(request):
                     new_article.descripcion = infForm['descripcion']
                 new_article.costo = infForm['costo']
                 new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                new_article.precio = infForm['costo'] + (infForm['costo'] * infForm['porcentaje_ganancia'] /100) # costo+(costo*porcentaje/100)
+                new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
                 if infForm['seccion'] != "":
                     new_article.seccion = infForm['seccion']
                 new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
             except ObjectDoesNotExist as DoesNotExist:
-                new_article = Article.objects.create(codigo=infForm['codigo'], descripcion=infForm['descripcion'], precio=infForm['precio'], costo=infForm['costo'], seccion=infForm['seccion'], stock=0)
+                new_article = Article.objects.create(codigo=infForm['codigo'],
+                                                    descripcion=infForm['descripcion'],
+                                                    precio=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']),
+                                                    porcentaje_ganancia=infForm['porcentaje_ganancia'],
+                                                    costo=infForm['costo'],
+                                                    seccion=infForm['seccion'],
+                                                    stock=0)
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
 
             lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)

@@ -13,3 +13,7 @@ def stock_total():
         diferentes_productos = 0
     resultado = [cantidad_total, diferentes_productos]
     return resultado
+
+def porcentaje_ganancia(costo, porcentaje):
+    precio_final = costo + (costo * porcentaje / 100)
+    return precio_final
