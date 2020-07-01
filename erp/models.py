@@ -67,21 +67,16 @@ class DetalleEntrada(models.Model):
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
+
 '''
-class Cliente():
-    class ConcicionIva(models.TextChoices):
-        C_FINAL
-        R_INSCRIPTO
-        MONOTRIBUTISTA
-        EXENTO
-        NO_ALCANZADO
+class Cliente(models.Model):
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
-    condicion_iva = models.CharField(max_length=50)
+    condicion_iva = models.CharField(max_length=25)
     dni = models.PositiveIntegerField()
-    cuit
-    direccion
-    telefono
-    email
-'''
+    cuit = models.PositiveIntegerField(null=True)
+    direccion = models.CharField(max_length=50, null=True)
+    telefono = models.PositiveIntegerField(null=True)
+    email = models.EmailField(null=True)
 
+'''

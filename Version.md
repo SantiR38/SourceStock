@@ -46,3 +46,8 @@
     * Se cambió la escritura del Readme de HTML a Markdown.
     * Se agregó una nueva imagen de la interfaz.
 4. **Interfaz de Formulario:** Se quitaron los errorlist y se alineó el formulario como tabla (antes estaba como párrafo).
+
+## Cambios en la versión 1.4
+
+1. **FormCliente:** Se creó el formulario cliente para la futura emisión de recibos y facturas.
+2. **Modelo Cliente:** Los datos de cada cliente se guardan en la base de datos.

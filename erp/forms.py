@@ -16,3 +16,20 @@ class FormEntrada(forms.Form):
     costo = forms.DecimalField(max_digits=10, decimal_places=2)
     cantidad = forms.IntegerField()
     fecha = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
+
+class FormCliente(forms.Form):
+    OPTIONS = [("CF", "Consumidor Final"),
+               ("RI", "Responsable Inscripto"),
+               ("MO", "Monotributista"),
+               ("IE", "IVA Excento"),
+               ("NA", "No Alcanzado"),
+               ]
+
+    nombre = forms.CharField(max_length=50, label= "Nombre*")
+    apellido = forms.CharField(max_length=50, label= "Apellido*")
+    condicion_iva = forms.ChoiceField(choices=OPTIONS, label= "Condición IVA*")
+    dni = forms.IntegerField(label= "DNI*")
+    cuit = forms.IntegerField(required=False)
+    direccion = forms.CharField(max_length=50, required=False)
+    telefono = forms.IntegerField(required=False)
+    email = forms.EmailField(required=False)

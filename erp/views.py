@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
-from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada
+from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
 from erp.functions import stock_total
 from datetime import date
@@ -309,5 +309,18 @@ def cancelar(request):
             nueva_venta.delete()
         except ObjectDoesNotExist as DoesNotExist:
             ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
+
+    return HttpResponse(template.render(ctx, request))
+
+
+def cliente(request):
+    template = loader.get_template('entrada.html')
+    miFormulario = FormCliente()
+    lista = []
+    ctx = {
+        "articulo_a_vender": lista,
+        "datos_generales": stock_total(),
+        "form": miFormulario
+    }
 
     return HttpResponse(template.render(ctx, request))
