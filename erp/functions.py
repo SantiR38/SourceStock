@@ -1,10 +1,13 @@
 from erp.models import Article
 
+def inventario():
+    return Article.objects.all()
+
 def stock_total():
     cantidad_total = 0
     diferentes_productos = 0
     try:
-        query_set = Article.objects.all()
+        query_set = inventario()
         for i in query_set:
             cantidad_total += query_set[diferentes_productos].stock
             diferentes_productos += 1

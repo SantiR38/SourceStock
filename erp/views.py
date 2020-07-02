@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
-from erp.functions import stock_total, porcentaje_ganancia
+from erp.functions import stock_total, porcentaje_ganancia, inventario
 from datetime import date
 
 def index(request):
@@ -336,7 +336,7 @@ def control_inventario(request):
     template = loader.get_template('control_inventario.html')
     ctx = {
         "datos_generales": stock_total(),
+        "articulos": inventario()
     }
-    ls = Article.objects.all()
 
     return HttpResponse(template.render(ctx, request))

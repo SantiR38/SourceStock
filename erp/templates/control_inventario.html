@@ -14,13 +14,19 @@
             <!-- Morris chart - Sales -->
             <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
 
-              <ul>
-                {% for i in ##articulos## %}
-
-                <li>Artículo i</li>
+              <table style="width:100%">
+                {% for i in articulos %}
+                
+                  <tr>
+                    <td> {{i.codigo}} </td>
+                    <td> {{i.descripcion}} </td>
+                    <td> {{i.costo}} </td>
+                    <td> {{i.precio}} </td>
+                    <td> {{i.seccion}} </td>
+                  </tr>
 
                 {% endfor %}
-              </ul>
+              </table>
 
             </div>
             <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
