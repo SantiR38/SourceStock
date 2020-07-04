@@ -22,6 +22,7 @@
                   <th>Porc.Ganancia</th>
                   <th>Precio</th>
                   <th>Sección</th>
+                  <th>Stock</th>
                 </tr>
                 {% for i in articulos %}
                 
@@ -33,6 +34,7 @@
                     <td> {{i.porcentaje_ganancia}}% </td>
                     <td> ${{i.precio}} </td>
                     <td> {{i.seccion}} </td>
+                    <td> {{i.stock}} </td>
                   </tr>
 
                 {% endfor %}

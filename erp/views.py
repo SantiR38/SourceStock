@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
@@ -37,7 +37,7 @@ def agregar_articulo(request):
                 lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
             miFormulario = FormNuevoArticulo()
 
-            return HttpResponse(template.render(ctx, request))
+            return redirect('control_inventario')
     else:
         miFormulario = FormNuevoArticulo()
 
@@ -303,7 +303,7 @@ def articulo(request, codigo_articulo):
                 lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
                 miFormulario = FormNuevoArticulo()
 
-                return HttpResponse(template.render(ctx, request))
+                return redirect('control_inventario')
         else:
             miFormulario = FormNuevoArticulo(detalles_formulario)
 
