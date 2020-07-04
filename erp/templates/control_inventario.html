@@ -3,25 +3,35 @@
 
 {% block content %}
 <div class="container-fluid">
-
+  {% include "small_boxes.html" %}
   <!-- Main row -->
   <div class="row">
     <!-- Left col -->
-    <section class="col-lg-7 connectedSortable">
+    <section class="connectedSortable">
       <!-- Custom tabs (Charts with tabs)-->
         <div class="card-body">
           <div class="tab-content p-0">
             <!-- Morris chart - Sales -->
             <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
 
-              <table style="width:100%">
+              <table style="width:100%;" class="borde-externo">
+                <tr class="intercalado">
+                  <th>Código</th>
+                  <th>Descripción</th>
+                  <th>Costo</th>
+                  <th>Porc.Ganancia</th>
+                  <th>Precio</th>
+                  <th>Sección</th>
+                </tr>
                 {% for i in articulos %}
                 
-                  <tr>
+
+                  <tr class="intercalado">
                     <td><a href="articulo/{{i.codigo}}">{{i.codigo}}</a></td>
                     <td> {{i.descripcion}} </td>
-                    <td> {{i.costo}} </td>
-                    <td> {{i.precio}} </td>
+                    <td> ${{i.costo}} </td>
+                    <td> {{i.porcentaje_ganancia}}% </td>
+                    <td> ${{i.precio}} </td>
                     <td> {{i.seccion}} </td>
                   </tr>
 
