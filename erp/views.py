@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
-from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
+from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
 from erp.functions import stock_total, porcentaje_ganancia, inventario
 from datetime import date
@@ -249,10 +249,21 @@ def cliente(request):
 
 def control_inventario(request):
     template = loader.get_template('control_inventario.html')
+    miFormulario = FormBusqueda()
     ctx = {
         "datos_generales": stock_total(),
-        "articulos": inventario()
+        "articulos": inventario(),
+        "form": miFormulario
     }
+
+    if request.method == "POST":
+        miFormulario = FormBusqueda(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data
+            resultado = Article.objects.filter(codigo=int(infForm['buscar'])) # Código
+            ctx["articulos"] = resultado
+    else:
+        miFormulario = FormBusqueda()
 
     return HttpResponse(template.render(ctx, request))
 

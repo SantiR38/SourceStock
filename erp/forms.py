@@ -1,5 +1,8 @@
 from django import forms
 
+class FormBusqueda(forms.Form):
+    buscar = forms.IntegerField()
+
 class FormVenta(forms.Form): # Sirve para la actualización inventario en general
     codigo = forms.IntegerField(label_suffix= "*:")
     cantidad = forms.IntegerField(label_suffix= "*:")
