@@ -53,5 +53,9 @@
 
 ## Cambios en la versión 1.4
 
+1. **Control de inventario:** Esta sección previamente era muy dificil de utilizar, por lo que, de ahora en más se utiliza en la interfaz el mismo estilo que en el panel de administración de Django. La lista completa de articulos de la base de datos. Cuando se hace click sobre uno de ellos, se le pueden editar sus campos comodamente.
+
+## Cambios en la versión 1.5
+
 1. **FormCliente:** Se creó el formulario cliente para la futura emisión de recibos y facturas.
 2. **Modelo Cliente:** Los datos de cada cliente se guardan en la base de datos.
