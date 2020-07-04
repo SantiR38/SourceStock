@@ -62,15 +62,7 @@ def agregar_modificar(request):
             infForm = miFormulario.cleaned_data
             try:
                 new_article = Article.objects.get(codigo=infForm['codigo'])
-                if infForm['descripcion'] != "":
-                    new_article.descripcion = infForm['descripcion']
-                new_article.costo = infForm['costo']
-                new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
-                if infForm['seccion'] != "":
-                    new_article.seccion = infForm['seccion']
-                new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-                ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
+                ctx['mensaje_error'] = "El código ya está siendo utilizado por otro producto."
             except ObjectDoesNotExist as DoesNotExist:
                 new_article = Article.objects.create(codigo=infForm['codigo'],
                                                     descripcion=infForm['descripcion'],
@@ -78,10 +70,10 @@ def agregar_modificar(request):
                                                     porcentaje_ganancia=infForm['porcentaje_ganancia'],
                                                     costo=infForm['costo'],
                                                     seccion=infForm['seccion'],
-                                                    stock=0)
+                                                    stock=infForm['stock'])
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
 
-            lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
+                lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
             miFormulario = FormNuevoArticulo()
 
             return HttpResponse(template.render(ctx, request))
@@ -349,7 +341,8 @@ def articulo(request, codigo_articulo):
         'descripcion': new_article.descripcion,
         'costo': new_article.costo,
         'porcentaje_ganancia': new_article.porcentaje_ganancia,
-        'seccion': new_article.seccion
+        'seccion': new_article.seccion,
+        'stock': new_article.stock
     }
     miFormulario = FormNuevoArticulo(detalles_formulario)
     lista = []
@@ -363,7 +356,8 @@ def articulo(request, codigo_articulo):
         miFormulario = FormNuevoArticulo(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data
-
+            
+            new_article.codigo = infForm['codigo']
             if infForm['descripcion'] != "":
                 new_article.descripcion = infForm['descripcion']
             new_article.costo = infForm['costo']
@@ -371,6 +365,7 @@ def articulo(request, codigo_articulo):
             new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
             if infForm['seccion'] != "":
                 new_article.seccion = infForm['seccion']
+            new_article.stock = infForm['stock']
             new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
             ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
 

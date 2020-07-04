@@ -10,6 +10,7 @@ class FormNuevoArticulo(forms.Form):
     costo = forms.DecimalField(max_digits=10, decimal_places=2)
     porcentaje_ganancia = forms.DecimalField(max_digits=10, decimal_places=2)
     seccion = forms.CharField(required=False)
+    stock = forms.IntegerField()
 
 class FormEntrada(forms.Form):
     codigo = forms.IntegerField()
