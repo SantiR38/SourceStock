@@ -259,45 +259,52 @@ def control_inventario(request):
 
 def articulo(request, codigo_articulo):
     template = loader.get_template('agregar_modificar.html')
-    new_article = Article.objects.get(codigo=codigo_articulo)
-    detalles_formulario = {
-        'codigo': new_article.codigo,
-        'descripcion': new_article.descripcion,
-        'costo': new_article.costo,
-        'porcentaje_ganancia': new_article.porcentaje_ganancia,
-        'seccion': new_article.seccion,
-        'stock': new_article.stock
-    }
-    miFormulario = FormNuevoArticulo(detalles_formulario)
-    lista = []
-    ctx = {
-        "datos_generales": stock_total(),
-        "articulos": inventario(),
-        "form": miFormulario,
-    }
-    
-    if request.method == "POST":
-        miFormulario = FormNuevoArticulo(request.POST)
-        if miFormulario.is_valid():
-            infForm = miFormulario.cleaned_data
-            
-            new_article.codigo = infForm['codigo']
-            if infForm['descripcion'] != "":
-                new_article.descripcion = infForm['descripcion']
-            new_article.costo = infForm['costo']
-            new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-            new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
-            if infForm['seccion'] != "":
-                new_article.seccion = infForm['seccion']
-            new_article.stock = infForm['stock']
-            new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-            ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
-
-            lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
-            miFormulario = FormNuevoArticulo()
-
+    try:
+        new_article = Article.objects.get(codigo=codigo_articulo)
+    except ObjectDoesNotExist as DoesNotExist:
+            template = loader.get_template('mensaje.html')
+            ctx = {'mensaje': 'Error 404. No se encontró el artículo.',
+                'redireccion': 'Volviendo a la página de ventas...'}
             return HttpResponse(template.render(ctx, request))
-    else:
+    else:  
+        detalles_formulario = {
+            'codigo': new_article.codigo,
+            'descripcion': new_article.descripcion,
+            'costo': new_article.costo,
+            'porcentaje_ganancia': new_article.porcentaje_ganancia,
+            'seccion': new_article.seccion,
+            'stock': new_article.stock
+        }
         miFormulario = FormNuevoArticulo(detalles_formulario)
+        lista = []
+        ctx = {
+            "datos_generales": stock_total(),
+            "articulos": inventario(),
+            "form": miFormulario,
+        }
+        
+        if request.method == "POST":
+            miFormulario = FormNuevoArticulo(request.POST)
+            if miFormulario.is_valid():
+                infForm = miFormulario.cleaned_data
+                
+                new_article.codigo = infForm['codigo']
+                if infForm['descripcion'] != "":
+                    new_article.descripcion = infForm['descripcion']
+                new_article.costo = infForm['costo']
+                new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
+                new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
+                if infForm['seccion'] != "":
+                    new_article.seccion = infForm['seccion']
+                new_article.stock = infForm['stock']
+                new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
+                ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
+
+                lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
+                miFormulario = FormNuevoArticulo()
+
+                return HttpResponse(template.render(ctx, request))
+        else:
+            miFormulario = FormNuevoArticulo(detalles_formulario)
 
     return HttpResponse(template.render(ctx, request))
