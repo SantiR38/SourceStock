@@ -46,7 +46,7 @@ def agregar_articulo(request):
 
 def entrada(request):
     template = loader.get_template('entrada.html')
-    miFormulario = FormEntrada({'cantidad': 1, 'fecha':date.today()})
+    miFormulario = FormEntrada({'cantidad': 1})
     lista = []
     ctx = {
         "articulo_a_comprar": lista,
@@ -95,12 +95,12 @@ def entrada(request):
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la compra seguirá guardada.'
 
-            miFormulario = FormEntrada({'cantidad': 1, 'fecha':date.today()})
+            miFormulario = FormEntrada({'cantidad': 1})
             
             return HttpResponse(template.render(ctx, request))
     else:
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a comprar es 1.
-        miFormulario = FormEntrada({'cantidad': 1, 'fecha':date.today()})
+        miFormulario = FormEntrada({'cantidad': 1})
 
     return HttpResponse(template.render(ctx, request))
 

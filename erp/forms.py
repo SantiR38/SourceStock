@@ -1,4 +1,5 @@
 from django import forms
+from datetime import date
 
 class FormBusqueda(forms.Form):
     buscar = forms.IntegerField()
@@ -19,7 +20,9 @@ class FormEntrada(forms.Form):
     codigo = forms.IntegerField(label_suffix= "*:")
     costo = forms.DecimalField(max_digits=10, decimal_places=2, label_suffix= "*:")
     cantidad = forms.IntegerField(label_suffix= "*:")
-    fecha = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), label_suffix= "*:")
+    fecha = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
+                                label_suffix= "*:",
+                                initial=date.today())
 
 class FormCliente(forms.Form):
     OPTIONS = [("CF", "Consumidor Final"),

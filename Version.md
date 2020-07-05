@@ -55,6 +55,8 @@
 
 1. **Control de inventario:** Esta sección previamente era muy dificil de utilizar, por lo que, de ahora en más se utiliza en la interfaz el mismo estilo que en el panel de administración de Django. La lista completa de articulos de la base de datos. Cuando se hace click sobre uno de ellos, se le pueden editar sus campos comodamente.
 2. Asterisco (*) utilizado para señalar campo obligatorio en formularios.
+3. Cambios en templates entrada, agregar_modificar y venta.
+4. Eliminados templates en desuso.
 
 ## Cambios en la versión 1.5
 
