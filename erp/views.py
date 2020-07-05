@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
-from erp.functions import stock_total, porcentaje_ganancia, inventario
+from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa
 from datetime import date
 
 def agregar_articulo(request):
@@ -108,18 +108,19 @@ def entrada(request):
 def venta(request):
     template = loader.get_template('venta.html')
     miFormulario = FormVenta({'cantidad': 1})
+    estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
     lista = []
     ctx = {
-        "articulo_a_vender": lista,
+        "articulo_a_vender": venta_activa()[0],
         "datos_generales": stock_total(),
         "form": miFormulario,
-        "total": 0
+        "total": venta_activa()[1].total
     }
+    
     if request.method == "POST":
         miFormulario = FormVenta(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.

@@ -7,6 +7,7 @@ class FormBusqueda(forms.Form):
 class FormVenta(forms.Form): # Sirve para la actualización inventario en general
     codigo = forms.IntegerField(label_suffix= "*:")
     cantidad = forms.IntegerField(label_suffix= "*:")
+    dni_cliente = forms.IntegerField(required=False, label="DNI Cliente")
 
 class FormNuevoArticulo(forms.Form):
     codigo = forms.IntegerField(label_suffix= "*:")
