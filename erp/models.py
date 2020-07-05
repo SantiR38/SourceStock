@@ -43,6 +43,7 @@ class Venta(models.Model):
     fecha = models.DateField()
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    cliente = models.ForeignKey('Cliente', on_delete=models.SET_NULL, null=True)
 
 
 class DetalleVenta(models.Model):
@@ -68,7 +69,7 @@ class DetalleEntrada(models.Model):
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
 
-'''
+
 class Cliente(models.Model):
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
@@ -79,4 +80,3 @@ class Cliente(models.Model):
     telefono = models.PositiveIntegerField(null=True)
     email = models.EmailField(null=True)
 
-'''

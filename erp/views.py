@@ -319,3 +319,7 @@ def articulo(request, codigo_articulo):
             miFormulario = FormNuevoArticulo(detalles_formulario)
 
     return HttpResponse(template.render(ctx, request))
+
+
+def historial_ventas(request):
+    pass
