@@ -1,4 +1,4 @@
-from erp.models import Article, ArtState, Venta, DetalleVenta
+from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
 
@@ -23,6 +23,7 @@ def porcentaje_ganancia(costo, porcentaje):
     precio_final = costo + (costo * porcentaje / 100)
     return precio_final
 
+#En la vista venta, esta función permite que se muestre la venta que haya en curso apenas se carga la página.
 def venta_activa():
     lista = []
     estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
@@ -39,3 +40,17 @@ def venta_activa():
             nueva_venta.total += (i.precio_unitario * i.cantidad)
         nueva_venta.save()
     return [lista, nueva_venta]
+
+def buscar_cliente(documento):
+    try:
+        cliente = Cliente.objects.get(dni=documento)
+    except ObjectDoesNotExist as DoesNotExist:
+        cliente = None
+    return cliente
+
+def dni_cliente():
+    if venta_activa()[1].cliente != None:
+        a = venta_activa()[1].cliente.dni
+    else:
+        a = None
+    return a

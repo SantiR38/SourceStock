@@ -1,5 +1,5 @@
 from django.contrib import admin
-from erp.models import Article, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
+from erp.models import Article, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
 
 # Register your models here.
 
@@ -18,3 +18,4 @@ admin.site.register(Venta)
 admin.site.register(DetalleVenta)
 admin.site.register(Perdida)
 admin.site.register(DetallePerdida)
+admin.site.register(Cliente)

@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
-from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa
+from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente
 from datetime import date
 
 def agregar_articulo(request):
@@ -107,7 +107,7 @@ def entrada(request):
 
 def venta(request):
     template = loader.get_template('venta.html')
-    miFormulario = FormVenta({'cantidad': 1})
+    miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
     estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
     lista = []
     ctx = {
@@ -121,15 +121,19 @@ def venta(request):
         miFormulario = FormVenta(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
                 try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
                     nueva_venta = Venta.objects.get(id_state=estado)
+                    nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
+                    nueva_venta.save()
                 except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
                     nueva_venta = Venta.objects.create(fecha=date.today(),
                                                          total=0,
-                                                         id_state=estado) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+                                                         id_state=estado,
+                                                         cliente=buscar_cliente(infForm['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
 
                 producto_leido = DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
                                                                precio_unitario=new_article.precio,
@@ -148,12 +152,12 @@ def venta(request):
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la venta seguirá guardada.'
 
-            miFormulario = FormVenta({'cantidad': 1 })
+            miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             
             return HttpResponse(template.render(ctx, request))
     else:
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a vender es 1.
-        miFormulario = FormVenta({'cantidad': 1})
+        miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
 
     return HttpResponse(template.render(ctx, request))
 

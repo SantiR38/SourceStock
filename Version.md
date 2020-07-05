@@ -62,3 +62,5 @@
 
 1. **FormCliente:** Se creó el formulario cliente para la futura emisión de recibos y facturas.
 2. **Modelo Cliente:** Los datos de cada cliente se guardan en la base de datos.
+3. El detalle de venta se muestra apenas se carga la vista venta.
+4. Modelo Cliente implementado en vista venta.
