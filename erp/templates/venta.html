@@ -44,12 +44,14 @@ Venta
         <div class="card-header border-0">
           <h3 class="card-title">
             <i class="fas fa-map-marker-alt mr-1"></i>
-            Esta compra
+            Esta venta
           </h3>
           <!-- /.card-tools -->
         </div>
         <div class="card-body">
           <div style=" width: 100%;">
+            <h5>Cliente: {{cliente}}</h5>
+            <br />
             {% for i in articulo_a_vender %}
               <p>{{ i.id_producto }}  -  Precio: ${{ i.precio_unitario }}  -  Cant: {{ i.cantidad }}</p>
             {% endfor %}

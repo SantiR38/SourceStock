@@ -15,6 +15,7 @@ def agregar_articulo(request):
         "articulo_a_agregar": lista, 
         "datos_generales": stock_total(),
         "form": miFormulario,
+        "titulo": "Agregar artículo"
     }
     # Manejo del formulario de compra
     if request.method == "POST":
@@ -114,7 +115,8 @@ def venta(request):
         "articulo_a_vender": venta_activa()[0],
         "datos_generales": stock_total(),
         "form": miFormulario,
-        "total": venta_activa()[1].total
+        "total": venta_activa()[1].total,
+        "cliente": ""
     }
     
     if request.method == "POST":
@@ -154,6 +156,7 @@ def venta(request):
 
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = miFormulario
+            ctx['cliente'] = nueva_venta.cliente.nombre + " " + nueva_venta.cliente.apellido
             
             return HttpResponse(template.render(ctx, request))
     else:
@@ -248,7 +251,8 @@ def cliente(request):
         "articulo_a_vender": lista,
         "datos_generales": stock_total(),
         "form": miFormulario,
-        "mensaje": ""
+        "mensaje": "",
+        "titulo": "Gestión de clientes"
     }
 
     if request.method == "POST":
@@ -322,6 +326,7 @@ def articulo(request, codigo_articulo):
             "datos_generales": stock_total(),
             "articulos": inventario(),
             "form": miFormulario,
+            "titulo": "Modificar Artículo"
         }
         
         if request.method == "POST":
