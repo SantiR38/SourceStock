@@ -2,7 +2,7 @@ from django import forms
 from datetime import date
 
 class FormBusqueda(forms.Form):
-    buscar = forms.IntegerField()
+    buscar = forms.IntegerField(label= "Código del producto")
 
 class FormVenta(forms.Form): # Sirve para la actualización inventario en general
     codigo = forms.IntegerField(label_suffix= "*:")

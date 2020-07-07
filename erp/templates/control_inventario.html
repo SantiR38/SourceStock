@@ -5,17 +5,17 @@
 <div class="container-fluid">
   {% include "small_boxes.html" %}
 
-  <form action="" method="post"> {% csrf_token %}
-    <span>
+  <div>
+    <form action="" method="post"> {% csrf_token %}
+      <span>
 
-        {{ form.as_table }}
+          {{ form.as_table }}
 
-        <input type="submit" value="Enviar" />
-    </span>
-
-
-</form>
-
+          <input type="submit" value="Buscar" />
+      </span>
+    </form>
+    <a href="/agregar_articulo"><button>+ Agregar Artículo</button></a>
+  </div>
   <!-- Main row -->
   <div class="row">
     <!-- Left col -->
