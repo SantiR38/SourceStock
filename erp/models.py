@@ -75,8 +75,8 @@ class Cliente(models.Model):
     apellido = models.CharField(max_length=50)
     condicion_iva = models.CharField(max_length=25)
     dni = models.PositiveIntegerField()
-    cuit = models.PositiveIntegerField(null=True)
+    cuit = models.CharField(max_length=15, null=True)
     direccion = models.CharField(max_length=50, null=True)
-    telefono = models.PositiveIntegerField(null=True)
+    telefono = models.CharField(max_length=30, null=True)
     email = models.EmailField(null=True)
 

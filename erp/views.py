@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
-from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida
+from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
 from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente
 from datetime import date
 
@@ -153,6 +153,7 @@ def venta(request):
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la venta seguirá guardada.'
 
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
+            ctx['form'] = miFormulario
             
             return HttpResponse(template.render(ctx, request))
     else:
@@ -240,14 +241,38 @@ def cancelar(request):
 
 
 def cliente(request):
-    template = loader.get_template('entrada.html')
+    template = loader.get_template('agregar_modificar.html')
     miFormulario = FormCliente()
     lista = []
     ctx = {
         "articulo_a_vender": lista,
         "datos_generales": stock_total(),
-        "form": miFormulario
+        "form": miFormulario,
+        "mensaje": ""
     }
+
+    if request.method == "POST":
+        miFormulario = FormCliente(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            
+            try: # Si el cliente existe en la base de datos
+                new_client = Cliente.objects.get(dni=infForm['dni'])
+                ctx['mensaje'] = "El cliente ya existe"
+                
+            except ObjectDoesNotExist as DoesNotExist: # Si el cliente no existe en la base de datos, crearlo
+                new_client = Cliente.objects.create(nombre=infForm['nombre'],
+                                                    apellido=infForm['apellido'],
+                                                    condicion_iva=infForm['condicion_iva'],
+                                                    dni=infForm['dni'],
+                                                    cuit=infForm['cuit'],
+                                                    direccion=infForm['direccion'],
+                                                    telefono=infForm['telefono'],
+                                                    email=infForm['email'])
+
+                ctx['mensaje'] = 'El cliente fue agregado correctamente.'
+
+            miFormulario = FormCliente()
 
     return HttpResponse(template.render(ctx, request))
 
