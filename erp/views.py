@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
-from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente
+from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva
 from datetime import date
 
 def agregar_articulo(request):
@@ -358,3 +358,12 @@ def articulo(request, codigo_articulo):
 
 def historial_ventas(request):
     pass
+
+def script_actualizacion(request):
+    template = loader.get_template('mje_sin_redireccion.html')
+    ctx = {'titulo': 'Se agregaron los nuevos valores',
+           'mensaje': 'Checkear en DB...'}
+    campos_sin_iva()
+
+
+    return HttpResponse(template.render(ctx, request))

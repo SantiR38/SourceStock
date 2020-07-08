@@ -1,6 +1,7 @@
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import date
+from decimal import *
 
 def inventario():
     return Article.objects.all()
@@ -54,3 +55,14 @@ def dni_cliente():
     else:
         a = None
     return a
+
+# Cuando la tabla solo tiene los costos y precios con iva incluidos, esta formula itera sobre cada producto
+# agregando el costo y el precio sin iva.
+def campos_sin_iva():
+    a = Article.objects.all()
+    x = round((Decimal(1.21)), 2)
+    for i in a:
+        i.costo_sin_iva = i.costo / x
+        i.precio_sin_iva = i.precio / x
+        i.save()
+        

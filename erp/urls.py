@@ -10,5 +10,6 @@ urlpatterns = [
     path('cancelar', views.cancelar, name='cancelar'),
     path('cliente', views.cliente, name='cliente'),
     path('control_inventario', views.control_inventario, name='control_inventario'),
-    path('articulo/<int:codigo_articulo>', views.articulo, name='articulo')
+    path('articulo/<int:codigo_articulo>', views.articulo, name='articulo'),
+    path('script_actualizacion', views.script_actualizacion, name='script_actualizacion')
 ]
