@@ -19,7 +19,16 @@ class FormNuevoArticulo(forms.Form):
 
 class FormEntrada(forms.Form):
     codigo = forms.IntegerField(label_suffix= "*:")
-    costo = forms.DecimalField(max_digits=10, decimal_places=2, label_suffix= "*:")
+    costo_sin_iva = forms.DecimalField(max_digits=10,
+                                       decimal_places=2,
+                                       label="Costo sin IVA",
+                                       label_suffix= "**:",
+                                       required=False)
+    costo = forms.DecimalField(max_digits=10,
+                               decimal_places=2,
+                               label="Costo con IVA",
+                               label_suffix= "**:",
+                               required=False)
     cantidad = forms.IntegerField(label_suffix= "*:")
     fecha = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
                                 label_suffix= "*:",

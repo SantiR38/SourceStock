@@ -359,6 +359,7 @@ def articulo(request, codigo_articulo):
 def historial_ventas(request):
     pass
 
+
 def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')
     ctx = {'titulo': 'Se agregaron los nuevos valores',
