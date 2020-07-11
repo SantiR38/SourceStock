@@ -57,7 +57,7 @@ def dni_cliente():
     return a
 
 # Cuando la tabla solo tiene los costos y precios con iva incluidos, esta formula itera sobre cada producto
-# agregando el costo y el precio sin iva.
+# agregando el costo y el precio sin iva (se hace solo una vez a la hora de actualizar la app.)
 def campos_sin_iva():
     a = Article.objects.all()
     x = round((Decimal(1.21)), 2)

@@ -30,8 +30,10 @@
                 <tr class="intercalado">
                   <th>Código</th>
                   <th>Descripción</th>
+                  <th>Costo sin IVA</th>
                   <th>Costo</th>
                   <th>Porc.Ganancia</th>
+                  <th>Precio sin IVA</th>
                   <th>Precio</th>
                   <th>Sección</th>
                   <th>Stock</th>
@@ -42,8 +44,10 @@
                   <tr class="intercalado">
                     <td><a href="articulo/{{i.codigo}}">{{i.codigo}}</a></td>
                     <td> {{i.descripcion}} </td>
+                    <td> ${{i.costo_sin_iva}} </td>
                     <td> ${{i.costo}} </td>
                     <td> {{i.porcentaje_ganancia}}% </td>
+                    <td> ${{i.precio_sin_iva}} </td>
                     <td> ${{i.precio}} </td>
                     <td> {{i.seccion}} </td>
                     <td> {{i.stock}} </td>
