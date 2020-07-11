@@ -6,6 +6,7 @@ from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, Fo
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
 from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva
 from datetime import date
+from decimal import *
 
 def agregar_articulo(request):
     template = loader.get_template('agregar_modificar.html')
@@ -74,25 +75,33 @@ def entrada(request):
                                                          total=0,
                                                          id_state=estado) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
 
-                
-                producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], # Iniciar un objeto de tipo detalle_entrada
-                                                               cantidad=infForm['cantidad'],
-                                                               id_entrada=Entrada.objects.get(id_state=estado),
-                                                               id_producto=Article.objects.get(codigo=infForm['codigo']))
-            # Se suman los precios unitarios al precio total de la compra
-                lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
-                nueva_venta.total = 0
-                for i in lista:
-                    nueva_venta.total += (i.costo_unitario * i.cantidad)
-                nueva_venta.save()
-                ctx['total'] = nueva_venta.total
+                if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
+                    ctx['inexistente'] = "Debes rellenar solo uno de los dos costos. El que quede en blanco, se calculará a partir del rellenado."
+                elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
+                    if infForm['costo_sin_iva'] != None:
+                        producto_leido = DetalleEntrada.objects.create(costo_sin_iva=infForm['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
+                                                                costo_unitario = porcentaje_ganancia(infForm['costo_sin_iva'], 21),
+                                                                cantidad=infForm['cantidad'],
+                                                                id_entrada=Entrada.objects.get(id_state=estado),
+                                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
+                    else:
+                        producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], # Iniciar un objeto de tipo detalle_entrada
+                                                                    costo_sin_iva=infForm['costo'] / Decimal(1.21),
+                                                                    cantidad=infForm['cantidad'],
+                                                                    id_entrada=Entrada.objects.get(id_state=estado),
+                                                                    id_producto=Article.objects.get(codigo=infForm['codigo']))
+                                    # Se suman los precios unitarios al precio total de la compra
+                    lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
+                    nueva_venta.total = 0
+                    for i in lista:
+                        nueva_venta.total += (i.costo_unitario * i.cantidad)
+                    nueva_venta.save()
+                    ctx['total'] = nueva_venta.total
+                    ctx['inexistente'] = ''
+                    ctx['articulo_a_comprar'] = lista
+                else:
+                    ctx['inexistente'] = "Debes rellenar uno de los dos costos."
 
-
-                '''
-                ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
-                '''
-                ctx['inexistente'] = ''
-                ctx['articulo_a_comprar'] = lista
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la compra seguirá guardada.'
 
@@ -181,8 +190,10 @@ def transaccion_exitosa(request):
             for j in producto_leido: # Esto es simplemente para que cancele la compra completa y no se actualicen el stock y precio solo de algunos productos
                 test_porcentaje = j.id_producto.porcentaje_ganancia * 1 # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
             for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
+                i.id_producto.costo_sin_iva = i.costo_sin_iva
                 i.id_producto.costo = i.costo_unitario
-                i.id_producto.precio = i.costo_unitario + (i.costo_unitario * i.id_producto.porcentaje_ganancia / 100)
+                i.id_producto.precio_sin_iva = porcentaje_ganancia(i.costo_sin_iva, i.id_producto.porcentaje_ganancia)
+                i.id_producto.precio = porcentaje_ganancia(i.costo_unitario, i.id_producto.porcentaje_ganancia)
                 i.id_producto.stock += i.cantidad
                 i.id_producto.save()
             
