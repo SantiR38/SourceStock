@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
-from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva
+from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva, precio_final
 from datetime import date
 from decimal import *
 
@@ -25,21 +25,57 @@ def agregar_articulo(request):
             infForm = miFormulario.cleaned_data
             try:
                 new_article = Article.objects.get(codigo=infForm['codigo'])
-                ctx['mensaje_error'] = "El código ya está siendo utilizado por otro producto."
+                ctx['mensaje'] = "El código ya está siendo utilizado por otro producto."
             except ObjectDoesNotExist as DoesNotExist:
-                new_article = Article.objects.create(codigo=infForm['codigo'],
-                                                    descripcion=infForm['descripcion'],
-                                                    precio=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']),
-                                                    porcentaje_ganancia=infForm['porcentaje_ganancia'],
-                                                    costo=infForm['costo'],
-                                                    seccion=infForm['seccion'],
-                                                    stock=infForm['stock'])
+
+                if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
+                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
+                        new_article = Article.objects.create(codigo=infForm['codigo'],
+                                    descripcion=infForm['descripcion'],
+                                    costo_sin_iva=infForm['costo_sin_iva'],
+                                    costo=infForm['costo'],
+                                    porcentaje_ganancia=infForm['porcentaje_ganancia'],
+                                    precio_sin_iva=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
+                                    precio=precio_final(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
+                                    seccion=infForm['seccion'],
+                                    stock=infForm['stock'])
+                    else:
+                        ctx['mensaje'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
+
+                elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
+                    if infForm['costo_sin_iva'] != None:
+                        new_article = Article.objects.create(codigo=infForm['codigo'],
+                                                            descripcion=infForm['descripcion'],
+                                                            costo_sin_iva=infForm['costo_sin_iva'],
+                                                            costo=porcentaje_ganancia(infForm['costo_sin_iva'], 21),
+                                                            precio_sin_iva=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
+                                                            precio=precio_final(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
+                                                            porcentaje_ganancia=infForm['porcentaje_ganancia'],
+                                                            seccion=infForm['seccion'],
+                                                            stock=infForm['stock'])
+                    else:
+                        new_article = Article.objects.create(codigo=infForm['codigo'],
+                                                            descripcion=infForm['descripcion'],
+                                                            costo_sin_iva=infForm['costo'] / Decimal(1.21),
+                                                            costo=infForm['costo'],
+                                                            precio_sin_iva=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) / Decimal(1.21),
+                                                            precio=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']),
+                                                            porcentaje_ganancia=infForm['porcentaje_ganancia'],
+                                                            seccion=infForm['seccion'],
+                                                            stock=infForm['stock'])
+
+                else:
+                    ctx['mensaje'] = "Debes rellenar uno de los dos costos."
+
+
+
+
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
 
                 lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
-            miFormulario = FormNuevoArticulo()
+                miFormulario = FormNuevoArticulo()
 
-            return redirect('control_inventario')
+                return redirect('control_inventario')
     else:
         miFormulario = FormNuevoArticulo()
 

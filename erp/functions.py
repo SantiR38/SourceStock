@@ -65,4 +65,8 @@ def campos_sin_iva():
         i.costo_sin_iva = i.costo / x
         i.precio_sin_iva = i.precio / x
         i.save()
-        
+
+def precio_final(costo_s_iva, porc_ganancia):
+    costo_final = porcentaje_ganancia(costo_s_iva, 21)
+    precio_final = porc_ganancia(costo_final, porc_ganancia)
+    return precio_final
