@@ -13,7 +13,6 @@ def agregar_articulo(request):
     miFormulario = FormNuevoArticulo()
     lista = []
     ctx = {
-        "articulo_a_agregar": lista, 
         "datos_generales": stock_total(),
         "form": miFormulario,
         "titulo": "Agregar artículo"
@@ -36,9 +35,10 @@ def agregar_articulo(request):
                                     costo=infForm['costo'],
                                     porcentaje_ganancia=infForm['porcentaje_ganancia'],
                                     precio_sin_iva=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
-                                    precio=precio_final(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
+                                    precio=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']),
                                     seccion=infForm['seccion'],
                                     stock=infForm['stock'])
+                        return redirect('control_inventario')
                     else:
                         ctx['mensaje'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
 
@@ -49,10 +49,11 @@ def agregar_articulo(request):
                                                             costo_sin_iva=infForm['costo_sin_iva'],
                                                             costo=porcentaje_ganancia(infForm['costo_sin_iva'], 21),
                                                             precio_sin_iva=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
-                                                            precio=precio_final(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
+                                                            precio=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']) * Decimal(1.21),
                                                             porcentaje_ganancia=infForm['porcentaje_ganancia'],
                                                             seccion=infForm['seccion'],
                                                             stock=infForm['stock'])
+                        return redirect('control_inventario')
                     else:
                         new_article = Article.objects.create(codigo=infForm['codigo'],
                                                             descripcion=infForm['descripcion'],
@@ -63,19 +64,13 @@ def agregar_articulo(request):
                                                             porcentaje_ganancia=infForm['porcentaje_ganancia'],
                                                             seccion=infForm['seccion'],
                                                             stock=infForm['stock'])
-
+                        return redirect('control_inventario')
                 else:
-                    ctx['mensaje'] = "Debes rellenar uno de los dos costos."
-
-
-
+                    ctx['mensaje'] = "PROBLEMA: Debes rellenar uno de los dos costos."
 
                 ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
 
-                lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
                 miFormulario = FormNuevoArticulo()
-
-                return redirect('control_inventario')
     else:
         miFormulario = FormNuevoArticulo()
 
@@ -99,20 +94,33 @@ def entrada(request):
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
             estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+            
+            try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_entrada a su id
+                    nueva_venta = Entrada.objects.get(id_state=estado)
+            except ObjectDoesNotExist as DoesNotExist:
+                nueva_venta = Entrada.objects.create(fecha=infForm['fecha'],
+                                                        total=0,
+                                                        id_state=estado) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
+
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
                 if new_article.porcentaje_ganancia == None:
                     ctx["porcentaje_inexistente"] = "Este producto no tiene porcentaje de ganancia. Agrégalo en la sección 'Agregar o modificar' antes de continuar."
-                try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_entrada a su id
-                    nueva_venta = Entrada.objects.get(id_state=estado)
-                except ObjectDoesNotExist as DoesNotExist:
-                    nueva_venta = Entrada.objects.create(fecha=infForm['fecha'],
-                                                         total=0,
-                                                         id_state=estado) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
-
+                
                 if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
-                    ctx['inexistente'] = "Debes rellenar solo uno de los dos costos. El que quede en blanco, se calculará a partir del rellenado."
+
+                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
+                        producto_leido = DetalleEntrada.objects.create(costo_sin_iva=infForm['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
+                                                                    costo_unitario = infForm['costo'],
+                                                                    cantidad=infForm['cantidad'],
+                                                                    id_entrada=Entrada.objects.get(id_state=estado),
+                                                                    id_producto=Article.objects.get(codigo=infForm['codigo']))
+                        ctx['inexistente'] = ''
+                    else:
+                        ctx['inexistente'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
+
+
                 elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
                     if infForm['costo_sin_iva'] != None:
                         producto_leido = DetalleEntrada.objects.create(costo_sin_iva=infForm['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
@@ -127,19 +135,20 @@ def entrada(request):
                                                                     id_entrada=Entrada.objects.get(id_state=estado),
                                                                     id_producto=Article.objects.get(codigo=infForm['codigo']))
                                     # Se suman los precios unitarios al precio total de la compra
-                    lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
-                    nueva_venta.total = 0
-                    for i in lista:
-                        nueva_venta.total += (i.costo_unitario * i.cantidad)
-                    nueva_venta.save()
-                    ctx['total'] = nueva_venta.total
                     ctx['inexistente'] = ''
-                    ctx['articulo_a_comprar'] = lista
                 else:
                     ctx['inexistente'] = "Debes rellenar uno de los dos costos."
 
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la compra seguirá guardada.'
+            
+            lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
+            nueva_venta.total = 0
+            for i in lista:
+                nueva_venta.total += (i.costo_unitario * i.cantidad)
+            nueva_venta.save()
+            ctx['total'] = nueva_venta.total
+            ctx['articulo_a_comprar'] = lista
 
             miFormulario = FormEntrada({'cantidad': 1})
             
@@ -354,7 +363,7 @@ def articulo(request, codigo_articulo):
     try:
         new_article = Article.objects.get(codigo=codigo_articulo)
     except ObjectDoesNotExist as DoesNotExist:
-            template = loader.get_template('mensaje.html')
+            template = loader.get_template('mensaje.html') # La redirección se hace con JavaScript en este template luego de 5 segundos.
             ctx = {'mensaje': 'Error 404. No se encontró el artículo.',
                 'redireccion': 'Volviendo a la página de ventas...'}
             return HttpResponse(template.render(ctx, request))
@@ -368,7 +377,6 @@ def articulo(request, codigo_articulo):
             'stock': new_article.stock
         }
         miFormulario = FormNuevoArticulo(detalles_formulario)
-        lista = []
         ctx = {
             "datos_generales": stock_total(),
             "articulos": inventario(),
@@ -381,22 +389,66 @@ def articulo(request, codigo_articulo):
             if miFormulario.is_valid():
                 infForm = miFormulario.cleaned_data
                 
-                new_article.codigo = infForm['codigo']
-                if infForm['descripcion'] != "":
-                    new_article.descripcion = infForm['descripcion']
-                new_article.costo = infForm['costo']
-                new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
-                if infForm['seccion'] != "":
-                    new_article.seccion = infForm['seccion']
-                new_article.stock = infForm['stock']
-                new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-                ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
+                if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
+                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
+                        
+                        new_article.codigo = infForm['codigo']
+                        if infForm['descripcion'] != "":
+                            new_article.descripcion = infForm['descripcion']
+                        new_article.costo_sin_iva = infForm['costo_sin_iva']
+                        new_article.costo = infForm['costo']
+                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
+                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia'])
+                        new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
+                        if infForm['seccion'] != "":
+                            new_article.seccion = infForm['seccion']
+                        new_article.stock = infForm['stock']
+                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
+                        
+                        return redirect('control_inventario')
+                    else:
+                        ctx['mensaje'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
+                        miFormulario = FormNuevoArticulo(detalles_formulario)
 
-                lista.append(new_article) # Colocamos el QuerySet anterior en una lista que esta en el contexto (ctx)
-                miFormulario = FormNuevoArticulo()
+                elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
+                    if infForm['costo_sin_iva'] != None:
 
-                return redirect('control_inventario')
+                        new_article.codigo = infForm['codigo']
+                        if infForm['descripcion'] != "":
+                            new_article.descripcion = infForm['descripcion']
+                        new_article.costo_sin_iva = infForm['costo_sin_iva']
+                        new_article.costo = porcentaje_ganancia(infForm['costo_sin_iva'], 21)
+                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
+                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia'])
+                        new_article.precio = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']) * Decimal(1.21)
+                        if infForm['seccion'] != "":
+                            new_article.seccion = infForm['seccion']
+                        new_article.stock = infForm['stock']
+                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
+
+                        return redirect('control_inventario')
+                        
+                    else: # Si el costo esta rellenado
+                        
+                        new_article.codigo = infForm['codigo']
+                        if infForm['descripcion'] != "":
+                            new_article.descripcion = infForm['descripcion']
+                        new_article.costo_sin_iva = infForm['costo'] / Decimal(1.21)
+                        new_article.costo = infForm['costo']
+                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
+                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) / Decimal(1.21)
+                        new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia'])
+                        if infForm['seccion'] != "":
+                            new_article.seccion = infForm['seccion']
+                        new_article.stock = infForm['stock']
+                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
+
+                        return redirect('control_inventario')
+
+                else:
+                    ctx['mensaje'] = "PROBLEMA: Debes rellenar uno de los dos costos."
+                    miFormulario = FormNuevoArticulo(detalles_formulario)
+
         else:
             miFormulario = FormNuevoArticulo(detalles_formulario)
 
