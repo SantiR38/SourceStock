@@ -210,7 +210,8 @@ def venta(request):
 
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = miFormulario
-            ctx['cliente'] = nueva_venta.cliente.nombre + " " + nueva_venta.cliente.apellido
+            if nueva_venta.cliente != None:
+                ctx['cliente'] = nueva_venta.cliente.nombre + " " + nueva_venta.cliente.apellido
             
             return HttpResponse(template.render(ctx, request))
     else:

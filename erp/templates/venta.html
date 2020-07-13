@@ -53,7 +53,7 @@ Venta
             <h5>Cliente: {{cliente}}</h5>
             <br />
             {% for i in articulo_a_vender %}
-              <p>{{ i.id_producto }}  -  Precio: ${{ i.precio_unitario }}  -  Cant: {{ i.cantidad }}</p>
+              <p>{{ i.id_producto }}  -  Precio: ${{ i.precio_unitario }}  -  Cant: {{ i.cantidad }} <button>X</button></p>
             {% endfor %}
             <p style= "color:#A91400"><strong>{{ inexistente }}</strong></p>
             <p><strong>Total: ${{ total }}</strong></p>
