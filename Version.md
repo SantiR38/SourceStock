@@ -65,3 +65,4 @@
 3. El detalle de venta se muestra apenas se carga la vista venta.
 4. Modelo Cliente implementado en vista venta.
 5. Costo y precio sin iva agregados.
+6. Opción de eliminar elemento a vender (vista 'cancelar_unidad').

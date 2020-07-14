@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <desc>Created with Lunacy</desc>
+  <defs>
+    <path d="M0 0L24 0L24 24L0 24L0 0Z" id="path_1" />
+    <clipPath id="mask_1">
+      <use xlink:href="#path_1" />
+    </clipPath>
+  </defs>
+  <g id="Cancel-icon">
+    <path d="M0 0L24 0L24 24L0 24L0 0Z" id="Background" fill="none" stroke="none" />
+    <g clip-path="url(#mask_1)">
+      <path d="M20 10C20 15.5225 15.5225 20 10 20C4.4775 20 0 15.5225 0 10C0 4.4775 4.4775 0 10 0C15.5225 0 20 4.4775 20 10L20 10Z" transform="translate(2 2)" id="Shape" fill="#F44336" stroke="none" />
+      <path d="M7.07 0L8.484 1.414L1.414 8.484L0 7.07L7.07 0L7.07 0Z" transform="translate(7.757996 7.757996)" id="Shape" fill="#FFFFFF" stroke="none" />
+      <path d="M8.484 7.07L7.07 8.484L0 1.414L1.414 0L8.484 7.07L8.484 7.07Z" transform="translate(7.757996 7.757996)" id="Shape" fill="#FFFFFF" stroke="none" />
+    </g>
+  </g>
+</svg>

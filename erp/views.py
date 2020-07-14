@@ -221,6 +221,16 @@ def venta(request):
     return HttpResponse(template.render(ctx, request))
 
 
+def cancelar_unidad(request, codigo_articulo):
+    try:
+        articulo_staging = DetalleVenta.objects.get(id=codigo_articulo)
+    except ObjectDoesNotExist as DoesNotExist:
+        pass
+    else:
+        articulo_staging.delete()
+    return redirect('venta')
+
+
 def transaccion_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',
