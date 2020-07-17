@@ -12,5 +12,6 @@ urlpatterns = [
     path('control_inventario', views.control_inventario, name='control_inventario'),
     path('articulo/<int:codigo_articulo>', views.articulo, name='articulo'),
     path('cancelar_unidad/<int:codigo_articulo>', views.cancelar_unidad, name='cancelar_unidad'),
-    path('script_actualizacion', views.script_actualizacion, name='script_actualizacion')
+    path('script_actualizacion', views.script_actualizacion, name='script_actualizacion'),
+    path('recibo', views.recibo, name='recibo')
 ]

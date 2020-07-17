@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
+from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
 from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva, precio_final
+from reportlab.pdfgen import canvas
 from datetime import date
 from decimal import *
+import io
 
 def agregar_articulo(request):
     template = loader.get_template('agregar_modificar.html')
@@ -469,6 +471,79 @@ def articulo(request, codigo_articulo):
 def historial_ventas(request):
     pass
 
+
+def recibo(request):
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer)
+
+    # Draw things on the PDF. Here's where the PDF generation happens.
+    # See the ReportLab documentation for the full list of functionality.
+    p.setFont("Helvetica", 26)
+    p.drawString(390, 780, "Recibo") #(Ancho, Alto, "Texto")
+    p.setFont("Helvetica", 11)
+    p.drawString(350, 760, "Documento no válido como factura")
+
+    # Header
+    p.line(30, 820, 565, 820)
+    p.line(30, 690, 565, 690)
+    p.line(30, 820, 30, 690)
+    p.line(565, 820, 565, 690)
+    p.line(30, 705, 565, 705)
+    p.line(297.5, 785, 297.5, 705)
+    p.line(318, 785, 318, 820)
+    p.line(277, 785, 277, 820)
+    p.line(277, 785, 318, 785)
+
+    p.setFont("Helvetica", 30)
+    p.drawString(288, 790, "X")
+
+
+
+
+    #Titulos de tabla
+    alto = 600
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(50, alto, "Cantidad")
+    p.drawString(150, alto, "Detalles")
+    p.drawString(390, alto, "P. Unitario")
+    p.drawString(490, alto, "P. Total")
+    p.line(50, 590, 535, 590)
+
+    # Articulos a vender (va a ser con bucle for)
+    alto = 550
+    p.setFont("Helvetica", 11)
+
+    p.drawString(50, alto, "2")
+    p.drawString(150, alto, "Batería Moura 70")
+    p.drawString(390, alto, "5000")
+    p.drawString(490, alto, "10000")
+
+    alto -= 30
+
+    p.drawString(50, alto, "1")
+    p.drawString(150, alto, "Aromatizante para auto")
+    p.drawString(390, alto, "300")
+    p.drawString(490, alto, "300")
+
+    # Filas total
+
+    alto -= 50
+    p.setFont("Helvetica-Bold", 11)
+    p.drawString(390, alto, "Total")
+    p.drawString(490, alto, "10300")
+
+
+    # Close the PDF object cleanly, and we're done.
+    p.showPage()
+    p.save()
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
 def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')

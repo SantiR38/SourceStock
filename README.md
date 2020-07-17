@@ -37,4 +37,4 @@ La aplicación tiene el siguiente aspecto:
 
 <img src="https://raw.githubusercontent.com/SantiR38/SourceStock/development/erp/static/dist/img/interfaz.png" />
 
-El frontend está realizado con la platilla de código abierto <a href="https://adminlte.io/">AdminLTE.io</a>
+El frontend está realizado con la plantilla de código abierto <a href="https://adminlte.io/">AdminLTE.io</a>
