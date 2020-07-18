@@ -482,19 +482,40 @@ def recibo(request):
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
     p.setFont("Helvetica", 26)
-    p.drawString(390, 780, "Recibo") #(Ancho, Alto, "Texto")
-    p.setFont("Helvetica", 11)
-    p.drawString(350, 760, "Documento no válido como factura")
+    p.drawString(327, 790, "Recibo") #(Ancho, Alto, "Texto")
+    p.setFont("Helvetica", 10)
+    p.drawString(328, 770, "Documento no válido como factura")
+    p.drawString(328, 740, "Fecha de emisión:")
+    p.drawString(328, 710, "Responsable Inscripto")
+    p.drawString(462, 710, "CUIT: 20-32987598-4")
+
+    p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
+    p.drawString(297.5, 693, "Tel: 358 517-0913")
+    p.drawString(420, 693, "Inicio Actividad: 01/01/2020")
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(80, 710, "LA CASA DE LAS BATERÍAS")
+
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(38, 673, "Cliente: ")
+    p.drawString(38, 653, "Dirección: ")
+    p.drawString(297.5, 673, "Cond. IVA: ")
+    p.drawString(297.5, 653, "CUIT: ")
+
+    p.setFont("Helvetica", 10)
+    p.drawString(95, 673, "Juan Perez")
+    p.drawString(95, 653, "Belgrano 1110")
+    p.drawString(355, 673, "Consumidor Final")
+    p.drawString(355, 653, "20-35867843-8")
 
     # Header
-    p.line(30, 820, 565, 820)
-    p.line(30, 690, 565, 690)
-    p.line(30, 820, 30, 690)
-    p.line(565, 820, 565, 690)
-    p.line(30, 705, 565, 705)
-    p.line(297.5, 785, 297.5, 705)
-    p.line(318, 785, 318, 820)
-    p.line(277, 785, 277, 820)
+    p.line(30, 820, 565, 820) #Horizontal Grande
+    p.line(30, 690, 565, 690) #Horizontal Grande
+    p.line(30, 820, 30, 690) #Vertical Izq
+    p.line(565, 820, 565, 690) #Vertical Der
+    p.line(30, 705, 565, 705) #Horizontal Grande
+    p.line(297.5, 785, 297.5, 705) #Vertical medio
+    p.line(318, 785, 318, 820) #Vertical
+    p.line(277, 785, 277, 820) #Vertical
     p.line(277, 785, 318, 785)
 
     p.setFont("Helvetica", 30)
