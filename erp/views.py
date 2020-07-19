@@ -4,11 +4,10 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
-from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva, precio_final
-from reportlab.pdfgen import canvas
+from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva, precio_final, emitir_recibo
 from datetime import date
 from decimal import *
-import io
+
 
 def agregar_articulo(request):
     template = loader.get_template('agregar_modificar.html')
@@ -287,6 +286,8 @@ def venta_exitosa(request):
         
         nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
         nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+        ctx['id_venta'] = nueva_venta.id
+
     except ObjectDoesNotExist as DoesNotExist:
         ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
     
@@ -472,99 +473,10 @@ def historial_ventas(request):
     pass
 
 
-def recibo(request):
-    # Create a file-like buffer to receive PDF data.
-    buffer = io.BytesIO()
+def recibo(request, id_venta):
+    
+    return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='hello.pdf')
 
-    # Create the PDF object, using the buffer as its "file."
-    p = canvas.Canvas(buffer)
-
-    # Draw things on the PDF. Here's where the PDF generation happens.
-    # See the ReportLab documentation for the full list of functionality.
-    p.setFont("Helvetica", 26)
-    p.drawString(327, 790, "Recibo") #(Ancho, Alto, "Texto")
-    p.setFont("Helvetica", 10)
-    p.drawString(328, 770, "Documento no válido como factura")
-    p.drawString(328, 740, "Fecha de emisión:")
-    p.drawString(328, 710, "Responsable Inscripto")
-    p.drawString(462, 710, "CUIT: 20-32987598-4")
-
-    p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
-    p.drawString(297.5, 693, "Tel: 358 517-0913")
-    p.drawString(420, 693, "Inicio Actividad: 01/01/2020")
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(80, 710, "LA CASA DE LAS BATERÍAS")
-
-    p.setFont("Helvetica-Bold", 10)
-    p.drawString(38, 673, "Cliente: ")
-    p.drawString(38, 653, "Dirección: ")
-    p.drawString(297.5, 673, "Cond. IVA: ")
-    p.drawString(297.5, 653, "CUIT: ")
-
-    p.setFont("Helvetica", 10)
-    p.drawString(95, 673, "Juan Perez")
-    p.drawString(95, 653, "Belgrano 1110")
-    p.drawString(355, 673, "Consumidor Final")
-    p.drawString(355, 653, "20-35867843-8")
-
-    # Header
-    p.line(30, 820, 565, 820) #Horizontal Grande
-    p.line(30, 690, 565, 690) #Horizontal Grande
-    p.line(30, 820, 30, 690) #Vertical Izq
-    p.line(565, 820, 565, 690) #Vertical Der
-    p.line(30, 705, 565, 705) #Horizontal Grande
-    p.line(297.5, 785, 297.5, 705) #Vertical medio
-    p.line(318, 785, 318, 820) #Vertical
-    p.line(277, 785, 277, 820) #Vertical
-    p.line(277, 785, 318, 785)
-
-    p.setFont("Helvetica", 30)
-    p.drawString(288, 790, "X")
-
-
-
-
-    #Titulos de tabla
-    alto = 600
-    p.setFont("Helvetica-Bold", 12)
-    p.drawString(50, alto, "Cantidad")
-    p.drawString(150, alto, "Detalles")
-    p.drawString(390, alto, "P. Unitario")
-    p.drawString(490, alto, "P. Total")
-    p.line(50, 590, 535, 590)
-
-    # Articulos a vender (va a ser con bucle for)
-    alto = 550
-    p.setFont("Helvetica", 11)
-
-    p.drawString(50, alto, "2")
-    p.drawString(150, alto, "Batería Moura 70")
-    p.drawString(390, alto, "5000")
-    p.drawString(490, alto, "10000")
-
-    alto -= 30
-
-    p.drawString(50, alto, "1")
-    p.drawString(150, alto, "Aromatizante para auto")
-    p.drawString(390, alto, "300")
-    p.drawString(490, alto, "300")
-
-    # Filas total
-
-    alto -= 50
-    p.setFont("Helvetica-Bold", 11)
-    p.drawString(390, alto, "Total")
-    p.drawString(490, alto, "10300")
-
-
-    # Close the PDF object cleanly, and we're done.
-    p.showPage()
-    p.save()
-
-    # FileResponse sets the Content-Disposition header so that browsers
-    # present the option to save the file.
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename='hello.pdf')
 
 def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')

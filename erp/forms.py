@@ -44,11 +44,11 @@ class FormEntrada(forms.Form):
                                 initial=date.today())
 
 class FormCliente(forms.Form):
-    OPTIONS = [("CF", "Consumidor Final"),
-               ("RI", "Responsable Inscripto"),
-               ("MO", "Monotributista"),
-               ("IE", "IVA Excento"),
-               ("NA", "No Alcanzado"),
+    OPTIONS = [("Consumidor Final", "Consumidor Final"),
+               ("Responsable Inscripto", "Responsable Inscripto"),
+               ("Monotributista", "Monotributista"),
+               ("IVA Excento", "IVA Excento"),
+               ("No Alcanzado", "No Alcanzado"),
                ]
 
     nombre = forms.CharField(max_length=50, label_suffix= "*:")
