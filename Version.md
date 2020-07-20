@@ -66,3 +66,4 @@
 4. Modelo Cliente implementado en vista venta.
 5. Costo y precio sin iva agregados.
 6. Opción de eliminar elemento a vender (vista 'cancelar_unidad').
+7. Generación de un comprobante de venta.

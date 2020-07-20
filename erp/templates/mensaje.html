@@ -16,9 +16,11 @@
               <h2>{{ mensaje }}</h2>
               <p>{{ redireccion }}</p>
             </div>
+            {% if request.path == '/venta_exitosa' %}
             <div>
               <a href="recibo/{{id_venta}}"><button>Imprimir recibo</button></a>
             </div>
+            {% endif %}
             <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
               <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
             </div>
@@ -35,25 +37,26 @@
 </div><!-- /.container-fluid -->
 {% endblock content %}
 
-{% block redirect %} 
+  {% block redirect %} 
 
-<script>
-  function delayRedirect(){
-      // Esta funcion es para que se redireccione al index luego de 3 segundos
+  <script>
+    function delayRedirect(){
+        // Esta funcion es para que se redireccione al index luego de 3 segundos
 
-      //La linea de abajo hace que aparezca un <span> con cuenta regresiva en pantalla (solo de prueba)
-      //document.getElementById('delayMsg').innerHTML = 'Tiempo restante: <span id="countDown">5</span> seconds....';
-      var count = 3;
-      setInterval(function(){
-          count--;
-          //document.getElementById('countDown').innerHTML = count;
-          if (count == 0){
-              window.location = '/'; 
-          }
-      },1000);
-  }
-  delayRedirect();
+        //La linea de abajo hace que aparezca un <span> con cuenta regresiva en pantalla (solo de prueba)
+        //document.getElementById('delayMsg').innerHTML = 'Tiempo restante: <span id="countDown">5</span> seconds....';
+        var count = 3;
+        setInterval(function(){
+            count--;
+            //document.getElementById('countDown').innerHTML = count;
+            if (count == 0){
+                window.location = '/'; 
+            }
+        },1000);
+    }
+    {% if request.path != '/venta_exitosa' %}delayRedirect();{% endif %}
 
-</script>
+  </script>
 
-{% endblock redirect %}
+  {% endblock redirect %}
+
