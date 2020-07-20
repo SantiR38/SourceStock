@@ -173,6 +173,8 @@ def venta(request):
         "total": venta_activa()[1].total,
         "cliente": ""
     }
+    if venta_activa()[1].cliente != None:
+        ctx['cliente'] = venta_activa()[1].cliente.nombre + " " + venta_activa()[1].cliente.apellido
     
     if request.method == "POST":
         miFormulario = FormVenta(request.POST)
@@ -211,8 +213,8 @@ def venta(request):
 
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = miFormulario
-            if nueva_venta.cliente != None:
-                ctx['cliente'] = nueva_venta.cliente.nombre + " " + nueva_venta.cliente.apellido
+            if venta_activa()[1].cliente != None:
+                ctx['cliente'] = venta_activa()[1].cliente.nombre + " " + venta_activa()[1].cliente.apellido
             
             return HttpResponse(template.render(ctx, request))
     else:
