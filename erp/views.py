@@ -484,7 +484,6 @@ def recibo(request, id_venta):
         return redirect('transaccion_exitosa')
     
 
-
 def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')
     ctx = {'titulo': 'Se agregaron los nuevos valores',

@@ -107,10 +107,13 @@ def emitir_recibo(id_venta):
     p.drawString(297.5, 653, "CUIT: ")
 
     p.setFont("Helvetica", 10)
-    p.drawString(95, 673, venta.cliente.nombre + " " + venta.cliente.apellido)
-    p.drawString(95, 653, venta.cliente.direccion)
-    p.drawString(355, 673, venta.cliente.condicion_iva)
-    p.drawString(355, 653, venta.cliente.cuit)
+    if venta.cliente != None:
+        p.drawString(95, 673, venta.cliente.nombre + " " + venta.cliente.apellido)
+        p.drawString(95, 653, venta.cliente.direccion)
+        p.drawString(355, 673, venta.cliente.condicion_iva)
+        p.drawString(355, 653, venta.cliente.cuit)
+    else:
+        p.drawString(355, 673, "Consumidor Final")
 
     # Header
     p.line(30, 820, 565, 820) #Horizontal Grande
