@@ -480,7 +480,7 @@ def historial_ventas(request):
 
     ctx = {
         "datos_generales": stock_total(),
-        "venta": Venta.objects.all().order_by('-fecha', '-id')
+        "venta": Venta.objects.all().order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
     }
 
     return HttpResponse(template.render(ctx, request))
