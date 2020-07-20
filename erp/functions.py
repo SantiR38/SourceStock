@@ -148,7 +148,9 @@ def emitir_recibo(id_venta):
     for i in detalle_venta:
         p.drawString(50, alto, str(i.cantidad))
         p.drawString(150, alto, i.id_producto.descripcion)
+        p.drawString(380, alto, "$")
         p.drawString(390, alto, str(i.precio_unitario))
+        p.drawString(480, alto, "$")
         p.drawString(490, alto, str(i.cantidad*i.precio_unitario))
         alto -= 30
 
@@ -158,6 +160,7 @@ def emitir_recibo(id_venta):
     alto -= 50
     p.setFont("Helvetica-Bold", 11)
     p.drawString(390, alto, "Total")
+    p.drawString(480, alto, "$")
     p.drawString(490, alto, str(venta.total))
 
 
