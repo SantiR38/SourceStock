@@ -476,7 +476,14 @@ def articulo(request, codigo_articulo):
 
 
 def historial_ventas(request):
-    pass
+    template = loader.get_template('historial_ventas.html')
+
+    ctx = {
+        "datos_generales": stock_total(),
+        "venta": Venta.objects.all()
+    }
+
+    return HttpResponse(template.render(ctx, request))
 
 
 def recibo(request, id_venta):
