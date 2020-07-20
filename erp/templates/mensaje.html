@@ -16,7 +16,7 @@
               <h2>{{ mensaje }}</h2>
               <p>{{ redireccion }}</p>
             </div>
-            {% if request.path == '/venta_exitosa' %}
+            {% if request.path == '/venta_exitosa' and hay_recibo == True %}
             <div>
               <a href="recibo/{{id_venta}}"><button>Imprimir recibo</button></a>
             </div>
@@ -54,7 +54,7 @@
             }
         },1000);
     }
-    {% if request.path != '/venta_exitosa' %}delayRedirect();{% endif %}
+    {% if request.path != '/venta_exitosa' or not hay_recibo %}delayRedirect();{% endif %}
 
   </script>
 

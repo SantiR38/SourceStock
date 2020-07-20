@@ -272,25 +272,29 @@ def transaccion_exitosa(request):
 def venta_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',
-           'redireccion': 'Volviendo a la página de ventas...'}
+           'hay_recibo': False}
 
     estado = ArtState.objects.get(nombre="Active")
     try:
         nueva_venta = Venta.objects.get(id_state=estado)
 
         producto_leido = DetalleVenta.objects.filter(id_venta=nueva_venta) # Se crea un QuerySet para sacar datos de cada producto comprado
-
-        for i in producto_leido: # Se actualiza  el stock de cada objeto Article
-            i.id_producto.stock -= i.cantidad
-            i.id_producto.save()
         
-        nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
-        nueva_venta.save() # Hace que esa entrada pase a estar inactiva
-        ctx['id_venta'] = nueva_venta.id
+        if producto_leido.exists():
+            for i in producto_leido: # Se actualiza  el stock de cada objeto Article
+                i.id_producto.stock -= i.cantidad
+                i.id_producto.save()
+            
+            nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
+            nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+            ctx['hay_recibo'] = True
+        else:
+            ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
 
     except ObjectDoesNotExist as DoesNotExist:
         ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
-    
+        
+    ctx['id_venta'] = nueva_venta.id
     return HttpResponse(template.render(ctx, request))
 
 
