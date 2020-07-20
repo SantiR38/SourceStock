@@ -478,8 +478,11 @@ def historial_ventas(request):
 
 
 def recibo(request, id_venta):
+    try:
+        return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='hello.pdf')
+    except ObjectDoesNotExist as DoesNotExist :
+        return redirect('transaccion_exitosa')
     
-    return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='hello.pdf')
 
 
 def script_actualizacion(request):
