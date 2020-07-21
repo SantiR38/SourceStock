@@ -478,23 +478,23 @@ def articulo(request, codigo_articulo):
 def historial_ventas(request):
     template = loader.get_template('historial_ventas.html')
     venta_historica = Venta.objects.all().order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
-    ultimas_ventas = []
-    x = 0
-    for i in venta_historica: # Este bucle solo selecciona una cantidad limitada de ventas para mostrar
-        ultimas_ventas.append(i)
-        x += 1
-        if x == 50:
-            break
-    ctx = {
-        "datos_generales": stock_total(),
-        "venta": ultimas_ventas,
-        "venta_historica": venta_historica
-    }
+    if venta_historica.exists():
+        ultimas_ventas = []
+        x = 0
+        for i in venta_historica: # Este bucle solo selecciona una cantidad limitada de ventas para mostrar
+            ultimas_ventas.append(i)
+            x += 1
+            if x == 50:
+                break
+        ctx = {
+            "datos_generales": stock_total(),
+            "venta": ultimas_ventas,
+            "venta_historica": venta_historica
+        }
+        return HttpResponse(template.render(ctx, request))
 
-
-
-
-    return HttpResponse(template.render(ctx, request))
+    else:
+        return redirect('venta_exitosa')
 
 
 def recibo(request, id_venta):
