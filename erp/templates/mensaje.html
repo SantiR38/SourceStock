@@ -18,7 +18,7 @@
             </div>
             {% if request.path == '/venta_exitosa' and hay_recibo == True %}
             <div>
-              <a href="recibo/{{id_venta}}"><button>Imprimir recibo</button></a>
+              <a href="recibo/{{id_venta}}" target="_blank"><button>Imprimir recibo</button></a>
             </div>
             {% endif %}
             <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
