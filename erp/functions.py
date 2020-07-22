@@ -91,12 +91,13 @@ def emitir_recibo(id_venta):
     p.setFont("Helvetica", 10)
     p.drawString(328, 770, "Documento no válido como factura")
     p.drawString(328, 740, "Fecha de emisión:")
+    p.drawString(420, 740, str(venta.fecha))
     p.drawString(328, 710, "Responsable Inscripto")
-    p.drawString(462, 710, "CUIT: 20-32987598-4")
+    p.drawString(462, 710, "CUIT: 20-35212998-5")
 
     p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
     p.drawString(297.5, 693, "Tel: 358 517-0913")
-    p.drawString(420, 693, "Inicio Actividad: 01/01/2020")
+    # p.drawString(420, 693, "Inicio Actividad: 01/01/2020") Esto se pondrá recien cuando sea factura
     p.setFont("Helvetica-Bold", 12)
     p.drawString(80, 710, "LA CASA DE LAS BATERÍAS")
 
