@@ -1,0 +1,14 @@
+
+<form action="" method="post"> {% csrf_token %}
+    
+    <table>
+
+        {{ form.as_table }}
+
+    </table>
+    <br />
+    <p>(*) Este campo es obligatorio.</p>
+
+    <input type="submit" value="Filtrar" />
+
+</form>

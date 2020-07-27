@@ -59,3 +59,11 @@ class FormCliente(forms.Form):
     direccion = forms.CharField(max_length=50, required=False)
     telefono = forms.CharField(required=False)
     email = forms.EmailField(required=False)
+
+class FormFiltroFecha(forms.Form):
+    fecha_inicial = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
+                                label_suffix= "*:",
+                                initial=date.today())
+    fecha_final = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
+                                label_suffix= "*:",
+                                initial=date.today())

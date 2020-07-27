@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
-from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda
+from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
 from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva, precio_final, emitir_recibo
 from datetime import date
@@ -477,6 +477,7 @@ def articulo(request, codigo_articulo):
 
 def historial_ventas(request):
     template = loader.get_template('historial_ventas.html')
+    miFormulario = FormFiltroFecha()
     venta_historica = Venta.objects.all().order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
     if venta_historica.exists():
         ultimas_ventas = []
@@ -489,8 +490,19 @@ def historial_ventas(request):
         ctx = {
             "datos_generales": stock_total(),
             "venta": ultimas_ventas,
-            "venta_historica": venta_historica
+            "venta_historica": venta_historica,
+            "form": miFormulario
         }
+        # Filtro fecha
+        if request.method == "POST":
+            miFormulario = FormFiltroFecha(request.POST)
+            if miFormulario.is_valid():
+                infForm = miFormulario.cleaned_data
+                ctx["venta"] = Venta.objects.filter(fecha__range=[infForm['fecha_inicial'], infForm['fecha_final']]).order_by('-fecha', '-id')
+        else:
+            miFormulario = FormFiltroFecha()
+        # !filtro fecha
+
         return HttpResponse(template.render(ctx, request))
 
     else:
