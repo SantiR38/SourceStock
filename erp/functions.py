@@ -99,6 +99,8 @@ def emitir_recibo(id_venta):
     p.drawString(297.5, 693, "Tel: 358 517-0913")
     # p.drawString(420, 693, "Inicio Actividad: 01/01/2020") Esto se pondrá recien cuando sea factura
     p.setFont("Helvetica-Bold", 12)
+    ##p.drawString(80, 790, "LA CASA DE LAS BATERÍAS")
+    p.drawInlineImage("erp/static/dist/img/logo_recibo.jpg", 95, 725, width=127.8,height=89.4) 
     p.drawString(80, 710, "LA CASA DE LAS BATERÍAS")
 
     p.setFont("Helvetica-Bold", 10)
