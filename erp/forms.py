@@ -39,6 +39,7 @@ class FormEntrada(forms.Form):
                                label_suffix= "**:",
                                required=False)
     cantidad = forms.IntegerField(label_suffix= "*:")
+    #proveedor = forms.ChoiceField(choices=, label= "Proveedor", label_suffix= "*:")
     fecha = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
                                 label_suffix= "*:",
                                 initial=date.today())
@@ -67,3 +68,18 @@ class FormFiltroFecha(forms.Form):
     fecha_final = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
                                 label_suffix= "*:",
                                 initial=date.today())
+
+class FormProveedor(forms.Form):
+    OPTIONS = [("Consumidor Final", "Consumidor Final"),
+               ("Responsable Inscripto", "Responsable Inscripto"),
+               ("Monotributista", "Monotributista"),
+               ("IVA Excento", "IVA Excento"),
+               ("No Alcanzado", "No Alcanzado"),
+               ]
+
+    nombre = forms.CharField(max_length=100, label= "Nombre Empresa", label_suffix= "*:")
+    condicion_iva = forms.ChoiceField(choices=OPTIONS, label= "Condición IVA", label_suffix= "*:")
+    cuit = forms.CharField(required=False)
+    direccion = forms.CharField(max_length=50, required=False)
+    telefono = forms.CharField(required=False)
+    email = forms.EmailField(required=False)
