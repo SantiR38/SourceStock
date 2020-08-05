@@ -141,7 +141,7 @@ def entrada(request):
                     ctx['inexistente'] = "Debes rellenar uno de los dos costos."
 
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
-                ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la compra seguirá guardada.'
+                ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la compra seguirá guardada.'
             
             lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
             nueva_venta.total = 0
@@ -209,7 +209,7 @@ def venta(request):
                 ctx['inexistente'] = ''
                 ctx['articulo_a_vender'] = lista
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
-                ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la pestaña "Agregar artículo". El resto de la venta seguirá guardada.'
+                ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la venta seguirá guardada.'
 
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = miFormulario
