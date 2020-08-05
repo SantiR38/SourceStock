@@ -2,8 +2,8 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
-from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha
-from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente
+from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
+from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
 from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva, precio_final, emitir_recibo
 from datetime import date
 from decimal import *
@@ -515,6 +515,42 @@ def recibo(request, id_venta):
     except ObjectDoesNotExist as DoesNotExist :
         return redirect('transaccion_exitosa')
     
+
+def proveedor(request):
+    template = loader.get_template('agregar_modificar.html')
+    miFormulario = FormProveedor()
+    lista = []
+    ctx = {
+        "articulo_a_vender": lista,
+        "datos_generales": stock_total(),
+        "form": miFormulario,
+        "mensaje": "",
+        "titulo": "Gestión de proveedores"
+    }
+
+    if request.method == "POST":
+        miFormulario = FormProveedor(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            
+            try: # Si el Proveedor existe en la base de datos
+                new_proveedor = Proveedor.objects.get(nombre=infForm['nombre'])
+                ctx['mensaje'] = "El proveedor ya existe"
+                
+            except ObjectDoesNotExist as DoesNotExist: # Si el Proveedor no existe en la base de datos, crearlo
+                new_proveedor = Proveedor.objects.create(nombre=infForm['nombre'],
+                                                    condicion_iva=infForm['condicion_iva'],
+                                                    cuit=infForm['cuit'],
+                                                    direccion=infForm['direccion'],
+                                                    telefono=infForm['telefono'],
+                                                    email=infForm['email'])
+
+                ctx['mensaje'] = 'El proveedor fue agregado correctamente.'
+
+            miFormulario = FormProveedor()
+
+    return HttpResponse(template.render(ctx, request))
+
 
 def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')
