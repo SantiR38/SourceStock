@@ -52,9 +52,27 @@ Compra
         </div>
         <div class="card-body">
           <div style=" width: 100%;">
+
+            <table>
+              
+              <tr>
+                <th>Producto</th>
+                <th>Costo</th>
+                <th>Cantidad</th>
+                <th></th>
+              </tr>
+
             {% for i in articulo_a_comprar %}
-              <p>{{ i.id_producto }}  -  Costo: ${{ i.costo_unitario }}  -  Cant: {{ i.cantidad }}</p>
+              <tr>
+                <td>{{ i.id_producto }}</td>
+                <td>${{ i.costo_unitario }}</td>
+                <td>{{ i.cantidad }} </td>
+                <!-- <td><a href="cancelar_unidad/{{i.id}}"><img src="{% static '/dist/img/cancel.svg' %}" alt="Cancelar" /></a></td> -->
+              </tr>
             {% endfor %}
+
+            </table>
+
             <p style= "color:#A91400"><strong>{{ inexistente }}</strong></p>
             <p style= "color:#A91400"><strong>{{ porcentaje_inexistente }}</strong></p>
             <p><strong>Total: ${{ total }}</strong></p>
