@@ -1,4 +1,4 @@
-from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
+from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -176,3 +176,10 @@ def emitir_recibo(id_venta):
     buffer.seek(0)
     return buffer
     
+def lista_proveedores():
+    query = Proveedor.objects.all().order_by('nombre')
+    lista = []
+    if query.exists():
+        for i in query:
+            lista.append(i.nombre)
+    return lista
