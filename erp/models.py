@@ -60,7 +60,7 @@ class Entrada(models.Model):
     fecha = models.DateField()
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
-    cliente = models.ForeignKey('Proveedor', on_delete=models.SET_NULL, null=True)
+    proveedor = models.ForeignKey('Proveedor', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return '%s (%s)' % (self.fecha, self.id)
