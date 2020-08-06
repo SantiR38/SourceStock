@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
-from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, buscar_cliente, dni_cliente, campos_sin_iva, precio_final, emitir_recibo
+from erp.functions import stock_total, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor
 from datetime import date
 from decimal import *
 
@@ -80,28 +80,34 @@ def agregar_articulo(request):
 
 def entrada(request):
     template = loader.get_template('entrada.html')
-    miFormulario = FormEntrada({'cantidad': 1})
+    miFormulario = FormEntrada({'cantidad': 1, 'proveedor': nombre_proveedor()})
+    estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
     lista = []
     ctx = {
-        "articulo_a_comprar": lista,
+        "articulo_a_comprar": compra_activa()[0],
         "datos_generales": stock_total(),
         "form": miFormulario,
-        "total": 0,
-        "porcentaje_inexistente": ""
+        "total": compra_activa()[1].total,
+        "porcentaje_inexistente": "",
+        "proveedor": ""
     }
+    if compra_activa()[1].proveedor != None:
+        ctx['proveedor'] = compra_activa()[1].proveedor.nombre
 
     if request.method == "POST":
         miFormulario = FormEntrada(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
             
             try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_entrada a su id
                     nueva_venta = Entrada.objects.get(id_state=estado)
+                    nueva_venta.proveedor=buscar_proveedor(infForm['proveedor'])
+                    nueva_venta.save()
             except ObjectDoesNotExist as DoesNotExist:
                 nueva_venta = Entrada.objects.create(fecha=infForm['fecha'],
                                                         total=0,
-                                                        id_state=estado) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
+                                                        id_state=estado,
+                                                        proveedor=buscar_proveedor(infForm['proveedor'])) # Iniciar un objeto de tipo entrada (id(auto), fecha, id_state=1(active), total=0)
 
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
@@ -151,12 +157,15 @@ def entrada(request):
             ctx['total'] = nueva_venta.total
             ctx['articulo_a_comprar'] = lista
 
-            miFormulario = FormEntrada({'cantidad': 1})
+            miFormulario = FormEntrada({'cantidad': 1, 'proveedor': nombre_proveedor()})
+
+            if compra_activa()[1].proveedor != None:
+                ctx['proveedor'] = compra_activa()[1].proveedor.nombre
             
             return HttpResponse(template.render(ctx, request))
     else:
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a comprar es 1.
-        miFormulario = FormEntrada({'cantidad': 1})
+        miFormulario = FormEntrada({'cantidad': 1, 'proveedor': nombre_proveedor()})
 
     return HttpResponse(template.render(ctx, request))
 
