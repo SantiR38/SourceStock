@@ -209,7 +209,7 @@ def emitir_recibo(id_venta):
     
 def lista_proveedores():
     query = Proveedor.objects.all().order_by('nombre')
-    lista = []
+    lista = [(" ", " ")]
     if query.exists():
         for i in query:
             lista.append((i.nombre, i.nombre))

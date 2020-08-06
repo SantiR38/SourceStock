@@ -40,7 +40,7 @@ class FormEntrada(forms.Form):
                                label_suffix= "**:",
                                required=False)
     cantidad = forms.IntegerField(label_suffix= "*:")
-    proveedor = forms.ChoiceField(choices=lista_proveedores(), label= "Proveedor", label_suffix= "*:")
+    proveedor = forms.ChoiceField(choices=lista_proveedores, label= "Proveedor", label_suffix= "*:")
     fecha = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
                                 label_suffix= "*:",
                                 initial=date.today())
