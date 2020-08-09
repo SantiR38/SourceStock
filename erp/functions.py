@@ -1,4 +1,4 @@
-from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
+from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
@@ -45,6 +45,23 @@ def venta_activa():
         nueva_venta.save()
     return [lista, nueva_venta]
 
+def compra_activa():
+    lista = []
+    estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+    try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Compra a su id
+        nueva_compra = Entrada.objects.get(id_state=estado)
+    except ObjectDoesNotExist as DoesNotExist:
+        nueva_compra = Entrada.objects.create(fecha=date.today(),
+                                            total=0,
+                                            id_state=estado) # Iniciar un objeto de tipo Compra (id(auto), fecha, id_state=1(active), total=0)
+    else:
+        lista = DetalleEntrada.objects.filter(id_entrada = nueva_compra)
+        nueva_compra.total = 0
+        for i in lista:
+            nueva_compra.total += (i.costo_unitario * i.cantidad)
+        nueva_compra.save()
+    return [lista, nueva_compra]
+
 def buscar_cliente(documento):
     try:
         cliente = Cliente.objects.get(dni=documento)
@@ -52,9 +69,23 @@ def buscar_cliente(documento):
         cliente = None
     return cliente
 
+def buscar_proveedor(name):
+    try:
+        proveedor = Proveedor.objects.get(nombre=name)
+    except ObjectDoesNotExist as DoesNotExist:
+        proveedor = None
+    return proveedor
+
 def dni_cliente():
     if venta_activa()[1].cliente != None:
         a = venta_activa()[1].cliente.dni
+    else:
+        a = None
+    return a
+
+def nombre_proveedor():
+    if compra_activa()[1].proveedor != None:
+        a = compra_activa()[1].proveedor.nombre
     else:
         a = None
     return a
@@ -176,3 +207,10 @@ def emitir_recibo(id_venta):
     buffer.seek(0)
     return buffer
     
+def lista_proveedores():
+    query = Proveedor.objects.all().order_by('nombre')
+    lista = [(" ", " ")]
+    if query.exists():
+        for i in query:
+            lista.append((i.nombre, i.nombre))
+    return lista

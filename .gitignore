@@ -1,7 +1,11 @@
 __pycache__/
 *.pyc
+
+venv/
+
 erp/static/plugins/
 erp/pdf_files/
+
 local.py
 production.py
 SourceStock.bat
