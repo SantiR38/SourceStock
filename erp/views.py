@@ -566,7 +566,8 @@ def script_actualizacion(request):
     ctx = {'titulo': 'Se agregaron los nuevos valores',
            'mensaje': 'Checkear en DB...'}
     campos_sin_iva()
-    add_art_state()
+    if not ArtState.objects.all().exists():
+        add_art_state()
     
 
 
