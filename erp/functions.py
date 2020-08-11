@@ -100,6 +100,11 @@ def campos_sin_iva():
         i.precio_sin_iva = i.precio / x
         i.save()
 
+def add_art_state():
+    ArtState.objects.create(nombre="Active")
+    ArtState.objects.create(nombre="Inactive")
+    ArtState.objects.create(nombre="Deleted")
+
 def precio_final(costo_s_iva, porc_ganancia):
     costo_final = porcentaje_ganancia(costo_s_iva, 21)
     precio_final = porc_ganancia(costo_final, porc_ganancia)
