@@ -62,11 +62,18 @@ def compra_activa():
         nueva_compra.save()
     return [lista, nueva_compra]
 
-def buscar_cliente(documento):
-    try:
-        cliente = Cliente.objects.get(dni=documento)
-    except ObjectDoesNotExist as DoesNotExist:
-        cliente = None
+def buscar_cliente(param):
+    if type(param) == int:
+        try:
+            cliente = Cliente.objects.get(dni=param)
+        except ObjectDoesNotExist as DoesNotExist:
+            cliente = None
+    elif type(param) == str:
+        try:
+            cliente = Cliente.objects.get(nombre=param)
+        except ObjectDoesNotExist as DoesNotExist:
+            cliente = None
+    
     return cliente
 
 def buscar_proveedor(name):
@@ -218,4 +225,12 @@ def lista_proveedores():
     if query.exists():
         for i in query:
             lista.append((i.nombre, i.nombre))
+    return lista
+
+def lista_clientes():
+    query = Cliente.objects.all().order_by('nombre')
+    lista = [(" ", " ")]
+    if query.exists():
+        for i in query:
+            lista.append((i.nombre + " " + i.apellido, i.nombre + " " + i.apellido))
     return lista

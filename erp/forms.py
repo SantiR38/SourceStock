@@ -1,6 +1,6 @@
 from django import forms
 from datetime import date
-from erp.functions import lista_proveedores
+from erp.functions import lista_proveedores, lista_clientes
 
 class FormBusqueda(forms.Form):
     buscar = forms.IntegerField(label= "Código del producto")
@@ -8,7 +8,8 @@ class FormBusqueda(forms.Form):
 class FormVenta(forms.Form): # Sirve para la actualización inventario en general
     codigo = forms.IntegerField(label_suffix= "*:")
     cantidad = forms.IntegerField(label_suffix= "*:")
-    dni_cliente = forms.IntegerField(required=False, label="DNI Cliente")
+    cliente = forms.ChoiceField(choices=lista_clientes, label= "Cliente", required=False, label_suffix= "**:")
+    dni_cliente = forms.IntegerField(required=False, label="DNI Cliente", label_suffix= "**:")
 
 class FormNuevoArticulo(forms.Form):
     codigo = forms.IntegerField(label_suffix= "*:")
@@ -56,7 +57,7 @@ class FormCliente(forms.Form):
     nombre = forms.CharField(max_length=50,label= "Nombre o Empresa", label_suffix= "*:")
     apellido = forms.CharField(max_length=50, required=False)
     condicion_iva = forms.ChoiceField(choices=OPTIONS, label= "Condición IVA", label_suffix= "*:")
-    dni = forms.IntegerField(label= "DNI", label_suffix= "*:")
+    dni = forms.IntegerField(label= "DNI", required=False)
     cuit = forms.CharField(required=False)
     direccion = forms.CharField(max_length=50, required=False)
     telefono = forms.CharField(required=False)

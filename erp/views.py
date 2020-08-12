@@ -195,13 +195,20 @@ def venta(request):
                                                                             # el formulario y lo metemos como QuerySet en una variable.
                 try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
                     nueva_venta = Venta.objects.get(id_state=estado)
-                    nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
-                    nueva_venta.save()
+                    
                 except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
                     nueva_venta = Venta.objects.create(fecha=date.today(),
                                                          total=0,
                                                          id_state=estado,
                                                          cliente=buscar_cliente(infForm['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+                else:
+                    if infForm['dni_cliente'] != None:
+                        nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
+                        
+                    elif infForm['cliente'] != None:
+                        nueva_venta.cliente = buscar_cliente(infForm['cliente'])
+                    nueva_venta.save()
+                
 
                 producto_leido = DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
                                                                precio_unitario=new_article.precio,

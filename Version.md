@@ -80,3 +80,4 @@
 2. Agregado archivo requirements.txt
 3. Modelo, formulario y vista "Proveedor" implementados al software.
 4. Corregido Script de actualización para añadir los 3 valores de ArtState.
+5. Ahora el cliente se puede buscar por nombre en la vista Venta.
