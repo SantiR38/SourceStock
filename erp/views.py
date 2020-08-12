@@ -570,5 +570,5 @@ def script_actualizacion(request):
         add_art_state()
     
 
-
     return HttpResponse(template.render(ctx, request))
+
