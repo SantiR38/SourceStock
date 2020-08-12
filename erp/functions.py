@@ -7,9 +7,17 @@ from decimal import *
 import io
 
 def inventario():
+
+    # Almacena todos los Artículos en un query_set para mostrar en la vista "control de inventario".
+
     return Article.objects.all()
 
 def stock_total():
+
+    # Se aplica al widget de cabecera donde se muestra:
+    #   1. El stock total todos los productos.
+    #   2. La cantidad de distintos productos que ofrece la empresa.
+
     cantidad_total = 0
     diferentes_productos = 0
     try:
@@ -24,11 +32,19 @@ def stock_total():
     return resultado
 
 def porcentaje_ganancia(costo, porcentaje):
+
+    # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
+
     precio_final = costo + (costo * porcentaje / 100)
     return precio_final
 
-#En la vista venta, esta función permite que se muestre la venta que haya en curso apenas se carga la página.
 def venta_activa():
+
+    # En la vista venta, muestra la venta en curso apenas se carga la página.
+    # Esta función devuelve dos parámetros:
+    #   1. Una lista del detalle de venta para mostrar en la vista venta
+    #   2. Datos de la venta general (cliente y total).
+    
     lista = []
     estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
@@ -46,6 +62,11 @@ def venta_activa():
     return [lista, nueva_venta]
 
 def compra_activa():
+
+    # Esta función devuelve dos parámetros:
+    #   1. Una lista del detalle de compra para mostrar en la vista entrada
+    #   2. Datos de la compra general (proveedor y total).
+
     lista = []
     estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Compra a su id
@@ -63,6 +84,9 @@ def compra_activa():
     return [lista, nueva_compra]
 
 def buscar_cliente(param):
+
+    # Se utiliza esta función para registrar un cliente dentro de una venta.
+
     if type(param) == int:
         try:
             cliente = Cliente.objects.get(dni=param)
@@ -77,6 +101,9 @@ def buscar_cliente(param):
     return cliente
 
 def buscar_proveedor(name):
+
+    # Se utiliza esta función para regustrar un proveedor dentro de una entrada.
+
     try:
         proveedor = Proveedor.objects.get(nombre=name)
     except ObjectDoesNotExist as DoesNotExist:
@@ -84,6 +111,9 @@ def buscar_proveedor(name):
     return proveedor
 
 def dni_cliente():
+
+    # Esta función introduce el dni del cliente en el formulario de la vista venta.
+
     if venta_activa()[1].cliente != None:
         a = venta_activa()[1].cliente.dni
     else:
@@ -91,15 +121,20 @@ def dni_cliente():
     return a
 
 def nombre_proveedor():
+
+    # Esta función introduce el nombre del proveedor en el formulario de la vista entrada.
+
     if compra_activa()[1].proveedor != None:
         a = compra_activa()[1].proveedor.nombre
     else:
         a = None
     return a
 
-# Cuando la tabla solo tiene los costos y precios con iva incluidos, esta formula itera sobre cada producto
-# agregando el costo y el precio sin iva (se hace solo una vez a la hora de actualizar la app.)
 def campos_sin_iva():
+
+    # Cuando la tabla solo tiene los costos y precios con iva incluidos, esta formula itera sobre cada producto
+    # agregando el costo y el precio sin iva (se hace solo una vez a la hora de actualizar la app.)
+
     a = Article.objects.all()
     x = round((Decimal(1.21)), 2)
     for i in a:
@@ -108,16 +143,26 @@ def campos_sin_iva():
         i.save()
 
 def add_art_state():
+
+    # Esta función es utilizada apenas se lanza el proyecto para registrar los tres campos de ArtState.
+
     ArtState.objects.create(nombre="Active")
     ArtState.objects.create(nombre="Inactive")
     ArtState.objects.create(nombre="Deleted")
 
 def precio_final(costo_s_iva, porc_ganancia):
+    
+    # Devuelve el precio final de un producto al cual se le registró solo el costo sin iva.
+
     costo_final = porcentaje_ganancia(costo_s_iva, 21)
     precio_final = porc_ganancia(costo_final, porc_ganancia)
     return precio_final
 
 def emitir_recibo(id_venta):
+
+    # Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
+    # Utiliza la librería reportlab
+
     venta = Venta.objects.get(id=id_venta)
     detalle_venta = DetalleVenta.objects.filter(id_venta=venta)
 
@@ -220,6 +265,9 @@ def emitir_recibo(id_venta):
     return buffer
     
 def lista_proveedores():
+
+    # Lista la totalidad de los proveedores para mostrar en la vista Entrada
+
     query = Proveedor.objects.all().order_by('nombre')
     lista = [(" ", " ")]
     if query.exists():
@@ -228,6 +276,9 @@ def lista_proveedores():
     return lista
 
 def lista_clientes():
+
+    # Lista la totalidad de los clientes para mostrar en la vista Venta
+
     query = Cliente.objects.all().order_by('nombre')
     lista = [(" ", " ")]
     if query.exists():
