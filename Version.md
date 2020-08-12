@@ -77,3 +77,6 @@
 ## Versión 1.7
 
 1. Campo Apellido cliente ya no es obligatorio. Campo nombre ahora se titula "Nombre o Empresa".
+2. Agregado archivo requirements.txt
+3. Modelo, formulario y vista "Proveedor" implementados al software.
+4. Corregido Script de actualización para añadir los 3 valores de ArtState.
