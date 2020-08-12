@@ -53,8 +53,8 @@ class FormCliente(forms.Form):
                ("No Alcanzado", "No Alcanzado"),
                ]
 
-    nombre = forms.CharField(max_length=50, label_suffix= "*:")
-    apellido = forms.CharField(max_length=50, label_suffix= "*:")
+    nombre = forms.CharField(max_length=50,label= "Nombre o Empresa", label_suffix= "*:")
+    apellido = forms.CharField(max_length=50, required=False)
     condicion_iva = forms.ChoiceField(choices=OPTIONS, label= "Condición IVA", label_suffix= "*:")
     dni = forms.IntegerField(label= "DNI", label_suffix= "*:")
     cuit = forms.CharField(required=False)

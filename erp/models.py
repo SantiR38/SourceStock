@@ -76,7 +76,7 @@ class DetalleEntrada(models.Model):
 
 class Cliente(models.Model):
     nombre = models.CharField(max_length=50)
-    apellido = models.CharField(max_length=50)
+    apellido = models.CharField(max_length=50, null=True)
     condicion_iva = models.CharField(max_length=25)
     dni = models.PositiveIntegerField()
     cuit = models.CharField(max_length=15, null=True)

@@ -73,3 +73,7 @@
 
 1. Filtro de fecha para historial de ventas.
 2. Logo de empresa añadido a recibo.
+
+## Versión 1.7
+
+1. Campo Apellido cliente ya no es obligatorio. Campo nombre ahora se titula "Nombre o Empresa".
