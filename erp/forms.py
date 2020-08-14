@@ -3,7 +3,7 @@ from datetime import date
 from erp.functions import lista_proveedores, lista_clientes
 
 class FormBusqueda(forms.Form):
-    buscar = forms.IntegerField(label= "Código del producto")
+    buscar = forms.IntegerField(label="")
 
 class FormVenta(forms.Form): # Sirve para la actualización inventario en general
     codigo = forms.IntegerField(label_suffix= "*:")

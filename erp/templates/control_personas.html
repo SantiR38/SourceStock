@@ -9,26 +9,38 @@
 <div class="container-fluid">
   {% include "small_boxes.html" %}
 
-  <div>
-    <form action="" method="post"> {% csrf_token %}
-      <span>
 
-          {{ form.as_table }}
-
-          <input type="submit" value="Buscar" />
-      </span>
-    </form>
-    <a href="{{link_agregar}}"><button>{{agregar_persona}}</button></a>
-  </div>
+  
   <!-- Main row -->
   <div class="row">
+    
     <!-- Left col -->
     <section class="connectedSortable">
+      
       <!-- Custom tabs (Charts with tabs)-->
         <div class="card-body">
+
           <div class="tab-content p-0">
             <!-- Morris chart - Sales -->
             <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
+
+              <div>
+                <form action="" method="post"> {% csrf_token %}
+                  <span>
+            
+                    <b>DNI del cliente: </b>
+                    {{ form.as_table }}
+            
+                    <input type="submit" value="Buscar" />
+            
+                  </span>
+                </form>
+                
+              </div>
+              <br>
+
+              <div><a href="{{link_agregar}}"><button>{{agregar_persona}}</button></a></div>
+              <br />
 
               <table style="width:100%;" class="borde-externo">
                 <tr class="intercalado">
