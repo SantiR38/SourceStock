@@ -6,11 +6,11 @@ from datetime import date
 from decimal import *
 import io
 
-def inventario():
+def inventario(param):
 
     # Almacena todos los Artículos en un query_set para mostrar en la vista "control de inventario".
 
-    return Article.objects.all()
+    return param.objects.all()
 
 def stock_total():
 
@@ -21,7 +21,7 @@ def stock_total():
     cantidad_total = 0
     diferentes_productos = 0
     try:
-        query_set = inventario()
+        query_set = inventario(Article)
         for i in query_set:
             cantidad_total += query_set[diferentes_productos].stock
             diferentes_productos += 1

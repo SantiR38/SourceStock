@@ -378,7 +378,7 @@ def control_inventario(request):
     miFormulario = FormBusqueda()
     ctx = {
         "datos_generales": stock_total(),
-        "articulos": inventario(),
+        "articulos": inventario(Article),
         "form": miFormulario
     }
 
@@ -415,7 +415,7 @@ def articulo(request, codigo_articulo):
         miFormulario = FormNuevoArticulo(detalles_formulario)
         ctx = {
             "datos_generales": stock_total(),
-            "articulos": inventario(),
+            "articulos": inventario(Article),
             "form": miFormulario,
             "titulo": "Modificar Artículo"
         }
@@ -584,7 +584,7 @@ def control_clientes(request):
     #miFormulario = FormBusqueda()
     ctx = {
         "datos_generales": stock_total(),
-        "articulos": inventario(),
+        "articulos": inventario(Cliente),
         #"form": miFormulario
     }
 
