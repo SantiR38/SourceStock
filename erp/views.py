@@ -366,7 +366,7 @@ def cliente(request):
                                                     telefono=infForm['telefono'],
                                                     email=infForm['email'])
 
-                ctx['mensaje'] = 'El cliente fue agregado correctamente.'
+                return redirect('control_clientes')
 
             miFormulario = FormCliente()
 
@@ -600,5 +600,55 @@ def control_clientes(request):
             ctx["articulos"] = resultado
     else:
         miFormulario = FormBusqueda()
+
+    return HttpResponse(template.render(ctx, request))
+
+
+def modificar_cliente(request, id_param):
+    template = loader.get_template('agregar_modificar.html')
+    try:
+        new_cliente = Cliente.objects.get(id=id_param)
+    except ObjectDoesNotExist as DoesNotExist:
+            template = loader.get_template('mensaje.html') # La redirección se hace con JavaScript en este template luego de 5 segundos.
+            ctx = {'mensaje': 'Error 404. No se encontró el artículo.',
+                'redireccion': 'Volviendo a la página de ventas...'}
+            return HttpResponse(template.render(ctx, request))
+    else:  
+        detalles_formulario = {
+            'nombre': new_cliente.nombre,
+            'apellido': new_cliente.apellido,
+            'condicion_iva': new_cliente.condicion_iva,
+            'dni': new_cliente.dni,
+            'cuit': new_cliente.cuit,
+            'direccion': new_cliente.direccion,
+            'telefono': new_cliente.telefono,
+            'email': new_cliente.email
+        }
+        miFormulario = FormCliente(detalles_formulario)
+        ctx = {
+            "datos_generales": stock_total(),
+            "articulos": inventario(Cliente),
+            "form": miFormulario,
+            "mensaje": "",
+            "titulo": "Modificar cliente"
+        }
+
+    if request.method == "POST":
+        miFormulario = FormCliente(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            
+            new_cliente.nombre = infForm["nombre"]
+            new_cliente.apellido = infForm["apellido"]
+            new_cliente.condicion_iva = infForm["condicion_iva"]
+            new_cliente.dni = infForm["dni"]
+            new_cliente.cuit = infForm["cuit"]
+            new_cliente.direccion = infForm["direccion"]
+            new_cliente.telefono = infForm["telefono"]
+            new_cliente.email = infForm["email"]
+
+            new_cliente.save()
+
+            return redirect('control_clientes')
 
     return HttpResponse(template.render(ctx, request))
