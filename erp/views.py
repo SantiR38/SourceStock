@@ -378,7 +378,7 @@ def control_inventario(request):
     miFormulario = FormBusqueda()
     ctx = {
         "datos_generales": stock_total(),
-        "articulos": inventario(Article),
+        "articulos": inventario(Article).order_by('descripcion'),
         "form": miFormulario
     }
 
@@ -586,7 +586,7 @@ def control_clientes(request):
     ctx = {
         "titulo": "Clientes",
         "datos_generales": stock_total(),
-        "articulos": inventario(Cliente),
+        "articulos": inventario(Cliente).order_by('nombre'),
         "agregar_persona": "+ Agregar Cliente",
         "link_agregar": "/cliente"
         #"form": miFormulario
