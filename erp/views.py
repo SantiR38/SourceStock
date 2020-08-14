@@ -579,3 +579,22 @@ def script_actualizacion(request):
 
     return HttpResponse(template.render(ctx, request))
 
+def control_clientes(request):
+    template = loader.get_template('control_personas.html')
+    #miFormulario = FormBusqueda()
+    ctx = {
+        "datos_generales": stock_total(),
+        "articulos": inventario(),
+        #"form": miFormulario
+    }
+
+    #if request.method == "POST":
+    #    miFormulario = FormBusqueda(request.POST)
+    #    if miFormulario.is_valid():
+    #        infForm = miFormulario.cleaned_data
+    #        resultado = Article.objects.filter(codigo=int(infForm['buscar'])) # Código
+    #        ctx["articulos"] = resultado
+    #else:
+    #    miFormulario = FormBusqueda()
+
+    return HttpResponse(template.render(ctx, request))

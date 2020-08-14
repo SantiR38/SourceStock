@@ -11,6 +11,7 @@ urlpatterns = [
     path('cliente', views.cliente, name='cliente'),
     path('proveedor', views.proveedor, name='proveedor'),
     path('control_inventario', views.control_inventario, name='control_inventario'),
+    path('control_clientes', views.control_clientes, name='control_clientes'),
     path('articulo/<int:codigo_articulo>', views.articulo, name='articulo'),
     path('cancelar_unidad/<int:codigo_articulo>', views.cancelar_unidad, name='cancelar_unidad'),
     path('script_actualizacion', views.script_actualizacion, name='script_actualizacion'),
