@@ -1,6 +1,10 @@
 {% extends "base_layout.html" %}
 {% load static %}
 
+{% block heading %}
+{{titulo}}
+{% endblock heading %}
+
 {% block content %}
 <div class="container-fluid">
   {% include "small_boxes.html" %}
@@ -14,7 +18,7 @@
           <input type="submit" value="Buscar" />
       </span>
     </form>
-    <a href="/agregar_articulo"><button>+ Agregar Artículo</button></a>
+    <a href="{{link_agregar}}"><button>{{agregar_persona}}</button></a>
   </div>
   <!-- Main row -->
   <div class="row">
@@ -52,7 +56,7 @@
                 {% endfor %}
               </table>
               <br />
-              <a href="/agregar_articulo"><button>+ Agregar Artículo</button></a>
+              <a href="{{link_agregar}}"><button>{{agregar_persona}}</button></a>
 
             </div>
             <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">

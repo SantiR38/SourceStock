@@ -579,12 +579,16 @@ def script_actualizacion(request):
 
     return HttpResponse(template.render(ctx, request))
 
+
 def control_clientes(request):
     template = loader.get_template('control_personas.html')
     #miFormulario = FormBusqueda()
     ctx = {
+        "titulo": "Clientes",
         "datos_generales": stock_total(),
         "articulos": inventario(Cliente),
+        "agregar_persona": "+ Agregar Cliente",
+        "link_agregar": "/cliente"
         #"form": miFormulario
     }
 

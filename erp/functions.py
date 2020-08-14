@@ -8,7 +8,8 @@ import io
 
 def inventario(param):
 
-    # Almacena todos los Artículos en un query_set para mostrar en la vista "control de inventario".
+    # Almacena todos los objetos del modelo pasado por parámetro
+    # en un query_set para mostrar en la vista "control de inventario".
 
     return param.objects.all()
 
