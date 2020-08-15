@@ -23,7 +23,7 @@
           <div class="tab-content p-0">
             <!-- Morris chart - Sales -->
             <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
-
+              {% if titulo == "Clientes" %}
               <div>
                 <form action="" method="post"> {% csrf_token %}
                   <span>
@@ -38,6 +38,7 @@
                 
               </div>
               <br>
+              {% endif %}
 
               <div><a href="{{link_agregar}}"><button>{{agregar_persona}}</button></a></div>
               <br />
@@ -46,7 +47,7 @@
                 <tr class="intercalado">
                   <th>Nombre o Empresa</th>
                   <th>Condicion frente al IVA</th>
-                  {% if articulos.0 == Cliente %}
+                  {% if titulo == "Clientes" %}
                     <th>DNI</th>
                   {% endif %}
                   <th>CUIT</th>
@@ -58,9 +59,9 @@
                 
 
                   <tr class="intercalado">
-                    <td><a href="{{link_modificar}}{{i.id}}">{{i.nombre}} {% if i == Cliente %}{{i.apellido}}{% endif %}</a></td>
+                    <td><a href="{{link_modificar}}{{i.id}}">{{i.nombre}} {% if titulo == "Clientes" %}{{i.apellido}}{% endif %}</a></td>
                     <td> {{i.condicion_iva}} </td>
-                    {% if i == Cliente %}
+                    {% if titulo == "Clientes" %}
                       <td> {{i.dni}} </td>
                     {% endif %}
                     <td> {{i.cuit}} </td>
