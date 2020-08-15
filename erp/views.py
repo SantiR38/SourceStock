@@ -610,7 +610,7 @@ def modificar_cliente(request, id_param):
         new_cliente = Cliente.objects.get(id=id_param)
     except ObjectDoesNotExist as DoesNotExist:
             template = loader.get_template('mensaje.html') # La redirección se hace con JavaScript en este template luego de 5 segundos.
-            ctx = {'mensaje': 'Error 404. No se encontró el artículo.',
+            ctx = {'mensaje': 'Error 404. No se encontró el cliente.',
                 'redireccion': 'Volviendo a la página de ventas...'}
             return HttpResponse(template.render(ctx, request))
     else:  
@@ -648,6 +648,51 @@ def modificar_cliente(request, id_param):
             new_cliente.email = infForm["email"]
 
             new_cliente.save()
+
+            return redirect('control_clientes')
+
+    return HttpResponse(template.render(ctx, request))
+
+def modificar_proveedor(request, id_param):
+    template = loader.get_template('agregar_modificar.html')
+    try:
+        new_proveedor = Proveedor.objects.get(id=id_param)
+    except ObjectDoesNotExist as DoesNotExist:
+            template = loader.get_template('mensaje.html') # La redirección se hace con JavaScript en este template luego de 5 segundos.
+            ctx = {'mensaje': 'Error 404. No se encontró el proveedor.',
+                'redireccion': 'Volviendo a la página de ventas...'}
+            return HttpResponse(template.render(ctx, request))
+    else:  
+        detalles_formulario = {
+            'nombre': new_proveedor.nombre,
+            'condicion_iva': new_proveedor.condicion_iva,
+            'cuit': new_proveedor.cuit,
+            'direccion': new_proveedor.direccion,
+            'telefono': new_proveedor.telefono,
+            'email': new_proveedor.email
+        }
+        miFormulario = FormProveedor(detalles_formulario)
+        ctx = {
+            "datos_generales": stock_total(),
+            "articulos": inventario(Proveedor),
+            "form": miFormulario,
+            "mensaje": "",
+            "titulo": "Modificar proveedor"
+        }
+
+    if request.method == "POST":
+        miFormulario = FormProveedor(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            
+            new_proveedor.nombre = infForm["nombre"]
+            new_proveedor.condicion_iva = infForm["condicion_iva"]
+            new_proveedor.cuit = infForm["cuit"]
+            new_proveedor.direccion = infForm["direccion"]
+            new_proveedor.telefono = infForm["telefono"]
+            new_proveedor.email = infForm["email"]
+
+            new_proveedor.save()
 
             return redirect('control_clientes')
 
