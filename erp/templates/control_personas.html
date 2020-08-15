@@ -46,7 +46,9 @@
                 <tr class="intercalado">
                   <th>Nombre o Empresa</th>
                   <th>Condicion frente al IVA</th>
-                  <th>DNI</th>
+                  {% if articulos.0 == Cliente %}
+                    <th>DNI</th>
+                  {% endif %}
                   <th>CUIT</th>
                   <th>Dirección</th>
                   <th>Teléfono</th>
@@ -56,9 +58,11 @@
                 
 
                   <tr class="intercalado">
-                    <td><a href="modificar_cliente/{{i.id}}">{{i.nombre}} {{i.apellido}}</a></td>
+                    <td><a href="{{link_modificar}}{{i.id}}">{{i.nombre}} {% if i == Cliente %}{{i.apellido}}{% endif %}</a></td>
                     <td> {{i.condicion_iva}} </td>
-                    <td> {{i.dni}} </td>
+                    {% if i == Cliente %}
+                      <td> {{i.dni}} </td>
+                    {% endif %}
                     <td> {{i.cuit}} </td>
                     <td> {{i.direccion}} </td>
                     <td> {{i.telefono}} </td>

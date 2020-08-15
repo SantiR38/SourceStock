@@ -335,44 +335,6 @@ def cancelar(request):
     return HttpResponse(template.render(ctx, request))
 
 
-def cliente(request):
-    template = loader.get_template('agregar_modificar.html')
-    miFormulario = FormCliente()
-    lista = []
-    ctx = {
-        "articulo_a_vender": lista,
-        "datos_generales": stock_total(),
-        "form": miFormulario,
-        "mensaje": "",
-        "titulo": "Gestión de clientes"
-    }
-
-    if request.method == "POST":
-        miFormulario = FormCliente(request.POST)
-        if miFormulario.is_valid():
-            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            
-            try: # Si el cliente existe en la base de datos
-                new_client = Cliente.objects.get(dni=infForm['dni'])
-                ctx['mensaje'] = "El cliente ya existe"
-                
-            except ObjectDoesNotExist as DoesNotExist: # Si el cliente no existe en la base de datos, crearlo
-                new_client = Cliente.objects.create(nombre=infForm['nombre'],
-                                                    apellido=infForm['apellido'],
-                                                    condicion_iva=infForm['condicion_iva'],
-                                                    dni=infForm['dni'],
-                                                    cuit=infForm['cuit'],
-                                                    direccion=infForm['direccion'],
-                                                    telefono=infForm['telefono'],
-                                                    email=infForm['email'])
-
-                return redirect('control_clientes')
-
-            miFormulario = FormCliente()
-
-    return HttpResponse(template.render(ctx, request))
-
-
 def control_inventario(request):
     template = loader.get_template('control_inventario.html')
     miFormulario = FormBusqueda()
@@ -392,7 +354,6 @@ def control_inventario(request):
         miFormulario = FormBusqueda()
 
     return HttpResponse(template.render(ctx, request))
-
 
 def articulo(request, codigo_articulo):
     template = loader.get_template('agregar_modificar.html')
@@ -524,49 +485,12 @@ def historial_ventas(request):
     else:
         return redirect('venta_exitosa')
 
-
 def recibo(request, id_venta):
     try:
         return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='hello.pdf')
     except ObjectDoesNotExist as DoesNotExist :
         return redirect('transaccion_exitosa')
     
-
-def proveedor(request):
-    template = loader.get_template('agregar_modificar.html')
-    miFormulario = FormProveedor()
-    lista = []
-    ctx = {
-        "articulo_a_vender": lista,
-        "datos_generales": stock_total(),
-        "form": miFormulario,
-        "mensaje": "",
-        "titulo": "Gestión de proveedores"
-    }
-
-    if request.method == "POST":
-        miFormulario = FormProveedor(request.POST)
-        if miFormulario.is_valid():
-            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            
-            try: # Si el Proveedor existe en la base de datos
-                new_proveedor = Proveedor.objects.get(nombre=infForm['nombre'])
-                ctx['mensaje'] = "El proveedor ya existe"
-                
-            except ObjectDoesNotExist as DoesNotExist: # Si el Proveedor no existe en la base de datos, crearlo
-                new_proveedor = Proveedor.objects.create(nombre=infForm['nombre'],
-                                                    condicion_iva=infForm['condicion_iva'],
-                                                    cuit=infForm['cuit'],
-                                                    direccion=infForm['direccion'],
-                                                    telefono=infForm['telefono'],
-                                                    email=infForm['email'])
-
-                ctx['mensaje'] = 'El proveedor fue agregado correctamente.'
-
-            miFormulario = FormProveedor()
-
-    return HttpResponse(template.render(ctx, request))
-
 
 def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')
@@ -579,6 +503,43 @@ def script_actualizacion(request):
 
     return HttpResponse(template.render(ctx, request))
 
+#Funciones para administrar los clientes
+def cliente(request):
+    template = loader.get_template('agregar_modificar.html')
+    miFormulario = FormCliente()
+    lista = []
+    ctx = {
+        "articulo_a_vender": lista,
+        "datos_generales": stock_total(),
+        "form": miFormulario,
+        "mensaje": "",
+        "titulo": "Gestión de clientes"
+    }
+
+    if request.method == "POST":
+        miFormulario = FormCliente(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            
+            try: # Si el cliente existe en la base de datos
+                new_client = Cliente.objects.get(dni=infForm['dni'])
+                ctx['mensaje'] = "El cliente ya existe"
+                
+            except ObjectDoesNotExist as DoesNotExist: # Si el cliente no existe en la base de datos, crearlo
+                new_client = Cliente.objects.create(nombre=infForm['nombre'],
+                                                    apellido=infForm['apellido'],
+                                                    condicion_iva=infForm['condicion_iva'],
+                                                    dni=infForm['dni'],
+                                                    cuit=infForm['cuit'],
+                                                    direccion=infForm['direccion'],
+                                                    telefono=infForm['telefono'],
+                                                    email=infForm['email'])
+
+                return redirect('control_clientes')
+
+            miFormulario = FormCliente()
+
+    return HttpResponse(template.render(ctx, request))
 
 def control_clientes(request):
     template = loader.get_template('control_personas.html')
@@ -589,6 +550,7 @@ def control_clientes(request):
         "articulos": inventario(Cliente).order_by('nombre'),
         "agregar_persona": "+ Agregar Cliente",
         "link_agregar": "/cliente",
+        "link_modificar": "/modificar_cliente/",
         "form": miFormulario
     }
 
@@ -602,7 +564,6 @@ def control_clientes(request):
         miFormulario = FormBusqueda()
 
     return HttpResponse(template.render(ctx, request))
-
 
 def modificar_cliente(request, id_param):
     template = loader.get_template('agregar_modificar.html')
@@ -653,6 +614,42 @@ def modificar_cliente(request, id_param):
 
     return HttpResponse(template.render(ctx, request))
 
+#Funciones para administrar los proveedores
+def proveedor(request):
+    template = loader.get_template('agregar_modificar.html')
+    miFormulario = FormProveedor()
+    lista = []
+    ctx = {
+        "articulo_a_vender": lista,
+        "datos_generales": stock_total(),
+        "form": miFormulario,
+        "mensaje": "",
+        "titulo": "Gestión de proveedores"
+    }
+
+    if request.method == "POST":
+        miFormulario = FormProveedor(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            
+            try: # Si el Proveedor existe en la base de datos
+                new_proveedor = Proveedor.objects.get(nombre=infForm['nombre'])
+                ctx['mensaje'] = "El proveedor ya existe"
+                
+            except ObjectDoesNotExist as DoesNotExist: # Si el Proveedor no existe en la base de datos, crearlo
+                new_proveedor = Proveedor.objects.create(nombre=infForm['nombre'],
+                                                    condicion_iva=infForm['condicion_iva'],
+                                                    cuit=infForm['cuit'],
+                                                    direccion=infForm['direccion'],
+                                                    telefono=infForm['telefono'],
+                                                    email=infForm['email'])
+
+                ctx['mensaje'] = 'El proveedor fue agregado correctamente.'
+
+            miFormulario = FormProveedor()
+
+    return HttpResponse(template.render(ctx, request))
+
 def modificar_proveedor(request, id_param):
     template = loader.get_template('agregar_modificar.html')
     try:
@@ -695,5 +692,29 @@ def modificar_proveedor(request, id_param):
             new_proveedor.save()
 
             return redirect('control_clientes')
+
+    return HttpResponse(template.render(ctx, request))
+
+def control_proveedores(request):
+    template = loader.get_template('control_personas.html')
+    miFormulario = FormBusqueda()
+    ctx = {
+        "titulo": "Proveedores",
+        "datos_generales": stock_total(),
+        "articulos": inventario(Proveedor).order_by('nombre'),
+        "agregar_persona": "+ Agregar Proveedor",
+        "link_agregar": "/proveedor",
+        "link_modificar": "/modificar_proveedor/",
+        "form": miFormulario
+    }
+
+    if request.method == "POST":
+        miFormulario = FormBusqueda(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data
+            resultado = Proveedor.objects.filter(nombre=infForm['buscar'])
+            ctx["articulos"] = resultado
+    else:
+        miFormulario = FormBusqueda()
 
     return HttpResponse(template.render(ctx, request))
