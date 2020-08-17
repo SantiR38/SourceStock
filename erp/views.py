@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
-from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor
+from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor, emitir_detalle_entrada
 from datetime import date
 from decimal import *
 
@@ -168,6 +168,12 @@ def historial_compras(request):
 
     else:
         return redirect('venta_exitosa')
+
+def detalle_entrada(request, id_entrada):
+    try:
+        return FileResponse(emitir_detalle_entrada(id_entrada), as_attachment=False, filename='hello.pdf')
+    except ObjectDoesNotExist as DoesNotExist:
+        return redirect('transaccion_exitosa')
 
 # Funcion util para compra o venta
 def cancelar(request):

@@ -264,7 +264,101 @@ def emitir_recibo(id_venta):
     # present the option to save the file.
     buffer.seek(0)
     return buffer
+
+def emitir_detalle_entrada(id_entrada):
+
+    # Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
+    # Utiliza la librería reportlab
+
+    entrada = Entrada.objects.get(id=id_entrada)
+    detalle_entrada = DetalleEntrada.objects.filter(id_entrada=entrada)
+
+    # Create a file-like buffer to receive PDF data.
+    buffer = io.BytesIO()
+
+    # Create the PDF object, using the buffer as its "file."
+    p = canvas.Canvas(buffer)
+
+    # Draw things on the PDF. Here's where the PDF generation happens.
+    # See the ReportLab documentation for the full list of functionality.
+    p.setFont("Helvetica", 26)
+    p.drawString(38, 780, "Registro de compra") #(Ancho, Alto, "Texto")
     
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(38, 740, "LA CASA DE LAS BATERÍAS")
+    
+    p.setFont("Helvetica", 10)
+    p.drawString(38, 715, "Fecha de emisión:")
+    p.drawString(130, 715, str(entrada.fecha))
+
+    p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
+    p.drawString(297.5, 693, "Tel: 358 517-0913")
+
+
+    p.setFont("Helvetica-Bold", 10)
+    p.drawString(38, 673, "Proveedor: ")
+    p.drawString(38, 653, "Dirección: ")
+    p.drawString(297.5, 673, "Cond. IVA: ")
+    p.drawString(297.5, 653, "CUIT: ")
+    
+    p.setFont("Helvetica", 10)
+    if entrada.proveedor != None:
+        p.drawString(95, 673, entrada.proveedor.nombre)
+        p.drawString(95, 653, entrada.proveedor.direccion)
+        p.drawString(355, 673, entrada.proveedor.condicion_iva)
+        p.drawString(355, 653, entrada.proveedor.cuit)
+    else:
+        p.drawString(355, 673, "Consumidor Final")
+    
+    # Header
+    p.line(30, 820, 565, 820) #Horizontal Grande
+    p.line(30, 690, 565, 690) #Horizontal Grande
+    p.line(30, 820, 30, 690) #Vertical Izq
+    p.line(565, 820, 565, 690) #Vertical Der
+    p.line(30, 705, 565, 705) #Horizontal Grande
+
+
+    #Titulos de tabla
+    alto = 600
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(50, alto, "Cantidad")
+    p.drawString(150, alto, "Detalles")
+    p.drawString(390, alto, "P. Unitario")
+    p.drawString(490, alto, "P. Total")
+    p.line(50, 590, 535, 590)
+
+    # Articulos a vender
+    alto = 550
+    p.setFont("Helvetica", 11)
+    '''
+    for i in detalle_venta:
+        p.drawString(50, alto, str(i.cantidad))
+        p.drawString(150, alto, i.id_producto.descripcion)
+        p.drawString(380, alto, "$")
+        p.drawString(390, alto, str(i.precio_unitario))
+        p.drawString(480, alto, "$")
+        p.drawString(490, alto, str(i.cantidad*i.precio_unitario))
+        alto -= 30
+    '''
+
+    # Filas total
+
+    alto -= 50
+    p.setFont("Helvetica-Bold", 11)
+    p.drawString(390, alto, "Total")
+    p.drawString(480, alto, "$")
+    #p.drawString(490, alto, str(venta.total))
+
+
+    # Close the PDF object cleanly, and we're done.
+    p.showPage()
+    p.save()
+
+    # FileResponse sets the Content-Disposition header so that browsers
+    # present the option to save the file.
+    buffer.seek(0)
+    return buffer
+
 def lista_proveedores():
 
     # Lista la totalidad de los proveedores para mostrar en la vista Entrada
