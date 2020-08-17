@@ -1,6 +1,10 @@
 {% extends "base_layout.html" %}
 {% load static %}
 
+{% block heading %}
+{{titulo}}
+{% endblock heading %}
+
 {% block content %}
 <div class="container-fluid">
   {% include "small_boxes.html" %}
@@ -17,16 +21,16 @@
           <div class="tab-content p-0">
             <!-- Morris chart - Sales -->
             <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
-
+              {% if titulo == "Historial de ventas" %}
               <table style="width:100%;" class="borde-externo">
                 <tr class="intercalado">
-                  <th>Código de Venta</th>
+                  <th>Cód. Venta</th>
                   <th>Fecha</th>
                   <th>Cliente</th>
                   <th>Valor total</th>
 
                 </tr>
-                {% for i in venta %}
+                {% for i in transaccion %}
                 
 
                   <tr class="intercalado">
@@ -44,6 +48,34 @@
 
                 {% endfor %}
               </table>
+              {% else %}
+              <table style="width:100%;" class="borde-externo">
+                <tr class="intercalado">
+                  <th>Cód. Compra</th>
+                  <th>Fecha</th>
+                  <th>Proveedor</th>
+                  <th>Valor total</th>
+
+                </tr>
+                {% for i in transaccion %}
+                
+
+                  <tr class="intercalado">
+                    <td><a href="" target="_blank">{{i.id}}</a></td>
+                    <td> {{i.fecha}} </td>
+                    <td> 
+                      {% if i.proveedor != None %}
+                      {{i.proveedor.nombre}}
+                      {% else %}
+                      -
+                      {% endif %}
+                    </td>
+                    <td> ${{i.total}} </td>
+                  </tr>
+
+                {% endfor %}
+              </table>
+              {% endif %}
               <br />
 
             </div>

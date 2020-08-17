@@ -136,6 +136,38 @@ def transaccion_exitosa(request):
 
     return HttpResponse(template.render(ctx, request))
 
+def historial_compras(request):
+    template = loader.get_template('historial_ventas.html')
+    miFormulario = FormFiltroFecha()
+    compra_historica = Entrada.objects.all().order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
+    if compra_historica.exists():
+        ultimas_compras = []
+        x = 0
+        for i in compra_historica: # Este bucle solo selecciona una cantidad limitada de ventas para mostrar
+            ultimas_compras.append(i)
+            x += 1
+            if x == 50:
+                break
+        ctx = {
+            "datos_generales": stock_total(),
+            "transaccion": ultimas_compras,
+            "form": miFormulario,
+            "titulo": "Historial de compras"
+        }
+        # Filtro fecha
+        if request.method == "POST":
+            miFormulario = FormFiltroFecha(request.POST)
+            if miFormulario.is_valid():
+                infForm = miFormulario.cleaned_data
+                ctx["transaccion"] = Entrada.objects.filter(fecha__range=[infForm['fecha_inicial'], infForm['fecha_final']]).order_by('-fecha', '-id')
+        else:
+            miFormulario = FormFiltroFecha()
+        # !filtro fecha
+
+        return HttpResponse(template.render(ctx, request))
+
+    else:
+        return redirect('venta_exitosa')
 
 # Funcion util para compra o venta
 def cancelar(request):
@@ -342,6 +374,7 @@ def articulo(request, codigo_articulo):
 
     return HttpResponse(template.render(ctx, request))
 
+
 # Funciones para administrar las ventas
 def venta(request):
     template = loader.get_template('venta.html')
@@ -426,16 +459,16 @@ def historial_ventas(request):
                 break
         ctx = {
             "datos_generales": stock_total(),
-            "venta": ultimas_ventas,
-            "venta_historica": venta_historica,
-            "form": miFormulario
+            "transaccion": ultimas_ventas,
+            "form": miFormulario,
+            "titulo": "Historial de ventas"
         }
         # Filtro fecha
         if request.method == "POST":
             miFormulario = FormFiltroFecha(request.POST)
             if miFormulario.is_valid():
                 infForm = miFormulario.cleaned_data
-                ctx["venta"] = Venta.objects.filter(fecha__range=[infForm['fecha_inicial'], infForm['fecha_final']]).order_by('-fecha', '-id')
+                ctx["transaccion"] = Venta.objects.filter(fecha__range=[infForm['fecha_inicial'], infForm['fecha_final']]).order_by('-fecha', '-id')
         else:
             miFormulario = FormFiltroFecha()
         # !filtro fecha
