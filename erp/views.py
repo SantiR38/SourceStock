@@ -557,7 +557,7 @@ def control_clientes(request):
         miFormulario = FormBusqueda(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data
-            resultado = Article.objects.filter(codigo=int(infForm['buscar'])) # Código
+            resultado = Cliente.objects.filter(dni=int(infForm['buscar'])) # Código
             ctx["articulos"] = resultado
     else:
         miFormulario = FormBusqueda()
