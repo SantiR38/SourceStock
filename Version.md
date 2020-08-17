@@ -85,3 +85,4 @@
 7. **Nueva vista:** Control de clientes.
 8. **Nueva vista:** Control de proveedores.
 9. **Nueva vista:** Historial de compras.
+10. **Nueva vista:** Detalle de compra.

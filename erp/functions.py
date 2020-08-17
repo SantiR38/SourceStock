@@ -323,31 +323,30 @@ def emitir_detalle_entrada(id_entrada):
     p.setFont("Helvetica-Bold", 12)
     p.drawString(50, alto, "Cantidad")
     p.drawString(150, alto, "Detalles")
-    p.drawString(390, alto, "P. Unitario")
-    p.drawString(490, alto, "P. Total")
+    p.drawString(380, alto, "Costo u.")
+    p.drawString(460, alto, "Costo Total")
     p.line(50, 590, 535, 590)
 
     # Articulos a vender
     alto = 550
     p.setFont("Helvetica", 11)
-    '''
-    for i in detalle_venta:
+
+    for i in detalle_entrada:
         p.drawString(50, alto, str(i.cantidad))
         p.drawString(150, alto, i.id_producto.descripcion)
         p.drawString(380, alto, "$")
-        p.drawString(390, alto, str(i.precio_unitario))
-        p.drawString(480, alto, "$")
-        p.drawString(490, alto, str(i.cantidad*i.precio_unitario))
+        p.drawString(390, alto, str(i.costo_unitario))
+        p.drawString(460, alto, "$")
+        p.drawString(470, alto, str(i.cantidad*i.costo_unitario))
         alto -= 30
-    '''
 
     # Filas total
 
     alto -= 50
     p.setFont("Helvetica-Bold", 11)
     p.drawString(390, alto, "Total")
-    p.drawString(480, alto, "$")
-    #p.drawString(490, alto, str(venta.total))
+    p.drawString(460, alto, "$")
+    p.drawString(470, alto, str(entrada.total))
 
 
     # Close the PDF object cleanly, and we're done.
