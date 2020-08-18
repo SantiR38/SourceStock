@@ -73,3 +73,16 @@
 
 1. Filtro de fecha para historial de ventas.
 2. Logo de empresa añadido a recibo.
+
+## Versión 1.7
+
+1. Campo Apellido cliente ya no es obligatorio. Campo nombre ahora se titula "Nombre o Empresa".
+2. Agregado archivo requirements.txt
+3. Modelo, formulario y vista "Proveedor" implementados al software.
+4. Corregido Script de actualización para añadir los 3 valores de ArtState.
+5. Ahora el cliente se puede buscar por nombre en la vista Venta.
+6. Artículos de control de inventario ahora están ordenados alfabéticamente.
+7. **Nueva vista:** Control de clientes.
+8. **Nueva vista:** Control de proveedores.
+9. **Nueva vista:** Historial de compras.
+10. **Nueva vista:** Detalle de compra.
