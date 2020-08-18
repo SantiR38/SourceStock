@@ -3,7 +3,6 @@ __pycache__/
 
 venv/
 
-erp/static/plugins/
 erp/pdf_files/
 
 local.py
