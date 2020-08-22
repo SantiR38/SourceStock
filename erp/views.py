@@ -513,11 +513,11 @@ def venta_exitosa(request):
             ctx['hay_recibo'] = True
         else:
             ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
-
+        ctx['id_venta'] = nueva_venta.id
     except ObjectDoesNotExist as DoesNotExist:
         ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
         
-    ctx['id_venta'] = nueva_venta.id
+    
     return HttpResponse(template.render(ctx, request))
 
 def cancelar_unidad(request, codigo_articulo):
@@ -747,4 +747,9 @@ def control_proveedores(request):
         "link_modificar": "/modificar_proveedor/"
     }
 
+    return HttpResponse(template.render(ctx, request))
+
+def not_found(request):
+    template = loader.get_template('error_404.html')
+    ctx = {"titulo": "Error 404. Su solicitud no fue encontrada."}
     return HttpResponse(template.render(ctx, request))

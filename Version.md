@@ -86,3 +86,5 @@
 8. **Nueva vista:** Control de proveedores.
 9. **Nueva vista:** Historial de compras.
 10. **Nueva vista:** Detalle de compra.
+11. **Bug Fixed:** El historial solo muestra compras/ventas confirmadas.
+12. **Nueva vista:** Not_found o error 404.
