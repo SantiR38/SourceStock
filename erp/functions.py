@@ -379,3 +379,38 @@ def lista_clientes():
         for i in query:
             lista.append((i.nombre + " " + i.apellido, i.nombre + " " + i.apellido))
     return lista
+
+def crear_articulo(infForm):
+
+    costo_sin_iva = infForm['costo_sin_iva']
+    costo = infForm['costo']
+    porcentaje_descuento = infForm['porcentaje_descuento']
+
+    if costo_sin_iva != None:
+        costo = porcentaje_ganancia(costo_sin_iva, 21)
+    elif costo != None:
+        costo_sin_iva = costo / Decimal(1.21)
+
+    precio = porcentaje_ganancia(costo, infForm['porcentaje_ganancia'])
+
+    if porcentaje_descuento != None:
+        precio_descontado = porcentaje_ganancia(precio, -porcentaje_descuento)
+    else:
+        porcentaje_descuento = "-"
+        precio_descontado = "-"
+
+    contexto = {
+        "codigo": infForm['codigo'],
+        "descripcion": infForm['descripcion'],
+        "costo_sin_iva": costo_sin_iva,
+        "costo": costo,
+        "precio_sin_iva": porcentaje_ganancia(costo_sin_iva, infForm['porcentaje_ganancia']),
+        "precio": precio,
+        "porcentaje_ganancia": infForm['porcentaje_ganancia'],
+        "porcentaje_descuento": porcentaje_descuento,
+        "precio_descontado": precio_descontado,
+        "seccion": infForm['seccion'],
+        "stock": infForm['stock']
+    }
+
+    return contexto
