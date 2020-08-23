@@ -14,6 +14,7 @@ class Article(models.Model):
     precio_sin_iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     porcentaje_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    precio_descontado = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     seccion = models.CharField(max_length=100, blank=True, null=True)
     stock = models.IntegerField(verbose_name="Cantidad")
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True)
