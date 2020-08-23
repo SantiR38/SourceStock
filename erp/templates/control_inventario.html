@@ -33,13 +33,11 @@
                 <tr class="intercalado">
                   <th>Código</th>
                   <th>Descripción</th>
-                  <th>Costo sin IVA</th>
-                  <th>Costo con IVA</th>
-                  <th>Porc. Ganancia</th>
-                  <th>Precio sin IVA</th>
-                  <th>Precio con IVA</th>
-                  <th>Porc. Descuento</th>
-                  <th>Precio con Descuento</th>
+                  <th>Costo</th>
+                  <th>% Gan.</th>
+                  <th>Precio</th>
+                  <th>% Desc.</th>
+                  <th>Precio c/Desc.</th>
                   <th>Sección</th>
                   <th>Stock</th>
                 </tr>
@@ -49,10 +47,8 @@
                   <tr class="intercalado">
                     <td><a href="articulo/{{i.codigo}}">{{i.codigo}}</a></td>
                     <td> {{i.descripcion}} </td>
-                    <td> ${{i.costo_sin_iva}} </td>
                     <td> ${{i.costo}} </td>
                     <td> {{i.porcentaje_ganancia}}% </td>
-                    <td> ${{i.precio_sin_iva}} </td>
                     <td> ${{i.precio}} </td>
                     <td> {{i.porcentaje_descuento}}% </td>
                     <td> ${{i.precio_descontado}} </td>
