@@ -381,7 +381,7 @@ def lista_clientes():
     return lista
 
 def crear_articulo(infForm):
-
+    # Funciona solo para modificar objetos de tipo Article.
     costo_sin_iva = infForm['costo_sin_iva']
     costo = infForm['costo']
     porcentaje_descuento = infForm['porcentaje_descuento']
@@ -408,6 +408,26 @@ def crear_articulo(infForm):
         "precio_descontado": precio_descontado,
         "seccion": infForm['seccion'],
         "stock": infForm['stock']
+    }
+
+    return contexto
+
+def comprar_articulo(infForm):
+    # Funciona solo para modificar objetos de tipo DetalleEntrada.
+    
+    costo_sin_iva = infForm['costo_sin_iva']
+    costo = infForm['costo']
+
+    if costo_sin_iva != None:
+        costo = porcentaje_ganancia(costo_sin_iva, 21)
+    elif costo != None:
+        costo_sin_iva = costo / Decimal(1.21)
+
+    contexto = {
+        "codigo": infForm['codigo'],
+        "costo_sin_iva": costo_sin_iva,
+        "costo": costo,
+        "cantidad": infForm['cantidad']
     }
 
     return contexto

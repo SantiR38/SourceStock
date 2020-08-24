@@ -5,7 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
 from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente
-from erp.functions import crear_articulo, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor, emitir_detalle_entrada
+from erp.functions import crear_articulo, comprar_articulo, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor, emitir_detalle_entrada
 from datetime import date
 from decimal import *
 
@@ -49,42 +49,27 @@ def entrada(request):
                 
                 if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
 
-                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
-                        producto_leido = DetalleEntrada.objects.create(costo_sin_iva=infForm['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
-                                                                    costo_unitario = infForm['costo'],
-                                                                    cantidad=infForm['cantidad'],
-                                                                    id_entrada=Entrada.objects.get(id_state=estado),
-                                                                    id_producto=Article.objects.get(codigo=infForm['codigo']))
-                        ctx['inexistente'] = ''
-                    else:
-                        ctx['inexistente'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
-
+                    ctx['inexistente'] = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
 
                 elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
-                    if infForm['costo_sin_iva'] != None:
-                        producto_leido = DetalleEntrada.objects.create(costo_sin_iva=infForm['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
-                                                                costo_unitario = porcentaje_ganancia(infForm['costo_sin_iva'], 21),
-                                                                cantidad=infForm['cantidad'],
-                                                                id_entrada=Entrada.objects.get(id_state=estado),
-                                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
-                    else:
-                        producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], # Iniciar un objeto de tipo detalle_entrada
-                                                                    costo_sin_iva=infForm['costo'] / Decimal(1.21),
-                                                                    cantidad=infForm['cantidad'],
-                                                                    id_entrada=Entrada.objects.get(id_state=estado),
-                                                                    id_producto=Article.objects.get(codigo=infForm['codigo']))
-                                    # Se suman los precios unitarios al precio total de la compra
+
+                    producto_leido = DetalleEntrada.objects.create(costo_sin_iva = comprar_articulo(infForm)['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
+                                                            costo_unitario = comprar_articulo(infForm)['costo'],
+                                                            cantidad=comprar_articulo(infForm)['cantidad'],
+                                                            id_entrada=Entrada.objects.get(id_state=estado),
+                                                            id_producto=Article.objects.get(codigo=infForm['codigo']))
                     ctx['inexistente'] = ''
+
                 else:
                     ctx['inexistente'] = "Debes rellenar uno de los dos costos."
 
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la compra seguirá guardada.'
             
-            lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
+            lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta)
             nueva_venta.total = 0
             for i in lista:
-                nueva_venta.total += (i.costo_unitario * i.cantidad)
+                nueva_venta.total += (i.costo_unitario * i.cantidad) # Se suman los precios unitarios al precio total de la compra
             nueva_venta.save()
             ctx['total'] = nueva_venta.total
             ctx['articulo_a_comprar'] = lista
@@ -120,6 +105,7 @@ def transaccion_exitosa(request):
                 i.id_producto.costo = i.costo_unitario
                 i.id_producto.precio_sin_iva = porcentaje_ganancia(i.costo_sin_iva, i.id_producto.porcentaje_ganancia)
                 i.id_producto.precio = porcentaje_ganancia(i.costo_unitario, i.id_producto.porcentaje_ganancia)
+                i.id_producto.precio_descontado = porcentaje_ganancia(i.id_producto.precio, -i.id_producto.porcentaje_descuento)
                 i.id_producto.stock += i.cantidad
                 i.id_producto.save()
             
