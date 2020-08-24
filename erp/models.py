@@ -47,6 +47,8 @@ class Venta(models.Model):
     fecha = models.DateField()
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
+    descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    total_con_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     cliente = models.ForeignKey('Cliente', on_delete=models.SET_NULL, null=True)
 
 
@@ -54,8 +56,8 @@ class DetalleVenta(models.Model):
     id_venta = models.ForeignKey('Venta', on_delete=models.CASCADE) # *1
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # Si bien tanto este dato como el del precio estan en el objeto Article,
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2) # es mejor guardar el producto al precio que se vendió para mejor contabilidad
-    pocentaje_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    precio_descontado = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    porcentaje_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
 

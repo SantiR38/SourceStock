@@ -328,7 +328,9 @@ def venta(request):
         "datos_generales": stock_total(),
         "form": miFormulario,
         "total": venta_activa()[1].total,
-        "cliente": ""
+        "cliente": "",
+        "descuento": venta_activa()[2],
+        "total_con_descuento": venta_activa()[1].total_con_descuento
     }
     if venta_activa()[1].cliente != None:
         ctx['cliente'] = venta_activa()[1].cliente.nombre + " " + venta_activa()[1].cliente.apellido
@@ -360,16 +362,25 @@ def venta(request):
 
                 producto_leido = DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
                                                                precio_unitario=new_article.precio,
+                                                               porcentaje_descuento=new_article.porcentaje_descuento,
+                                                               descuento=new_article.precio * new_article.porcentaje_descuento / 100,
                                                                cantidad=infForm['cantidad'],
                                                                id_venta=Venta.objects.get(id_state=estado),
                                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
             # Se suman los precios unitarios al precio total de la venta
                 lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
                 nueva_venta.total = 0
+                descuento_total = 0
                 for i in lista:
                     nueva_venta.total += (i.precio_unitario * i.cantidad)
+                    if i.descuento != None:
+                        descuento_total += (i.descuento * i.cantidad)
+                nueva_venta.total_con_descuento = nueva_venta.total - descuento_total
+                
                 nueva_venta.save()
                 ctx['total'] = nueva_venta.total
+                ctx['descuento'] = descuento_total
+                ctx['total_con_descuento'] = nueva_venta.total_con_descuento
                 ctx['inexistente'] = ''
                 ctx['articulo_a_vender'] = lista
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos

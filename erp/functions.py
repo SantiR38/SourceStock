@@ -48,6 +48,7 @@ def venta_activa():
     
     lista = []
     estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+    descuento_total = 0
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
         nueva_venta = Venta.objects.get(id_state=estado)
     except ObjectDoesNotExist as DoesNotExist:
@@ -59,8 +60,13 @@ def venta_activa():
         nueva_venta.total = 0
         for i in lista:
             nueva_venta.total += (i.precio_unitario * i.cantidad)
+
+            if i.descuento != None:
+                descuento_total += (i.descuento * i.cantidad)
+        nueva_venta.total_con_descuento = nueva_venta.total - descuento_total
+        
         nueva_venta.save()
-    return [lista, nueva_venta]
+    return [lista, nueva_venta, descuento_total]
 
 def compra_activa():
 
