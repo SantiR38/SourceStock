@@ -385,7 +385,7 @@ def crear_articulo(infForm):
     costo_sin_iva = infForm['costo_sin_iva']
     costo = infForm['costo']
     porcentaje_descuento = infForm['porcentaje_descuento']
-
+    precio_descontado = None
     if costo_sin_iva != None:
         costo = porcentaje_ganancia(costo_sin_iva, 21)
     elif costo != None:
@@ -395,9 +395,6 @@ def crear_articulo(infForm):
 
     if porcentaje_descuento != None:
         precio_descontado = porcentaje_ganancia(precio, -porcentaje_descuento)
-    else:
-        porcentaje_descuento = "-"
-        precio_descontado = "-"
 
     contexto = {
         "codigo": infForm['codigo'],

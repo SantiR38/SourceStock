@@ -268,6 +268,7 @@ def control_inventario(request):
     return HttpResponse(template.render(ctx, request))
 
 def articulo(request, codigo_articulo):
+    # Modificar un artículo existente.
     template = loader.get_template('agregar_modificar.html')
     try:
         new_article = Article.objects.get(codigo=codigo_articulo)
@@ -279,6 +280,7 @@ def articulo(request, codigo_articulo):
             'descripcion': new_article.descripcion,
             'costo': new_article.costo,
             'porcentaje_ganancia': new_article.porcentaje_ganancia,
+            'porcentaje_descuento': new_article.porcentaje_descuento,
             'seccion': new_article.seccion,
             'stock': new_article.stock
         }
@@ -296,60 +298,28 @@ def articulo(request, codigo_articulo):
                 infForm = miFormulario.cleaned_data
                 
                 if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
-                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
-                        
-                        new_article.codigo = infForm['codigo']
-                        if infForm['descripcion'] != "":
-                            new_article.descripcion = infForm['descripcion']
-                        new_article.costo_sin_iva = infForm['costo_sin_iva']
-                        new_article.costo = infForm['costo']
-                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia'])
-                        new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
-                        if infForm['seccion'] != "":
-                            new_article.seccion = infForm['seccion']
-                        new_article.stock = infForm['stock']
-                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-                        
-                        return redirect('control_inventario')
-                    else:
-                        ctx['mensaje'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
-                        miFormulario = FormNuevoArticulo(detalles_formulario)
+                    
+                    ctx['mensaje'] = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
 
                 elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
-                    if infForm['costo_sin_iva'] != None:
+                    
+                    new_article.codigo = infForm['codigo']
+                    if infForm['descripcion'] != "":
+                        new_article.descripcion = infForm['descripcion']
+                    new_article.costo_sin_iva = infForm['costo_sin_iva']
+                    new_article.costo = crear_articulo(infForm)['costo']
+                    new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
+                    new_article.precio_sin_iva = crear_articulo(infForm)['precio_sin_iva']
+                    new_article.precio = crear_articulo(infForm)['precio']
+                    new_article.porcentaje_descuento = crear_articulo(infForm)['porcentaje_descuento']
+                    new_article.precio_descontado = crear_articulo(infForm)['precio_descontado']
+                    if infForm['seccion'] != "":
+                        new_article.seccion = infForm['seccion']
+                    new_article.stock = infForm['stock']
+                    
+                    new_article.save() # Guardamos los cambios en la base de datos
 
-                        new_article.codigo = infForm['codigo']
-                        if infForm['descripcion'] != "":
-                            new_article.descripcion = infForm['descripcion']
-                        new_article.costo_sin_iva = infForm['costo_sin_iva']
-                        new_article.costo = porcentaje_ganancia(infForm['costo_sin_iva'], 21)
-                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia'])
-                        new_article.precio = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']) * Decimal(1.21)
-                        if infForm['seccion'] != "":
-                            new_article.seccion = infForm['seccion']
-                        new_article.stock = infForm['stock']
-                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-
-                        return redirect('control_inventario')
-                        
-                    else: # Si el costo esta rellenado
-                        
-                        new_article.codigo = infForm['codigo']
-                        if infForm['descripcion'] != "":
-                            new_article.descripcion = infForm['descripcion']
-                        new_article.costo_sin_iva = infForm['costo'] / Decimal(1.21)
-                        new_article.costo = infForm['costo']
-                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) / Decimal(1.21)
-                        new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia'])
-                        if infForm['seccion'] != "":
-                            new_article.seccion = infForm['seccion']
-                        new_article.stock = infForm['stock']
-                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-
-                        return redirect('control_inventario')
+                    return redirect('control_inventario')
 
                 else:
                     ctx['mensaje'] = "PROBLEMA: Debes rellenar uno de los dos costos."
