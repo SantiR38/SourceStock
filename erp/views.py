@@ -329,7 +329,7 @@ def venta(request):
         "form": miFormulario,
         "total": venta_activa()[1].total,
         "cliente": "",
-        "descuento": venta_activa()[2],
+        "descuento": venta_activa()[1].descuento,
         "total_con_descuento": venta_activa()[1].total_con_descuento
     }
     if venta_activa()[1].cliente != None:
@@ -350,6 +350,7 @@ def venta(request):
                     nueva_venta = Venta.objects.create(fecha=date.today(),
                                                          total=0,
                                                          id_state=estado,
+                                                         descuento=0,
                                                          cliente=buscar_cliente(infForm['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
                 else:
                     if infForm['dni_cliente'] != None:
@@ -370,16 +371,15 @@ def venta(request):
             # Se suman los precios unitarios al precio total de la venta
                 lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
                 nueva_venta.total = 0
-                descuento_total = 0
                 for i in lista:
                     nueva_venta.total += (i.precio_unitario * i.cantidad)
                     if i.descuento != None:
-                        descuento_total += (i.descuento * i.cantidad)
-                nueva_venta.total_con_descuento = nueva_venta.total - descuento_total
+                        nueva_venta.descuento += (i.descuento * i.cantidad)
+                nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
                 
                 nueva_venta.save()
                 ctx['total'] = nueva_venta.total
-                ctx['descuento'] = descuento_total
+                ctx['descuento'] = nueva_venta.descuento
                 ctx['total_con_descuento'] = nueva_venta.total_con_descuento
                 ctx['inexistente'] = ''
                 ctx['articulo_a_vender'] = lista
