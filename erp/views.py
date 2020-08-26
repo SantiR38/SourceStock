@@ -340,52 +340,70 @@ def venta(request):
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
+            ##
+            # Venta
+            ##
+
+            try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
+                    nueva_venta = Venta.objects.get(id_state=estado)
+                    
+            except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
+                nueva_venta = Venta.objects.create(fecha=date.today(),
+                                                    total=0,
+                                                    id_state=estado,
+                                                    descuento=0,
+                                                    cliente=buscar_cliente(infForm['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+            else:
+                if infForm['dni_cliente'] != None:
+                    nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
+                    
+                elif infForm['cliente'] != None:
+                    nueva_venta.cliente = buscar_cliente(infForm['cliente'])
+                nueva_venta.save()
+            
+            ##
+            # Articulo
+            ##
+
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
-                try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
-                    nueva_venta = Venta.objects.get(id_state=estado)
-                    
-                except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
-                    nueva_venta = Venta.objects.create(fecha=date.today(),
-                                                         total=0,
-                                                         id_state=estado,
-                                                         descuento=0,
-                                                         cliente=buscar_cliente(infForm['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
-                else:
-                    if infForm['dni_cliente'] != None:
-                        nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
-                        
-                    elif infForm['cliente'] != None:
-                        nueva_venta.cliente = buscar_cliente(infForm['cliente'])
-                    nueva_venta.save()
                 
+                ##
+                # Detalle de venta
+                ##
 
-                producto_leido = DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
-                                                               precio_unitario=new_article.precio,
-                                                               porcentaje_descuento=new_article.porcentaje_descuento,
-                                                               descuento=new_article.precio * new_article.porcentaje_descuento / 100,
-                                                               cantidad=infForm['cantidad'],
-                                                               id_venta=Venta.objects.get(id_state=estado),
-                                                               id_producto=Article.objects.get(codigo=infForm['codigo']))
-            # Se suman los precios unitarios al precio total de la venta
-                lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
-                nueva_venta.total = 0
-                nueva_venta.descuento = 0
-                for i in lista:
-                    nueva_venta.total += (i.precio_unitario * i.cantidad)
-                    if i.descuento != None:
-                        nueva_venta.descuento += (i.descuento * i.cantidad)
-                nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+                if new_article.stock >= infForm['cantidad']:
+                    DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
+                                                precio_unitario=new_article.precio,
+                                                porcentaje_descuento=new_article.porcentaje_descuento,
+                                                descuento=new_article.precio * new_article.porcentaje_descuento / 100,
+                                                cantidad=infForm['cantidad'],
+                                                id_venta=Venta.objects.get(id_state=estado),
+                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
                 
-                nueva_venta.save()
-                ctx['total'] = nueva_venta.total
-                ctx['descuento'] = nueva_venta.descuento
-                ctx['total_con_descuento'] = nueva_venta.total_con_descuento
-                ctx['inexistente'] = ''
-                ctx['articulo_a_vender'] = lista
+                else:
+                    ctx['inexistente'] = 'No hay suficiente stock del producto.'
+            
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la venta seguirá guardada.'
+
+            # Se suman los precios unitarios al precio total de la venta
+            lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
+            nueva_venta.total = 0
+            nueva_venta.descuento = 0
+            for i in lista:
+                nueva_venta.total += (i.precio_unitario * i.cantidad)
+                if i.descuento != None:
+                    nueva_venta.descuento += (i.descuento * i.cantidad)
+            nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+            
+            nueva_venta.save()
+            ctx['total'] = nueva_venta.total
+            ctx['descuento'] = nueva_venta.descuento
+            ctx['total_con_descuento'] = nueva_venta.total_con_descuento
+            
+            ctx['articulo_a_vender'] = lista
 
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = miFormulario

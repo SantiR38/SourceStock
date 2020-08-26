@@ -88,3 +88,6 @@
 10. **Nueva vista:** Detalle de compra.
 11. **Bug Fixed:** El historial solo muestra compras/ventas confirmadas.
 12. **Nueva vista:** Not_found o error 404.
+13. **Bug Fixed:** Ahora el cliente es leido correctamente en la vista ventas.
+14. Precio con descuento agregado.
+15. **Bug Fixed:** Ya no se permite vender cantidades por encima del stock disponible.
