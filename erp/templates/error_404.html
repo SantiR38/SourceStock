@@ -1,0 +1,28 @@
+{% extends "base_layout.html" %}
+{% load static %}
+
+{% block heading %} {{titulo}} {% endblock heading %} 
+
+  {% block redirect %} 
+
+  <script>
+    function delayRedirect(){
+        // Esta funcion es para que se redireccione al index luego de 3 segundos
+
+        //La linea de abajo hace que aparezca un <span> con cuenta regresiva en pantalla (solo de prueba)
+        //document.getElementById('delayMsg').innerHTML = 'Tiempo restante: <span id="countDown">5</span> seconds....';
+        var count = 3;
+        setInterval(function(){
+            count--;
+            //document.getElementById('countDown').innerHTML = count;
+            if (count == 0){
+                window.location = '/'; 
+            }
+        },1000);
+    }
+    {% if request.path != '/venta_exitosa' or not hay_recibo %}delayRedirect();{% endif %}
+
+  </script>
+
+  {% endblock redirect %}
+

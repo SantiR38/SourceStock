@@ -48,17 +48,26 @@ def venta_activa():
     
     lista = []
     estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+    
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
         nueva_venta = Venta.objects.get(id_state=estado)
     except ObjectDoesNotExist as DoesNotExist:
         nueva_venta = Venta.objects.create(fecha=date.today(),
                                             total=0,
-                                            id_state=estado) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+                                            id_state=estado,
+                                            descuento=0
+                                            ) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
     else:
         lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
         nueva_venta.total = 0
+        nueva_venta.descuento = 0
         for i in lista:
             nueva_venta.total += (i.precio_unitario * i.cantidad)
+
+            if i.descuento != None:
+                nueva_venta.descuento += (i.descuento * i.cantidad)
+        nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+        
         nueva_venta.save()
     return [lista, nueva_venta]
 
@@ -250,10 +259,20 @@ def emitir_recibo(id_venta):
     # Filas total
 
     alto -= 50
+    p.drawString(390, alto, "Subtotal")
+    p.drawString(480, alto, "$")
+    p.drawString(490, alto, str(venta.total))
+
+    alto -= 35
+    p.drawString(390, alto, "Descuento")
+    p.drawString(480, alto, "$")
+    p.drawString(490, alto, str(venta.descuento))
+
+    alto -= 35
     p.setFont("Helvetica-Bold", 11)
     p.drawString(390, alto, "Total")
     p.drawString(480, alto, "$")
-    p.drawString(490, alto, str(venta.total))
+    p.drawString(490, alto, str(venta.total_con_descuento))
 
 
     # Close the PDF object cleanly, and we're done.
@@ -377,5 +396,57 @@ def lista_clientes():
     lista = [(" ", " ")]
     if query.exists():
         for i in query:
-            lista.append((i.nombre + " " + i.apellido, i.nombre + " " + i.apellido))
+            lista.append((i.nombre, i.nombre + " " + i.apellido))
     return lista
+
+def crear_articulo(infForm):
+    # Funciona solo para modificar objetos de tipo Article.
+    costo_sin_iva = infForm['costo_sin_iva']
+    costo = infForm['costo']
+    porcentaje_descuento = infForm['porcentaje_descuento']
+    precio_descontado = None
+    if costo_sin_iva != None:
+        costo = porcentaje_ganancia(costo_sin_iva, 21)
+    elif costo != None:
+        costo_sin_iva = costo / Decimal(1.21)
+
+    precio = porcentaje_ganancia(costo, infForm['porcentaje_ganancia'])
+
+    if porcentaje_descuento != None:
+        precio_descontado = porcentaje_ganancia(precio, -porcentaje_descuento)
+
+    contexto = {
+        "codigo": infForm['codigo'],
+        "descripcion": infForm['descripcion'],
+        "costo_sin_iva": costo_sin_iva,
+        "costo": costo,
+        "precio_sin_iva": porcentaje_ganancia(costo_sin_iva, infForm['porcentaje_ganancia']),
+        "precio": precio,
+        "porcentaje_ganancia": infForm['porcentaje_ganancia'],
+        "porcentaje_descuento": porcentaje_descuento,
+        "precio_descontado": precio_descontado,
+        "seccion": infForm['seccion'],
+        "stock": infForm['stock']
+    }
+
+    return contexto
+
+def comprar_articulo(infForm):
+    # Funciona solo para modificar objetos de tipo DetalleEntrada.
+    
+    costo_sin_iva = infForm['costo_sin_iva']
+    costo = infForm['costo']
+
+    if costo_sin_iva != None:
+        costo = porcentaje_ganancia(costo_sin_iva, 21)
+    elif costo != None:
+        costo_sin_iva = costo / Decimal(1.21)
+
+    contexto = {
+        "codigo": infForm['codigo'],
+        "costo_sin_iva": costo_sin_iva,
+        "costo": costo,
+        "cantidad": infForm['cantidad']
+    }
+
+    return contexto

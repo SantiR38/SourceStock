@@ -4,7 +4,8 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
-from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor, emitir_detalle_entrada
+from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente
+from erp.functions import crear_articulo, comprar_articulo, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor, emitir_detalle_entrada
 from datetime import date
 from decimal import *
 
@@ -48,42 +49,27 @@ def entrada(request):
                 
                 if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
 
-                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
-                        producto_leido = DetalleEntrada.objects.create(costo_sin_iva=infForm['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
-                                                                    costo_unitario = infForm['costo'],
-                                                                    cantidad=infForm['cantidad'],
-                                                                    id_entrada=Entrada.objects.get(id_state=estado),
-                                                                    id_producto=Article.objects.get(codigo=infForm['codigo']))
-                        ctx['inexistente'] = ''
-                    else:
-                        ctx['inexistente'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
-
+                    ctx['inexistente'] = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
 
                 elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
-                    if infForm['costo_sin_iva'] != None:
-                        producto_leido = DetalleEntrada.objects.create(costo_sin_iva=infForm['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
-                                                                costo_unitario = porcentaje_ganancia(infForm['costo_sin_iva'], 21),
-                                                                cantidad=infForm['cantidad'],
-                                                                id_entrada=Entrada.objects.get(id_state=estado),
-                                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
-                    else:
-                        producto_leido = DetalleEntrada.objects.create(costo_unitario=infForm['costo'], # Iniciar un objeto de tipo detalle_entrada
-                                                                    costo_sin_iva=infForm['costo'] / Decimal(1.21),
-                                                                    cantidad=infForm['cantidad'],
-                                                                    id_entrada=Entrada.objects.get(id_state=estado),
-                                                                    id_producto=Article.objects.get(codigo=infForm['codigo']))
-                                    # Se suman los precios unitarios al precio total de la compra
+
+                    producto_leido = DetalleEntrada.objects.create(costo_sin_iva = comprar_articulo(infForm)['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
+                                                            costo_unitario = comprar_articulo(infForm)['costo'],
+                                                            cantidad=comprar_articulo(infForm)['cantidad'],
+                                                            id_entrada=Entrada.objects.get(id_state=estado),
+                                                            id_producto=Article.objects.get(codigo=infForm['codigo']))
                     ctx['inexistente'] = ''
+
                 else:
                     ctx['inexistente'] = "Debes rellenar uno de los dos costos."
 
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la compra seguirá guardada.'
             
-            lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta) 
+            lista = DetalleEntrada.objects.filter(id_entrada = nueva_venta)
             nueva_venta.total = 0
             for i in lista:
-                nueva_venta.total += (i.costo_unitario * i.cantidad)
+                nueva_venta.total += (i.costo_unitario * i.cantidad) # Se suman los precios unitarios al precio total de la compra
             nueva_venta.save()
             ctx['total'] = nueva_venta.total
             ctx['articulo_a_comprar'] = lista
@@ -119,6 +105,7 @@ def transaccion_exitosa(request):
                 i.id_producto.costo = i.costo_unitario
                 i.id_producto.precio_sin_iva = porcentaje_ganancia(i.costo_sin_iva, i.id_producto.porcentaje_ganancia)
                 i.id_producto.precio = porcentaje_ganancia(i.costo_unitario, i.id_producto.porcentaje_ganancia)
+                i.id_producto.precio_descontado = porcentaje_ganancia(i.id_producto.precio, -i.id_producto.porcentaje_descuento)
                 i.id_producto.stock += i.cantidad
                 i.id_producto.save()
             
@@ -131,7 +118,7 @@ def transaccion_exitosa(request):
 
 
     except ObjectDoesNotExist as DoesNotExist:
-        ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
+        return redirect('not_found')
 
 
     return HttpResponse(template.render(ctx, request))
@@ -139,7 +126,8 @@ def transaccion_exitosa(request):
 def historial_compras(request):
     template = loader.get_template('historial_ventas.html')
     miFormulario = FormFiltroFecha()
-    compra_historica = Entrada.objects.all().order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
+    estado = ArtState.objects.get(nombre="Inactive") # Para filtrar solo las ventas que ya se confirmaron.
+    compra_historica = Entrada.objects.filter(id_state=estado).order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
     if compra_historica.exists():
         ultimas_compras = []
         x = 0
@@ -173,13 +161,12 @@ def detalle_entrada(request, id_entrada):
     try:
         return FileResponse(emitir_detalle_entrada(id_entrada), as_attachment=False, filename='hello.pdf')
     except ObjectDoesNotExist as DoesNotExist:
-        return redirect('transaccion_exitosa')
+        return redirect('not_found')
 
 # Funcion util para compra o venta
 def cancelar(request):
     template = loader.get_template('mensaje.html')
-    ctx = {'mensaje': 'Se ha cancelado la transacción.',
-           'redireccion': 'Volviendo a la página de ventas...'}
+    
     
     estado = ArtState.objects.get(nombre="Active")
     try:
@@ -190,7 +177,10 @@ def cancelar(request):
             nueva_venta = Venta.objects.get(id_state=estado)
             nueva_venta.delete()
         except ObjectDoesNotExist as DoesNotExist:
-            ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
+            return redirect('not_found')
+    
+    ctx = {'mensaje': 'Se ha cancelado la transacción.',
+           'redireccion': 'Volviendo a la página de ventas...'}
 
     return HttpResponse(template.render(ctx, request))
 
@@ -216,43 +206,24 @@ def agregar_articulo(request):
             except ObjectDoesNotExist as DoesNotExist:
 
                 if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
-                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
-                        new_article = Article.objects.create(codigo=infForm['codigo'],
-                                    descripcion=infForm['descripcion'],
-                                    costo_sin_iva=infForm['costo_sin_iva'],
-                                    costo=infForm['costo'],
-                                    porcentaje_ganancia=infForm['porcentaje_ganancia'],
-                                    precio_sin_iva=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
-                                    precio=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']),
-                                    seccion=infForm['seccion'],
-                                    stock=infForm['stock'])
-                        return redirect('control_inventario')
-                    else:
-                        ctx['mensaje'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
+                    
+                    ctx['mensaje'] = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
 
                 elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
-                    if infForm['costo_sin_iva'] != None:
-                        new_article = Article.objects.create(codigo=infForm['codigo'],
-                                                            descripcion=infForm['descripcion'],
-                                                            costo_sin_iva=infForm['costo_sin_iva'],
-                                                            costo=porcentaje_ganancia(infForm['costo_sin_iva'], 21),
-                                                            precio_sin_iva=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']),
-                                                            precio=porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']) * Decimal(1.21),
-                                                            porcentaje_ganancia=infForm['porcentaje_ganancia'],
-                                                            seccion=infForm['seccion'],
-                                                            stock=infForm['stock'])
-                        return redirect('control_inventario')
-                    else:
-                        new_article = Article.objects.create(codigo=infForm['codigo'],
-                                                            descripcion=infForm['descripcion'],
-                                                            costo_sin_iva=infForm['costo'] / Decimal(1.21),
-                                                            costo=infForm['costo'],
-                                                            precio_sin_iva=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) / Decimal(1.21),
-                                                            precio=porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']),
-                                                            porcentaje_ganancia=infForm['porcentaje_ganancia'],
-                                                            seccion=infForm['seccion'],
-                                                            stock=infForm['stock'])
-                        return redirect('control_inventario')
+
+                    new_article = Article.objects.create(codigo = crear_articulo(infForm)['codigo'],
+                                                        descripcion = crear_articulo(infForm)['descripcion'],
+                                                        costo_sin_iva = crear_articulo(infForm)['costo_sin_iva'],
+                                                        costo= crear_articulo(infForm)['costo'],
+                                                        precio_sin_iva = crear_articulo(infForm)['precio_sin_iva'],
+                                                        precio = crear_articulo(infForm)['precio'],
+                                                        porcentaje_ganancia = crear_articulo(infForm)['porcentaje_ganancia'],
+                                                        porcentaje_descuento = crear_articulo(infForm)['porcentaje_descuento'],
+                                                        precio_descontado = crear_articulo(infForm)['precio_descontado'],
+                                                        seccion = crear_articulo(infForm)['seccion'],
+                                                        stock = crear_articulo(infForm)['stock'])
+
+                    return redirect('control_inventario')
                 else:
                     ctx['mensaje'] = "PROBLEMA: Debes rellenar uno de los dos costos."
 
@@ -285,20 +256,19 @@ def control_inventario(request):
     return HttpResponse(template.render(ctx, request))
 
 def articulo(request, codigo_articulo):
+    # Modificar un artículo existente.
     template = loader.get_template('agregar_modificar.html')
     try:
         new_article = Article.objects.get(codigo=codigo_articulo)
     except ObjectDoesNotExist as DoesNotExist:
-            template = loader.get_template('mensaje.html') # La redirección se hace con JavaScript en este template luego de 5 segundos.
-            ctx = {'mensaje': 'Error 404. No se encontró el artículo.',
-                'redireccion': 'Volviendo a la página de ventas...'}
-            return HttpResponse(template.render(ctx, request))
+            return redirect('not_found')
     else:  
         detalles_formulario = {
             'codigo': new_article.codigo,
             'descripcion': new_article.descripcion,
             'costo': new_article.costo,
             'porcentaje_ganancia': new_article.porcentaje_ganancia,
+            'porcentaje_descuento': new_article.porcentaje_descuento,
             'seccion': new_article.seccion,
             'stock': new_article.stock
         }
@@ -316,60 +286,28 @@ def articulo(request, codigo_articulo):
                 infForm = miFormulario.cleaned_data
                 
                 if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
-                    if porcentaje_ganancia(infForm['costo_sin_iva'], 21) == infForm['costo']:
-                        
-                        new_article.codigo = infForm['codigo']
-                        if infForm['descripcion'] != "":
-                            new_article.descripcion = infForm['descripcion']
-                        new_article.costo_sin_iva = infForm['costo_sin_iva']
-                        new_article.costo = infForm['costo']
-                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia'])
-                        new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) # costo+(costo*porcentaje/100)
-                        if infForm['seccion'] != "":
-                            new_article.seccion = infForm['seccion']
-                        new_article.stock = infForm['stock']
-                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-                        
-                        return redirect('control_inventario')
-                    else:
-                        ctx['mensaje'] = "PROBLEMA: El costo final no es el costo neto + IVA. Se recomienda llenar solo uno de estos dos campos."
-                        miFormulario = FormNuevoArticulo(detalles_formulario)
+                    
+                    ctx['mensaje'] = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
 
                 elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
-                    if infForm['costo_sin_iva'] != None:
+                    
+                    new_article.codigo = infForm['codigo']
+                    if infForm['descripcion'] != "":
+                        new_article.descripcion = infForm['descripcion']
+                    new_article.costo_sin_iva = infForm['costo_sin_iva']
+                    new_article.costo = crear_articulo(infForm)['costo']
+                    new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
+                    new_article.precio_sin_iva = crear_articulo(infForm)['precio_sin_iva']
+                    new_article.precio = crear_articulo(infForm)['precio']
+                    new_article.porcentaje_descuento = crear_articulo(infForm)['porcentaje_descuento']
+                    new_article.precio_descontado = crear_articulo(infForm)['precio_descontado']
+                    if infForm['seccion'] != "":
+                        new_article.seccion = infForm['seccion']
+                    new_article.stock = infForm['stock']
+                    
+                    new_article.save() # Guardamos los cambios en la base de datos
 
-                        new_article.codigo = infForm['codigo']
-                        if infForm['descripcion'] != "":
-                            new_article.descripcion = infForm['descripcion']
-                        new_article.costo_sin_iva = infForm['costo_sin_iva']
-                        new_article.costo = porcentaje_ganancia(infForm['costo_sin_iva'], 21)
-                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia'])
-                        new_article.precio = porcentaje_ganancia(infForm['costo_sin_iva'], infForm['porcentaje_ganancia']) * Decimal(1.21)
-                        if infForm['seccion'] != "":
-                            new_article.seccion = infForm['seccion']
-                        new_article.stock = infForm['stock']
-                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-
-                        return redirect('control_inventario')
-                        
-                    else: # Si el costo esta rellenado
-                        
-                        new_article.codigo = infForm['codigo']
-                        if infForm['descripcion'] != "":
-                            new_article.descripcion = infForm['descripcion']
-                        new_article.costo_sin_iva = infForm['costo'] / Decimal(1.21)
-                        new_article.costo = infForm['costo']
-                        new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                        new_article.precio_sin_iva = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia']) / Decimal(1.21)
-                        new_article.precio = porcentaje_ganancia(infForm['costo'], infForm['porcentaje_ganancia'])
-                        if infForm['seccion'] != "":
-                            new_article.seccion = infForm['seccion']
-                        new_article.stock = infForm['stock']
-                        new_article.save() # Guardamos los cambios de la linea anterior en la base de datos
-
-                        return redirect('control_inventario')
+                    return redirect('control_inventario')
 
                 else:
                     ctx['mensaje'] = "PROBLEMA: Debes rellenar uno de los dos costos."
@@ -392,7 +330,9 @@ def venta(request):
         "datos_generales": stock_total(),
         "form": miFormulario,
         "total": venta_activa()[1].total,
-        "cliente": ""
+        "cliente": "",
+        "descuento": venta_activa()[1].descuento,
+        "total_con_descuento": venta_activa()[1].total_con_descuento
     }
     if venta_activa()[1].cliente != None:
         ctx['cliente'] = venta_activa()[1].cliente.nombre + " " + venta_activa()[1].cliente.apellido
@@ -402,47 +342,75 @@ def venta(request):
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
+            ##
+            # Venta
+            ##
+
+            try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
+                    nueva_venta = Venta.objects.get(id_state=estado)
+                    
+            except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
+                nueva_venta = Venta.objects.create(fecha=date.today(),
+                                                    total=0,
+                                                    id_state=estado,
+                                                    descuento=0,
+                                                    cliente=buscar_cliente(infForm['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+            else:
+                if infForm['dni_cliente'] != None:
+                    nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
+                    
+                elif infForm['cliente'] != None:
+                    nueva_venta.cliente = buscar_cliente(infForm['cliente'])
+                nueva_venta.save()
+            
+            ##
+            # Articulo
+            ##
+
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
-                try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
-                    nueva_venta = Venta.objects.get(id_state=estado)
-                    
-                except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
-                    nueva_venta = Venta.objects.create(fecha=date.today(),
-                                                         total=0,
-                                                         id_state=estado,
-                                                         cliente=buscar_cliente(infForm['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
-                else:
-                    if infForm['dni_cliente'] != None:
-                        nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
-                        
-                    elif infForm['cliente'] != None:
-                        nueva_venta.cliente = buscar_cliente(infForm['cliente'])
-                    nueva_venta.save()
                 
+                ##
+                # Detalle de venta
+                ##
 
-                producto_leido = DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
-                                                               precio_unitario=new_article.precio,
-                                                               cantidad=infForm['cantidad'],
-                                                               id_venta=Venta.objects.get(id_state=estado),
-                                                               id_producto=Article.objects.get(codigo=infForm['codigo']))
-            # Se suman los precios unitarios al precio total de la venta
-                lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
-                nueva_venta.total = 0
-                for i in lista:
-                    nueva_venta.total += (i.precio_unitario * i.cantidad)
-                nueva_venta.save()
-                ctx['total'] = nueva_venta.total
-                ctx['inexistente'] = ''
-                ctx['articulo_a_vender'] = lista
+                if new_article.stock >= infForm['cantidad']:
+                    DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
+                                                precio_unitario=new_article.precio,
+                                                porcentaje_descuento=new_article.porcentaje_descuento,
+                                                descuento=new_article.precio * new_article.porcentaje_descuento / 100,
+                                                cantidad=infForm['cantidad'],
+                                                id_venta=Venta.objects.get(id_state=estado),
+                                                id_producto=Article.objects.get(codigo=infForm['codigo']))
+                
+                else:
+                    ctx['inexistente'] = 'No hay suficiente stock del producto.'
+            
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la venta seguirá guardada.'
 
+            # Se suman los precios unitarios al precio total de la venta
+            lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
+            nueva_venta.total = 0
+            nueva_venta.descuento = 0
+            for i in lista:
+                nueva_venta.total += (i.precio_unitario * i.cantidad)
+                if i.descuento != None:
+                    nueva_venta.descuento += (i.descuento * i.cantidad)
+            nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+            
+            nueva_venta.save()
+            ctx['total'] = nueva_venta.total
+            ctx['descuento'] = nueva_venta.descuento
+            ctx['total_con_descuento'] = nueva_venta.total_con_descuento
+            
+            ctx['articulo_a_vender'] = lista
+
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = miFormulario
-            if venta_activa()[1].cliente != None:
-                ctx['cliente'] = venta_activa()[1].cliente.nombre + " " + venta_activa()[1].cliente.apellido
+            if nueva_venta.cliente != None:
+                ctx['cliente'] = nueva_venta.cliente.nombre + " " + nueva_venta.cliente.apellido
             
             return HttpResponse(template.render(ctx, request))
     else:
@@ -454,7 +422,8 @@ def venta(request):
 def historial_ventas(request):
     template = loader.get_template('historial_ventas.html')
     miFormulario = FormFiltroFecha()
-    venta_historica = Venta.objects.all().order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
+    estado = ArtState.objects.get(nombre="Inactive") # Para filtrar solo las ventas que ya se confirmaron.
+    venta_historica = Venta.objects.filter(id_state=estado).order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
     if venta_historica.exists():
         ultimas_ventas = []
         x = 0
@@ -488,7 +457,7 @@ def recibo(request, id_venta):
     try:
         return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='hello.pdf')
     except ObjectDoesNotExist as DoesNotExist :
-        return redirect('transaccion_exitosa')
+        return redirect('not_found')
 
 def venta_exitosa(request):
     template = loader.get_template('mensaje.html')
@@ -510,12 +479,12 @@ def venta_exitosa(request):
             nueva_venta.save() # Hace que esa entrada pase a estar inactiva
             ctx['hay_recibo'] = True
         else:
-            ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
-
+            return redirect('not_found')
+        ctx['id_venta'] = nueva_venta.id
     except ObjectDoesNotExist as DoesNotExist:
-        ctx['mensaje'] = 'Error 404. Tu solicitud no fue encontrada.'
+        return redirect('not_found')
         
-    ctx['id_venta'] = nueva_venta.id
+    
     return HttpResponse(template.render(ctx, request))
 
 def cancelar_unidad(request, codigo_articulo):
@@ -608,10 +577,7 @@ def modificar_cliente(request, id_param):
     try:
         new_cliente = Cliente.objects.get(id=id_param)
     except ObjectDoesNotExist as DoesNotExist:
-            template = loader.get_template('mensaje.html') # La redirección se hace con JavaScript en este template luego de 5 segundos.
-            ctx = {'mensaje': 'Error 404. No se encontró el cliente.',
-                'redireccion': 'Volviendo a la página de ventas...'}
-            return HttpResponse(template.render(ctx, request))
+            return redirect('not_found')
     else:  
         detalles_formulario = {
             'nombre': new_cliente.nombre,
@@ -632,25 +598,25 @@ def modificar_cliente(request, id_param):
             "titulo": "Modificar cliente"
         }
 
-    if request.method == "POST":
-        miFormulario = FormCliente(request.POST)
-        if miFormulario.is_valid():
-            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            
-            new_cliente.nombre = infForm["nombre"]
-            new_cliente.apellido = infForm["apellido"]
-            new_cliente.condicion_iva = infForm["condicion_iva"]
-            new_cliente.dni = infForm["dni"]
-            new_cliente.cuit = infForm["cuit"]
-            new_cliente.direccion = infForm["direccion"]
-            new_cliente.telefono = infForm["telefono"]
-            new_cliente.email = infForm["email"]
+        if request.method == "POST":
+            miFormulario = FormCliente(request.POST)
+            if miFormulario.is_valid():
+                infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+                
+                new_cliente.nombre = infForm["nombre"]
+                new_cliente.apellido = infForm["apellido"]
+                new_cliente.condicion_iva = infForm["condicion_iva"]
+                new_cliente.dni = infForm["dni"]
+                new_cliente.cuit = infForm["cuit"]
+                new_cliente.direccion = infForm["direccion"]
+                new_cliente.telefono = infForm["telefono"]
+                new_cliente.email = infForm["email"]
 
-            new_cliente.save()
+                new_cliente.save()
 
-            return redirect('control_clientes')
+                return redirect('control_clientes')
 
-    return HttpResponse(template.render(ctx, request))
+        return HttpResponse(template.render(ctx, request))
 
 
 #Funciones para administrar los proveedores
@@ -694,10 +660,7 @@ def modificar_proveedor(request, id_param):
     try:
         new_proveedor = Proveedor.objects.get(id=id_param)
     except ObjectDoesNotExist as DoesNotExist:
-            template = loader.get_template('mensaje.html') # La redirección se hace con JavaScript en este template luego de 5 segundos.
-            ctx = {'mensaje': 'Error 404. No se encontró el proveedor.',
-                'redireccion': 'Volviendo a la página de ventas...'}
-            return HttpResponse(template.render(ctx, request))
+            return redirect('not_found')
     else:  
         detalles_formulario = {
             'nombre': new_proveedor.nombre,
@@ -716,23 +679,23 @@ def modificar_proveedor(request, id_param):
             "titulo": "Modificar proveedor"
         }
 
-    if request.method == "POST":
-        miFormulario = FormProveedor(request.POST)
-        if miFormulario.is_valid():
-            infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
-            
-            new_proveedor.nombre = infForm["nombre"]
-            new_proveedor.condicion_iva = infForm["condicion_iva"]
-            new_proveedor.cuit = infForm["cuit"]
-            new_proveedor.direccion = infForm["direccion"]
-            new_proveedor.telefono = infForm["telefono"]
-            new_proveedor.email = infForm["email"]
+        if request.method == "POST":
+            miFormulario = FormProveedor(request.POST)
+            if miFormulario.is_valid():
+                infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+                
+                new_proveedor.nombre = infForm["nombre"]
+                new_proveedor.condicion_iva = infForm["condicion_iva"]
+                new_proveedor.cuit = infForm["cuit"]
+                new_proveedor.direccion = infForm["direccion"]
+                new_proveedor.telefono = infForm["telefono"]
+                new_proveedor.email = infForm["email"]
 
-            new_proveedor.save()
+                new_proveedor.save()
 
-            return redirect('control_clientes')
+                return redirect('control_clientes')
 
-    return HttpResponse(template.render(ctx, request))
+        return HttpResponse(template.render(ctx, request))
 
 def control_proveedores(request):
     template = loader.get_template('control_personas.html')
@@ -745,4 +708,9 @@ def control_proveedores(request):
         "link_modificar": "/modificar_proveedor/"
     }
 
+    return HttpResponse(template.render(ctx, request))
+
+def not_found(request):
+    template = loader.get_template('error_404.html')
+    ctx = {"titulo": "Error 404. Su solicitud no fue encontrada."}
     return HttpResponse(template.render(ctx, request))
