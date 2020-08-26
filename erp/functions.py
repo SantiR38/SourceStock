@@ -61,12 +61,13 @@ def venta_activa():
     else:
         lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
         nueva_venta.total = 0
+        nueva_venta.descuento = 0
         for i in lista:
             nueva_venta.total += (i.precio_unitario * i.cantidad)
 
-#            if i.descuento != None:
-#                nueva_venta.descuento += (i.descuento * i.cantidad)
-#        nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+            if i.descuento != None:
+                nueva_venta.descuento += (i.descuento * i.cantidad)
+        nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
         
         nueva_venta.save()
     return [lista, nueva_venta]
