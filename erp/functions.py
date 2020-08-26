@@ -55,8 +55,7 @@ def venta_activa():
         nueva_venta = Venta.objects.create(fecha=date.today(),
                                             total=0,
                                             id_state=estado,
-                                            descuento=0,
-                                            #cliente=buscar_cliente(infForm['dni_cliente'])
+                                            descuento=0
                                             ) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
     else:
         lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
@@ -397,7 +396,7 @@ def lista_clientes():
     lista = [(" ", " ")]
     if query.exists():
         for i in query:
-            lista.append((i.nombre + " " + i.apellido, i.nombre + " " + i.apellido))
+            lista.append((i.nombre, i.nombre + " " + i.apellido))
     return lista
 
 def crear_articulo(infForm):
