@@ -371,6 +371,7 @@ def venta(request):
             # Se suman los precios unitarios al precio total de la venta
                 lista = DetalleVenta.objects.filter(id_venta = nueva_venta) 
                 nueva_venta.total = 0
+                nueva_venta.descuento = 0
                 for i in lista:
                     nueva_venta.total += (i.precio_unitario * i.cantidad)
                     if i.descuento != None:
