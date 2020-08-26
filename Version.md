@@ -91,3 +91,4 @@
 13. **Bug Fixed:** Ahora el cliente es leido correctamente en la vista ventas.
 14. Precio con descuento agregado.
 15. **Bug Fixed:** Ya no se permite vender cantidades por encima del stock disponible.
+15. **Bug Fixed:** Cuando se cancela una compra o venta, ya no quedan remanentes indeseados.

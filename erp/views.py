@@ -166,8 +166,7 @@ def detalle_entrada(request, id_entrada):
 # Funcion util para compra o venta
 def cancelar(request):
     template = loader.get_template('mensaje.html')
-    ctx = {'mensaje': 'Se ha cancelado la transacción.',
-           'redireccion': 'Volviendo a la página de ventas...'}
+    
     
     estado = ArtState.objects.get(nombre="Active")
     try:
@@ -179,6 +178,9 @@ def cancelar(request):
             nueva_venta.delete()
         except ObjectDoesNotExist as DoesNotExist:
             return redirect('not_found')
+    
+    ctx = {'mensaje': 'Se ha cancelado la transacción.',
+           'redireccion': 'Volviendo a la página de ventas...'}
 
     return HttpResponse(template.render(ctx, request))
 
