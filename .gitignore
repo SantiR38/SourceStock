@@ -6,6 +6,7 @@ venv/
 erp/pdf_files/
 
 local.py
+deploy.py
 production.py
 deploy.py
 SourceStock.bat
