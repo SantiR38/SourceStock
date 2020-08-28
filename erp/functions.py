@@ -209,7 +209,7 @@ def emitir_recibo(id_venta):
 
     p.setFont("Helvetica", 10)
     if venta.cliente != None:
-        p.drawString(95, 673, venta.cliente.nombre + " " + venta.cliente.apellido)
+        p.drawString(95, 673, venta.cliente.nombre)
         p.drawString(95, 653, venta.cliente.direccion)
         p.drawString(355, 673, venta.cliente.condicion_iva)
         p.drawString(355, 653, venta.cliente.cuit)
@@ -396,7 +396,7 @@ def lista_clientes():
     lista = [(" ", " ")]
     if query.exists():
         for i in query:
-            lista.append((i.nombre, i.nombre + " " + i.apellido))
+            lista.append((i.nombre, i.nombre))
     return lista
 
 def crear_articulo(infForm):
