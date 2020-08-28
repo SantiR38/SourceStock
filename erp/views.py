@@ -335,7 +335,7 @@ def venta(request):
         "total_con_descuento": venta_activa()[1].total_con_descuento
     }
     if venta_activa()[1].cliente != None:
-        ctx['cliente'] = venta_activa()[1].cliente.nombre + " " + venta_activa()[1].cliente.apellido
+        ctx['cliente'] = venta_activa()[1].cliente.nombre
     
     if request.method == "POST":
         miFormulario = FormVenta(request.POST)
@@ -410,7 +410,7 @@ def venta(request):
             miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = miFormulario
             if nueva_venta.cliente != None:
-                ctx['cliente'] = nueva_venta.cliente.nombre + " " + nueva_venta.cliente.apellido
+                ctx['cliente'] = nueva_venta.cliente.nombre
             
             return HttpResponse(template.render(ctx, request))
     else:
@@ -534,7 +534,6 @@ def cliente(request):
                 
             except ObjectDoesNotExist as DoesNotExist: # Si el cliente no existe en la base de datos, crearlo
                 new_client = Cliente.objects.create(nombre=infForm['nombre'],
-                                                    apellido=infForm['apellido'],
                                                     condicion_iva=infForm['condicion_iva'],
                                                     dni=infForm['dni'],
                                                     cuit=infForm['cuit'],
@@ -581,7 +580,6 @@ def modificar_cliente(request, id_param):
     else:  
         detalles_formulario = {
             'nombre': new_cliente.nombre,
-            'apellido': new_cliente.apellido,
             'condicion_iva': new_cliente.condicion_iva,
             'dni': new_cliente.dni,
             'cuit': new_cliente.cuit,
@@ -604,7 +602,6 @@ def modificar_cliente(request, id_param):
                 infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
                 
                 new_cliente.nombre = infForm["nombre"]
-                new_cliente.apellido = infForm["apellido"]
                 new_cliente.condicion_iva = infForm["condicion_iva"]
                 new_cliente.dni = infForm["dni"]
                 new_cliente.cuit = infForm["cuit"]
