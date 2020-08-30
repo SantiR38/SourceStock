@@ -92,3 +92,7 @@
 14. Precio con descuento agregado.
 15. **Bug Fixed:** Ya no se permite vender cantidades por encima del stock disponible.
 15. **Bug Fixed:** Cuando se cancela una compra o venta, ya no quedan remanentes indeseados.
+16. **Bug Fixed:** Se eliminó el campo apellido del modelo Cliente.
+
+## Versión 1.8
+1. Los errores 404 son dirigidos a un template de la aplicacion erp.
