@@ -1,5 +1,5 @@
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from datetime import date

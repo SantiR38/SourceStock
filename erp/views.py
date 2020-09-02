@@ -360,7 +360,12 @@ def venta(request):
                     nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
                     
                 elif infForm['cliente'] != None:
-                    nueva_venta.cliente = buscar_cliente(infForm['cliente'])
+                    try:
+                        nueva_venta.cliente = buscar_cliente(infForm['cliente'])
+                    except:
+                        nueva_venta.cliente = None
+                        ctx['cliente'] = "Hay más de un cliente con el mismo nombre, probar con DNI."
+
                 nueva_venta.save()
             
             ##
@@ -713,6 +718,6 @@ def not_found(request):
     return HttpResponse(template.render(ctx, request))
 
 def error_404(request, exception):
-    template = loader.get_template('error_404.html')
+    template = loader.get_template('error/404.html')
     ctx = {"titulo": "Error 404. Hola Mundo."}
     return HttpResponse(template.render(ctx, request))
