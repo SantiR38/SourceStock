@@ -1,6 +1,7 @@
 from django.urls import path
 from . import views
 
+
 urlpatterns = [
     path('', views.venta, name='venta'),
     path('agregar_articulo', views.agregar_articulo, name='agregar_articulo'),
@@ -24,3 +25,4 @@ urlpatterns = [
     path('not_found', views.not_found, name='not_found'),
     path('historial_compras', views.historial_compras, name='historial_compras')
 ]
+
