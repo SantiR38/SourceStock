@@ -507,9 +507,16 @@ def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')
     ctx = {'titulo': 'Se agregaron los nuevos valores',
            'mensaje': 'Checkear en DB...'}
-    campos_sin_iva()
+    '''campos_sin_iva()
     if not ArtState.objects.all().exists():
-        add_art_state()
+        add_art_state()'''
+    articulos = Article.objects.all()
+
+    for i in articulos:
+        i.porcentaje_descuento = 0
+        i.precio_descontado = 0
+    
+    articulos.save()
     
 
     return HttpResponse(template.render(ctx, request))
