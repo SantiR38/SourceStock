@@ -515,8 +515,7 @@ def script_actualizacion(request):
     for i in articulos:
         i.porcentaje_descuento = 0
         i.precio_descontado = 0
-    
-    articulos.save()
+        i.save()
     
 
     return HttpResponse(template.render(ctx, request))
