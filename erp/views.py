@@ -510,13 +510,17 @@ def script_actualizacion(request):
     '''campos_sin_iva()
     if not ArtState.objects.all().exists():
         add_art_state()'''
+    '''
     articulos = Article.objects.all()
-
     for i in articulos:
         i.porcentaje_descuento = 0
         i.precio_descontado = 0
         i.save()
+<<<<<<< HEAD
     
+=======
+    '''
+>>>>>>> development
 
     return HttpResponse(template.render(ctx, request))
 
