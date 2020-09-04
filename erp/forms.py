@@ -25,8 +25,8 @@ class FormNuevoArticulo(forms.Form):
                                label="Costo con IVA",
                                required=False)
     porcentaje_ganancia = forms.DecimalField(max_digits=10, decimal_places=2, label_suffix= "*:")
-    porcentaje_descuento = forms.DecimalField(max_digits=10, decimal_places=2, required=False)
-    seccion = forms.CharField(required=False)
+    porcentaje_descuento = forms.DecimalField(max_digits=10, decimal_places=2, initial=0, label_suffix= "*:")
+    seccion = forms.CharField(initial=0, label_suffix= "*:")
     stock = forms.IntegerField(label_suffix= "*:")
 
 class FormEntrada(forms.Form):
