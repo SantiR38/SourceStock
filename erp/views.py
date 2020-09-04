@@ -516,11 +516,7 @@ def script_actualizacion(request):
         i.porcentaje_descuento = 0
         i.precio_descontado = 0
         i.save()
-<<<<<<< HEAD
-    
-=======
     '''
->>>>>>> development
 
     return HttpResponse(template.render(ctx, request))
 
