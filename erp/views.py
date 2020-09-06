@@ -725,5 +725,5 @@ def not_found(request):
 
 def error_404(request, exception):
     template = loader.get_template('error/404.html')
-    ctx = {"titulo": "Error 404. Hola Mundo."}
+    ctx = {"titulo": "Error 404."}
     return HttpResponse(template.render(ctx, request))

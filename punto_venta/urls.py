@@ -22,6 +22,7 @@ from erp.views import error_404
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('erp.urls')),
+    path('ventas_por_catalogo', include('venta_catalogo.urls')),
 ]
 
 handler404 = error_404
