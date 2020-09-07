@@ -101,3 +101,4 @@
 4. **Mejoras estéticas:**
     * Tamaño general de letra reducido.
     * Small boxes eliminados de todos los templates excepto 'control_inventario.html'.
+    * Cambio de color a small boxes (gris claro).
