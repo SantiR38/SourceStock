@@ -102,3 +102,5 @@
     * Tamaño general de letra reducido.
     * Small boxes eliminados de todos los templates excepto 'control_inventario.html'.
     * Cambio de color a small boxes (gris claro).
+5. **Nueva Vista:** Aniadir_carrito.
+6. Filtro de busqueda en vista venta_por_catalogo.

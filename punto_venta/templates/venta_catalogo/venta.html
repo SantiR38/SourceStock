@@ -13,6 +13,23 @@
           <div class="tab-content p-0">
             <!-- Morris chart - Sales -->
             <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
+              
+              <!-- Carrito de compras -->
+              <div>
+                <table style="width:100%;" class="borde-externo">
+                  <tr class="intercalado">
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>% Desc.</th>
+                    <th>Precio c/Desc.</th>
+                    <th>Marca</th>
+                    <th>Stock</th>
+                    <th>Remover</th>
+                  </tr>
+                </table>
+              </div>
+              <br />
 
               <div>
                 <form action="" method="post"> {% csrf_token %}
@@ -51,7 +68,7 @@
                     <td> {{i.marca}} </td>
                     <td> {{i.stock}} </td>
                     {% if i.stock > 0 %}
-                      <td> <a href="aniadir_al_carrito">✅</a> </td>
+                      <td> <a href="aniadir_al_carrito/{{i.codigo}}">✅</a> </td>
                     {% else %}
                       <td> <a href="">⛔</a> </td>
                     {% endif %}

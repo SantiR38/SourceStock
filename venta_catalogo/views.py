@@ -13,6 +13,7 @@ def venta_por_catalogo(request):
     ctx = {
         "datos_generales": stock_total(),
         "articulos": inventario(Article).order_by('descripcion'),
+        "carrito": "",
         "form": miFormulario
     }
 
@@ -27,5 +28,6 @@ def venta_por_catalogo(request):
 
     return HttpResponse(template.render(ctx, request))
 
-def aniadir_al_carrito(request):
+def aniadir_al_carrito(request, codigo_param):
+    
     return redirect('venta_por_catalogo')
