@@ -96,3 +96,8 @@
 
 ## Versión 1.8
 1. Los errores 404 son dirigidos a un template de la aplicacion erp.
+2. Corregido bug de precio con descuento.
+3. **Nueva App:** venta_catalogo.
+4. **Mejoras estéticas:**
+    * Tamaño general de letra reducido.
+    * Small boxes eliminados de todos los templates excepto 'control_inventario.html'.
