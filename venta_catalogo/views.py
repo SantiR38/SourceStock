@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
 from erp.models import Article
@@ -6,7 +6,7 @@ from venta_catalogo.forms import FormFiltrarArticulos
 from erp.functions import inventario, stock_total
 from .functions.search_engines import search_articles
 
-# Create your views here.
+
 def venta_por_catalogo(request):
     template = loader.get_template('venta_catalogo/venta.html')
     miFormulario = FormFiltrarArticulos()
@@ -20,10 +20,12 @@ def venta_por_catalogo(request):
         miFormulario = FormFiltrarArticulos(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data
-            resultado = Article.objects.filter(codigo=int(infForm['codigo'])) # Código
-            # resultado = search_articles(infForm)
+            resultado = search_articles(infForm)
             ctx["articulos"] = resultado
     else:
         miFormulario = FormFiltrarArticulos()
 
     return HttpResponse(template.render(ctx, request))
+
+def aniadir_al_carrito(request):
+    return redirect('venta_por_catalogo')
