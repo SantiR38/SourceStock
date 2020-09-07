@@ -1,4 +1,4 @@
 from erp.models import Article
 
 def search_articles(infForm):
-    pass
+    query = Article.objects.filter(codigo=infForm['codigo'])

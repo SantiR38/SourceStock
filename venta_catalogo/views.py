@@ -4,6 +4,7 @@ from django.template import Template, Context, loader
 from erp.models import Article
 from venta_catalogo.forms import FormFiltrarArticulos
 from erp.functions import inventario, stock_total
+from .functions.search_engines import search_articles
 
 # Create your views here.
 def venta_por_catalogo(request):
@@ -20,6 +21,7 @@ def venta_por_catalogo(request):
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data
             resultado = Article.objects.filter(codigo=int(infForm['codigo'])) # Código
+            # resultado = search_articles(infForm)
             ctx["articulos"] = resultado
     else:
         miFormulario = FormFiltrarArticulos()
