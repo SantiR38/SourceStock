@@ -221,6 +221,7 @@ def agregar_articulo(request):
                                                         porcentaje_descuento = crear_articulo(infForm)['porcentaje_descuento'],
                                                         precio_descontado = crear_articulo(infForm)['precio_descontado'],
                                                         seccion = crear_articulo(infForm)['seccion'],
+                                                        marca = crear_articulo(infForm)['marca'],
                                                         stock = crear_articulo(infForm)['stock'])
 
                     return redirect('control_inventario')
@@ -303,6 +304,7 @@ def articulo(request, codigo_articulo):
                     new_article.precio_descontado = crear_articulo(infForm)['precio_descontado']
                     if infForm['seccion'] != "":
                         new_article.seccion = infForm['seccion']
+                    new_article.marca = infForm['marca']
                     new_article.stock = infForm['stock']
                     
                     new_article.save() # Guardamos los cambios en la base de datos

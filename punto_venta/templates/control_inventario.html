@@ -39,6 +39,7 @@
                   <th>% Desc.</th>
                   <th>Precio c/Desc.</th>
                   <th>Sección</th>
+                  <th>Marca</th>
                   <th>Stock</th>
                 </tr>
                 {% for i in articulos %}
@@ -53,6 +54,7 @@
                     <td> {{i.porcentaje_descuento}}% </td>
                     <td> ${{i.precio_descontado}} </td>
                     <td> {{i.seccion}} </td>
+                    <td> {{i.marca}} </td>
                     <td> {{i.stock}} </td>
                   </tr>
 

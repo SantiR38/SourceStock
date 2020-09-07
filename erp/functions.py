@@ -426,6 +426,7 @@ def crear_articulo(infForm):
         "porcentaje_descuento": porcentaje_descuento,
         "precio_descontado": precio_descontado,
         "seccion": infForm['seccion'],
+        "marca": infForm['marca'],
         "stock": infForm['stock']
     }
 
