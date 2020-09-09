@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
-from erp.models import Article, ArtState, Venta, DetalleVenta
-from venta_catalogo.forms import FormFiltrarArticulos
+from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
+from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from erp.functions import inventario, stock_total, venta_activa
 from .functions.search_engines import search_articles
 
@@ -15,7 +15,6 @@ def venta_por_catalogo(request):
         "totales": venta_activa()[1],
         "datos_generales": stock_total(),
         "articulos": inventario(Article).order_by('descripcion'),
-        "carrito": "",
         "form": miFormulario
     }
 
@@ -48,7 +47,22 @@ def aniadir_al_carrito(request, codigo_param):
                                 id_venta=nueva_venta,
                                 id_producto=new_article)
 
-
-
-    
     return redirect('venta_por_catalogo')
+
+def confirmar_venta(request):
+    template = loader.get_template('venta_catalogo/confirmar_operacion.html')
+    miFormulario = FormBuscarCliente()
+
+    ctx = {
+        "articulo_a_vender": venta_activa()[0],
+        "totales": venta_activa()[1],
+        "titulo": "Confirmar venta",
+        "persona": Cliente.objects.all(),
+        "articulos": inventario(Article).order_by('descripcion'),
+        "form": miFormulario
+    }
+
+    estado = ArtState.objects.get(nombre="Active")
+    nueva_venta = Venta.objects.get(id_state=estado)
+
+    return HttpResponse(template.render(ctx, request))

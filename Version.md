@@ -104,3 +104,5 @@
     * Cambio de color a small boxes (gris claro).
 5. **Nueva Vista:** Aniadir_carrito.
 6. Filtro de busqueda en vista venta_por_catalogo.
+7. Mediante un metodo del modelo Venta, se simplifico el codigo para crear el objeto.
+8. **Nueva Vista:** confirmar_venta.

@@ -53,7 +53,7 @@
                     <td><b>${{totales.total_con_descuento}}</b></td>
                     <td></td>
                     <td></td>
-                    <td> <a href="confirmar_venta"><button>Confirmar</button></a> </td>
+                    <td> <a href="/venta_exitosa"><button>Confirmar</button></a> </td>
                   </tr>
 
                 </table>
@@ -62,7 +62,7 @@
               <br />
               
               <div >
-                <h4>Filtrar productos</h4>
+                <h4>Buscar Cliente</h4>
                 <form action="" method="post"> {% csrf_token %}
                   <span>
                     
@@ -74,39 +74,39 @@
               </div>
               <br />
 
+              <!--Registro de Persona-->
+
               <table style="width:100%;" class="borde-externo">
                 <tr class="intercalado">
-                  <th>Código</th>
-                  <th>Descripción</th>
-                  <th>Precio</th>
-                  <th>% Desc.</th>
-                  <th>Precio c/Desc.</th>
-                  <th>Sección</th>
-                  <th>Marca</th>
-                  <th>Stock</th>
-                  <th>Añadir</th>
+                  <th>Nombre o Empresa</th>
+                  <th>Condicion frente al IVA</th>
+                  {% if titulo == "Confirmar venta" %}
+                    <th>DNI</th>
+                  {% endif %}
+                  <th>CUIT</th>
+                  <th>Dirección</th>
+                  <th>Teléfono</th>
+                  <th>E-mail</th>
                 </tr>
-                {% for i in articulos %}
+                {% for i in persona %}
                 
 
                   <tr class="intercalado">
-                    <td><a href="/articulo/{{i.codigo}}">{{i.codigo}}</a></td>
-                    <td> {{i.descripcion}} </td>
-                    <td> ${{i.precio}} </td>
-                    <td> {{i.porcentaje_descuento}}% </td>
-                    <td> ${{i.precio_descontado}} </td>
-                    <td> {{i.seccion}} </td>
-                    <td> {{i.marca}} </td>
-                    <td> {{i.stock}} </td>
-                    {% if i.stock > 0 %}
-                      <td> <a href="aniadir_al_carrito/{{i.codigo}}">✅</a> </td>
-                    {% else %}
-                      <td>⚪</td>
+                    <td>{{i.nombre}}</td>
+                    <td> {{i.condicion_iva}} </td>
+                    {% if titulo == "Confirmar venta" %}
+                      <td> {{i.dni}} </td>
                     {% endif %}
+                    <td> {{i.cuit}} </td>
+                    <td> {{i.direccion}} </td>
+                    <td> {{i.telefono}} </td>
+                    <td> {{i.email}} </td>
                   </tr>
 
                 {% endfor %}
               </table>
+
+              <!--Fin registro de clientes-->
               
             </div>
             <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
