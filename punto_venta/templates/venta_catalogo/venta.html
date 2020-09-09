@@ -27,6 +27,23 @@
                     <th>Stock</th>
                     <th>Remover</th>
                   </tr>
+
+                  {% for i in articulo_a_vender %}
+                
+
+                  <tr class="intercalado">
+                    <td>{{i.id_producto.codigo}}</td>
+                    <td> {{i.id_producto.descripcion}} </td>
+                    <td> ${{i.precio_unitario}} </td>
+                    <td> {{i.porcentaje_descuento}}% </td>
+                    <td> ${{i.descuento}} </td>
+                    <td> {{i.id_producto.marca}} </td>
+                    <td> {{i.cantidad}} </td>
+                    <td> <a href="/cancelar_unidad/{{i.id}}">⛔</a> </td>
+                  </tr>
+
+                {% endfor %}
+
                 </table>
               </div>
               <br />
