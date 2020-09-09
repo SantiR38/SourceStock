@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
-from erp.models import Article
+from erp.models import Article, ArtState, Venta, DetalleVenta
 from venta_catalogo.forms import FormFiltrarArticulos
 from erp.functions import inventario, stock_total, venta_activa
 from .functions.search_engines import search_articles
@@ -32,10 +32,23 @@ def venta_por_catalogo(request):
 
 def aniadir_al_carrito(request, codigo_param):
 
-    new_article = Article.objects.get(codigo=codigo_param)
     estado = ArtState.objects.get(nombre="Active")
-
     nueva_venta = Venta.objects.get(id_state=estado)
+
+    new_article = Article.objects.get(codigo=codigo_param)
+
+    ##
+    # Detalle de venta
+    ##
+    DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
+                                precio_unitario=new_article.precio,
+                                porcentaje_descuento=new_article.porcentaje_descuento,
+                                descuento=new_article.precio * new_article.porcentaje_descuento / 100,
+                                cantidad=1,
+                                id_venta=nueva_venta,
+                                id_producto=new_article)
+
+
 
     
     return redirect('venta_por_catalogo')
