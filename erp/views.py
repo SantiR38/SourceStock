@@ -502,8 +502,8 @@ def cancelar_unidad(request, codigo_articulo):
         pass
     else:
         articulo_staging.delete()
-    #return redirect('venta')
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER')) # esto hace que se redirija a la url anterior.
     
 
 # Funcion que debe ejecutarse en la instalacion del programa
