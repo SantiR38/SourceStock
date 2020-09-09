@@ -33,6 +33,9 @@ def venta_por_catalogo(request):
 def aniadir_al_carrito(request, codigo_param):
 
     new_article = Article.objects.get(codigo=codigo_param)
+    estado = ArtState.objects.get(nombre="Active")
+
+    nueva_venta = Venta.objects.get(id_state=estado)
 
     
     return redirect('venta_por_catalogo')

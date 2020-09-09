@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse, FileResponse, HttpResponseRedirect
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
@@ -8,6 +8,7 @@ from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inven
 from erp.functions import crear_articulo, comprar_articulo, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor, emitir_detalle_entrada
 from datetime import date
 from decimal import *
+
 
 # Funciones para administrar las compras o entradas.
 def entrada(request):
@@ -501,7 +502,8 @@ def cancelar_unidad(request, codigo_articulo):
         pass
     else:
         articulo_staging.delete()
-    return redirect('venta')
+    #return redirect('venta')
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
     
 
 # Funcion que debe ejecutarse en la instalacion del programa
