@@ -52,11 +52,8 @@ def venta_activa():
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
         nueva_venta = Venta.objects.get(id_state=estado)
     except ObjectDoesNotExist as DoesNotExist:
-        nueva_venta = Venta.objects.create(fecha=date.today(),
-                                            total=0,
-                                            id_state=estado,
-                                            descuento=0
-                                            ) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+        nueva_venta = Venta.crear_venta_vacia(estado)
+
     else:
         lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
         nueva_venta.total = 0

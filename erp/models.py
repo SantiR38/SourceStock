@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 
 # *1: CASCADE, significa que cuando se borre un artículo de la tabla padre, el artículo de la
 #     tabla hija que tiene esa clave foranea, también se borra
@@ -51,6 +52,15 @@ class Venta(models.Model):
     descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total_con_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     cliente = models.ForeignKey('Cliente', on_delete=models.SET_NULL, null=True)
+
+    @classmethod
+    def crear_venta_vacia(cls, estado):
+        venta = cls(fecha=date.today(),
+                    total=0,
+                    id_state=estado,
+                    descuento=0)
+        venta.save()
+        return venta
 
 
 class DetalleVenta(models.Model):

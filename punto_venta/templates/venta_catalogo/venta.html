@@ -16,6 +16,7 @@
               
               <!-- Carrito de compras -->
               <div>
+                <h4>Esta venta</h4>
                 <table style="width:100%;" class="borde-externo">
                   <tr class="intercalado">
                     <th>Código</th>
@@ -36,19 +37,32 @@
                     <td> {{i.id_producto.descripcion}} </td>
                     <td> ${{i.precio_unitario}} </td>
                     <td> {{i.porcentaje_descuento}}% </td>
-                    <td> ${{i.descuento}} </td>
+                    <td> ${{i.descuento }} </td>
                     <td> {{i.id_producto.marca}} </td>
                     <td> {{i.cantidad}} </td>
                     <td> <a href="/cancelar_unidad/{{i.id}}">⛔</a> </td>
                   </tr>
 
-                {% endfor %}
+                  {% endfor %}
+
+                  <tr class="intercalado">
+                    <td><b> Total </b></td>
+                    <td></td>
+                    <td><b> ${{totales.total}} </b></td>
+                    <td></td>
+                    <td><b>${{totales.total_con_descuento}}</b></td>
+                    <td></td>
+                    <td></td>
+                    <td> <a href="/venta_exitosa"><button>Confirmar</button></a> </td>
+                  </tr>
 
                 </table>
               </div>
               <br />
-
-              <div>
+              <br />
+              
+              <div >
+                <h4>Filtrar productos</h4>
                 <form action="" method="post"> {% csrf_token %}
                   <span>
                     

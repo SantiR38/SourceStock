@@ -7,8 +7,6 @@
 
 {% block content %}
 <div class="container-fluid">
-  {% include "small_boxes.html" %}
-
   <!-- Main row -->
   <div class="row">
 
@@ -43,7 +41,7 @@
                         -
                         {% endif %}
                       </td>
-                      <td> ${{i.total}} </td>
+                      <td> ${{i.total_con_descuento}} </td>
                     </tr>
 
                   {% endfor %}
