@@ -58,6 +58,8 @@ def confirmar_venta(request):
         "totales": venta_activa()[1],
         "titulo": "Confirmar venta",
         "persona": Cliente.objects.all(),
+        "titulo_persona": "Cliente",
+        "persona_elegida": "",
         "articulos": inventario(Article).order_by('descripcion'),
         "form": miFormulario
     }

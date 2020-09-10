@@ -45,18 +45,26 @@
 
                   {% endfor %}
 
+                </table>
+                <br />
+                <table class="borde-externo">
                   <tr class="intercalado">
                     <td><b> Total </b></td>
-                    <td></td>
-                    <td><b> ${{totales.total}} </b></td>
-                    <td></td>
-                    <td><b>${{totales.total_con_descuento}}</b></td>
-                    <td></td>
-                    <td></td>
-                    <td> <a href="/venta_exitosa"><button>Confirmar</button></a> </td>
-                  </tr>
+                    <td><b> Descuento </b></td>
+                    <td><b> Total con descuento </b></td>
+                    <td><b> {{ titulo_persona }} </b> </td>
 
+                  <tr class="intercalado">
+                    <td> ${{totales.total}} </td>
+                    <td> ${{totales.descuento}} </td>
+                    <td> ${{totales.total_con_descuento}} </td>
+                    <td> {{ persona_elegida }} </td>
+                  </tr>
                 </table>
+                
+                <br />
+                <button><a href="/venta_exitosa">Confirmar</a></button>
+
               </div>
               <br />
               <br />
