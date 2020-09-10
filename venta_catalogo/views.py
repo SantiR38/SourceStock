@@ -4,7 +4,7 @@ from django.template import Template, Context, loader
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from erp.functions import inventario, stock_total, venta_activa
-from .functions.search_engines import search_articles
+from .functions.search_engines import search_articles, search_clients
 
 
 def venta_por_catalogo(request):
@@ -66,5 +66,12 @@ def confirmar_venta(request):
 
     estado = ArtState.objects.get(nombre="Active")
     nueva_venta = Venta.objects.get(id_state=estado)
+
+    if request.method == "POST":
+        miFormulario = FormBuscarCliente(request.POST)
+        if miFormulario.is_valid():
+            ctx["persona"] = search_clients(miFormulario.cleaned_data)
+    else:
+        miFormulario = FormBuscarCliente()
 
     return HttpResponse(template.render(ctx, request))
