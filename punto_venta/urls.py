@@ -24,7 +24,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('erp.urls')),
     path('venta_catalogo/', include('venta_catalogo.urls')),
-    path('login/', LoginView.as_view(), name='login'),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
 
 handler404 = error_404

@@ -7,7 +7,7 @@ from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from erp.functions import inventario, stock_total, venta_activa
 from .functions.search_engines import search_articles, search_clients
 
-
+@login_required
 def venta_por_catalogo(request):
     template = loader.get_template('venta_catalogo/venta.html')
     miFormulario = FormFiltrarArticulos()
@@ -30,6 +30,7 @@ def venta_por_catalogo(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def aniadir_al_carrito(request, codigo_param):
 
     estado = ArtState.objects.get(nombre="Active")
@@ -50,7 +51,7 @@ def aniadir_al_carrito(request, codigo_param):
 
     return redirect('venta_por_catalogo')
 
-
+@login_required
 def confirmar_venta(request):
     template = loader.get_template('venta_catalogo/confirmar_operacion.html')
     miFormulario = FormBuscarCliente()
@@ -77,7 +78,7 @@ def confirmar_venta(request):
 
     return HttpResponse(template.render(ctx, request))
 
-
+@login_required
 def elegir_cliente(request, codigo_param):
 
     estado = ArtState.objects.get(nombre="Active")
