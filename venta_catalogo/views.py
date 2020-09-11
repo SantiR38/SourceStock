@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
+from django.contrib.auth.decorators import login_required
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from erp.functions import inventario, stock_total, venta_activa
@@ -49,17 +50,17 @@ def aniadir_al_carrito(request, codigo_param):
 
     return redirect('venta_por_catalogo')
 
+
 def confirmar_venta(request):
     template = loader.get_template('venta_catalogo/confirmar_operacion.html')
     miFormulario = FormBuscarCliente()
 
     ctx = {
         "articulo_a_vender": venta_activa()[0],
-        "totales": venta_activa()[1],
+        "esta_venta": venta_activa()[1],
         "titulo": "Confirmar venta",
         "persona": Cliente.objects.all(),
         "titulo_persona": "Cliente",
-        "persona_elegida": "",
         "articulos": inventario(Article).order_by('descripcion'),
         "form": miFormulario
     }
@@ -75,3 +76,14 @@ def confirmar_venta(request):
         miFormulario = FormBuscarCliente()
 
     return HttpResponse(template.render(ctx, request))
+
+
+def elegir_cliente(request, codigo_param):
+
+    estado = ArtState.objects.get(nombre="Active")
+    nueva_venta = Venta.objects.get(id_state=estado)
+
+    nueva_venta.cliente = Cliente.objects.get(id=codigo_param)
+    nueva_venta.save()
+
+    return redirect('confirmar_venta')

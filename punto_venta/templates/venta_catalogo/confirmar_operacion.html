@@ -55,10 +55,10 @@
                     <td><b> {{ titulo_persona }} </b> </td>
 
                   <tr class="intercalado">
-                    <td> ${{totales.total}} </td>
-                    <td> ${{totales.descuento}} </td>
-                    <td> ${{totales.total_con_descuento}} </td>
-                    <td> {{ persona_elegida }} </td>
+                    <td> ${{esta_venta.total}} </td>
+                    <td> ${{esta_venta.descuento}} </td>
+                    <td> ${{esta_venta.total_con_descuento}} </td>
+                    <td> {{ esta_venta.cliente.nombre }} </td>
                   </tr>
                 </table>
                 
@@ -95,6 +95,7 @@
                   <th>Dirección</th>
                   <th>Teléfono</th>
                   <th>E-mail</th>
+                  <th>Elegir</th>
                 </tr>
                 {% for i in persona %}
                 
@@ -109,6 +110,7 @@
                     <td> {{i.direccion}} </td>
                     <td> {{i.telefono}} </td>
                     <td> {{i.email}} </td>
+                    <td> <a href="elegir_cliente/{{i.id}}">✅</a> </td>
                   </tr>
 
                 {% endfor %}

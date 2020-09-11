@@ -106,3 +106,4 @@
 6. Filtro de busqueda en vista venta_por_catalogo.
 7. Mediante un metodo del modelo Venta, se simplifico el codigo para crear el objeto.
 8. **Nueva Vista:** confirmar_venta.
+9. **Nueva Vista:** elegir_cliente.
