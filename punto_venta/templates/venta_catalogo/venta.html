@@ -86,6 +86,7 @@
                   <th>Precio c/Desc.</th>
                   <th>Sección</th>
                   <th>Marca</th>
+                  <th>Modelo</th>
                   <th>Stock</th>
                   <th>Añadir</th>
                 </tr>
@@ -100,6 +101,7 @@
                     <td> ${{i.precio_descontado}} </td>
                     <td> {{i.seccion}} </td>
                     <td> {{i.marca}} </td>
+                    <td> {{i.modelo}} </td>
                     <td> {{i.stock}} </td>
                     {% if i.stock > 0 %}
                       <td> <a href="aniadir_al_carrito/{{i.codigo}}">✅</a> </td>
