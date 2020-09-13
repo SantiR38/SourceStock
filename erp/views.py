@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, FileResponse
+from django.http import HttpResponse, FileResponse, HttpResponseRedirect
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
+from django.contrib.auth.decorators import login_required
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
 from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente
@@ -9,7 +10,9 @@ from erp.functions import crear_articulo, comprar_articulo, buscar_proveedor, dn
 from datetime import date
 from decimal import *
 
+
 # Funciones para administrar las compras o entradas.
+@login_required
 def entrada(request):
     template = loader.get_template('entrada.html')
     miFormulario = FormEntrada({'cantidad': 1, 'proveedor': nombre_proveedor()})
@@ -86,6 +89,7 @@ def entrada(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def transaccion_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',
@@ -123,6 +127,7 @@ def transaccion_exitosa(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def historial_compras(request):
     template = loader.get_template('historial_ventas.html')
     miFormulario = FormFiltroFecha()
@@ -157,13 +162,16 @@ def historial_compras(request):
     else:
         return redirect('venta_exitosa')
 
+@login_required
 def detalle_entrada(request, id_entrada):
     try:
         return FileResponse(emitir_detalle_entrada(id_entrada), as_attachment=False, filename='hello.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
 
+
 # Funcion util para compra o venta
+@login_required
 def cancelar(request):
     template = loader.get_template('mensaje.html')
     
@@ -186,6 +194,7 @@ def cancelar(request):
 
 
 # Funciones para administrar la mercadería
+@login_required
 def agregar_articulo(request):
     template = loader.get_template('agregar_modificar.html')
     miFormulario = FormNuevoArticulo()
@@ -221,6 +230,8 @@ def agregar_articulo(request):
                                                         porcentaje_descuento = crear_articulo(infForm)['porcentaje_descuento'],
                                                         precio_descontado = crear_articulo(infForm)['precio_descontado'],
                                                         seccion = crear_articulo(infForm)['seccion'],
+                                                        marca = crear_articulo(infForm)['marca'],
+                                                        modelo = crear_articulo(infForm)['modelo'],
                                                         stock = crear_articulo(infForm)['stock'])
 
                     return redirect('control_inventario')
@@ -235,6 +246,7 @@ def agregar_articulo(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def control_inventario(request):
     template = loader.get_template('control_inventario.html')
     miFormulario = FormBusqueda()
@@ -255,6 +267,7 @@ def control_inventario(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def articulo(request, codigo_articulo):
     # Modificar un artículo existente.
     template = loader.get_template('agregar_modificar.html')
@@ -270,6 +283,8 @@ def articulo(request, codigo_articulo):
             'porcentaje_ganancia': new_article.porcentaje_ganancia,
             'porcentaje_descuento': new_article.porcentaje_descuento,
             'seccion': new_article.seccion,
+            'marca': new_article.marca,
+            'modelo': new_article.modelo,
             'stock': new_article.stock
         }
         miFormulario = FormNuevoArticulo(detalles_formulario)
@@ -303,6 +318,8 @@ def articulo(request, codigo_articulo):
                     new_article.precio_descontado = crear_articulo(infForm)['precio_descontado']
                     if infForm['seccion'] != "":
                         new_article.seccion = infForm['seccion']
+                    new_article.marca = infForm['marca']
+                    new_article.modelo = infForm['modelo']
                     new_article.stock = infForm['stock']
                     
                     new_article.save() # Guardamos los cambios en la base de datos
@@ -320,6 +337,7 @@ def articulo(request, codigo_articulo):
 
 
 # Funciones para administrar las ventas
+@login_required
 def venta(request):
     template = loader.get_template('venta.html')
     miFormulario = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
@@ -360,7 +378,12 @@ def venta(request):
                     nueva_venta.cliente = buscar_cliente(infForm['dni_cliente'])
                     
                 elif infForm['cliente'] != None:
-                    nueva_venta.cliente = buscar_cliente(infForm['cliente'])
+                    try:
+                        nueva_venta.cliente = buscar_cliente(infForm['cliente'])
+                    except:
+                        nueva_venta.cliente = None
+                        ctx['cliente'] = "Hay más de un cliente con el mismo nombre, probar con DNI."
+
                 nueva_venta.save()
             
             ##
@@ -419,6 +442,7 @@ def venta(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def historial_ventas(request):
     template = loader.get_template('historial_ventas.html')
     miFormulario = FormFiltroFecha()
@@ -453,12 +477,14 @@ def historial_ventas(request):
     else:
         return redirect('venta_exitosa')
 
+@login_required
 def recibo(request, id_venta):
     try:
         return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='hello.pdf')
     except ObjectDoesNotExist as DoesNotExist :
         return redirect('not_found')
 
+@login_required
 def venta_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',
@@ -487,6 +513,7 @@ def venta_exitosa(request):
     
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def cancelar_unidad(request, codigo_articulo):
     try:
         articulo_staging = DetalleVenta.objects.get(id=codigo_articulo)
@@ -494,23 +521,32 @@ def cancelar_unidad(request, codigo_articulo):
         pass
     else:
         articulo_staging.delete()
-    return redirect('venta')
+
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER')) # esto hace que se redirija a la url anterior.
     
 
 # Funcion que debe ejecutarse en la instalacion del programa
+@login_required
 def script_actualizacion(request):
     template = loader.get_template('mje_sin_redireccion.html')
     ctx = {'titulo': 'Se agregaron los nuevos valores',
            'mensaje': 'Checkear en DB...'}
-    campos_sin_iva()
+    '''campos_sin_iva()
     if not ArtState.objects.all().exists():
-        add_art_state()
-    
+        add_art_state()'''
+    '''
+    articulos = Article.objects.all()
+    for i in articulos:
+        i.porcentaje_descuento = 0
+        i.precio_descontado = 0
+        i.save()
+    '''
 
     return HttpResponse(template.render(ctx, request))
 
 
 #Funciones para administrar los clientes
+@login_required
 def cliente(request):
     template = loader.get_template('agregar_modificar.html')
     miFormulario = FormCliente()
@@ -547,6 +583,7 @@ def cliente(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def control_clientes(request):
     template = loader.get_template('control_personas.html')
     miFormulario = FormBusqueda()
@@ -571,6 +608,7 @@ def control_clientes(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def modificar_cliente(request, id_param):
     template = loader.get_template('agregar_modificar.html')
     try:
@@ -617,6 +655,7 @@ def modificar_cliente(request, id_param):
 
 
 #Funciones para administrar los proveedores
+@login_required
 def proveedor(request):
     template = loader.get_template('agregar_modificar.html')
     miFormulario = FormProveedor()
@@ -652,6 +691,7 @@ def proveedor(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def modificar_proveedor(request, id_param):
     template = loader.get_template('agregar_modificar.html')
     try:
@@ -694,6 +734,7 @@ def modificar_proveedor(request, id_param):
 
         return HttpResponse(template.render(ctx, request))
 
+@login_required
 def control_proveedores(request):
     template = loader.get_template('control_personas.html')
     ctx = {
@@ -707,7 +748,14 @@ def control_proveedores(request):
 
     return HttpResponse(template.render(ctx, request))
 
+@login_required
 def not_found(request):
     template = loader.get_template('error_404.html')
     ctx = {"titulo": "Error 404. Su solicitud no fue encontrada."}
+    return HttpResponse(template.render(ctx, request))
+
+@login_required
+def error_404(request, exception):
+    template = loader.get_template('error/404.html')
+    ctx = {"titulo": "Error 404."}
     return HttpResponse(template.render(ctx, request))

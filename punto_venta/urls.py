@@ -15,8 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.auth.views import LoginView
+from django.conf.urls import handler404
+from erp.views import error_404
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('erp.urls')),
+    path('venta_catalogo/', include('venta_catalogo.urls')),
+    path('accounts/', include('django.contrib.auth.urls')),
 ]
+
+handler404 = error_404

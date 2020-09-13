@@ -1,0 +1,131 @@
+{% extends "base_layout.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+
+  <!-- Main row -->
+  <div class="row">
+    <!-- Left col -->
+    <section class="connectedSortable">
+      <!-- Custom tabs (Charts with tabs)-->
+        <div class="card-body">
+          <div class="tab-content p-0">
+            <!-- Morris chart - Sales -->
+            <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
+              
+              <!-- Carrito de compras -->
+              <div>
+                <h4>Esta venta</h4>
+                <table style="width:100%;" class="borde-externo">
+                  <tr class="intercalado">
+                    <th>Código</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>% Desc.</th>
+                    <th>Precio c/Desc.</th>
+                    <th>Marca</th>
+                    <th>Modelo</th>
+                    <th>Stock</th>
+                    <th>Remover</th>
+                  </tr>
+
+                  {% for i in articulo_a_vender %}
+                
+
+                  <tr class="intercalado">
+                    <td>{{i.id_producto.codigo}}</td>
+                    <td> {{i.id_producto.descripcion}} </td>
+                    <td> ${{i.precio_unitario}} </td>
+                    <td> {{i.porcentaje_descuento}}% </td>
+                    <td> ${{i.descuento }} </td>
+                    <td> {{i.id_producto.marca}} </td>
+                    <td> {{i.id_producto.modelo}} </td>
+                    <td> {{i.cantidad}} </td>
+                    <td> <a href="/cancelar_unidad/{{i.id}}">⛔</a> </td>
+                  </tr>
+
+                  {% endfor %}
+
+                  <tr class="intercalado">
+                    <td><b> Total </b></td>
+                    <td></td>
+                    <td><b> ${{totales.total}} </b></td>
+                    <td></td>
+                    <td><b>${{totales.total_con_descuento}}</b></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td> <a href="confirmar_venta"><button>Confirmar</button></a> </td>
+                  </tr>
+
+                </table>
+              </div>
+              <br />
+              <br />
+              
+              <div >
+                <h4>Filtrar productos</h4>
+                <form action="" method="post"> {% csrf_token %}
+                  <span>
+                    
+                      {{ form.as_table }}
+            
+                      <input type="submit" value="Buscar" />
+                  </span>
+                </form>
+              </div>
+              <br />
+
+              <table style="width:100%;" class="borde-externo">
+                <tr class="intercalado">
+                  <th>Código</th>
+                  <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>% Desc.</th>
+                  <th>Precio c/Desc.</th>
+                  <th>Sección</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Stock</th>
+                  <th>Añadir</th>
+                </tr>
+                {% for i in articulos %}
+                
+
+                  <tr class="intercalado">
+                    <td><a href="/articulo/{{i.codigo}}">{{i.codigo}}</a></td>
+                    <td> {{i.descripcion}} </td>
+                    <td> ${{i.precio}} </td>
+                    <td> {{i.porcentaje_descuento}}% </td>
+                    <td> ${{i.precio_descontado}} </td>
+                    <td> {{i.seccion}} </td>
+                    <td> {{i.marca}} </td>
+                    <td> {{i.modelo}} </td>
+                    <td> {{i.stock}} </td>
+                    {% if i.stock > 0 %}
+                      <td> <a href="aniadir_al_carrito/{{i.codigo}}">✅</a> </td>
+                    {% else %}
+                      <td>⚪</td>
+                    {% endif %}
+                  </tr>
+
+                {% endfor %}
+              </table>
+              
+            </div>
+            <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
+              <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
+            </div>
+          </div>
+        </div><!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+
+    </section>
+    <!-- /.Left col -->
+
+  </div>
+  <!-- /.row (main row) -->
+</div><!-- /.container-fluid -->
+{% endblock content %}

@@ -92,3 +92,20 @@
 14. Precio con descuento agregado.
 15. **Bug Fixed:** Ya no se permite vender cantidades por encima del stock disponible.
 15. **Bug Fixed:** Cuando se cancela una compra o venta, ya no quedan remanentes indeseados.
+16. **Bug Fixed:** Se eliminó el campo apellido del modelo Cliente.
+
+## Versión 1.8
+1. Los errores 404 son dirigidos a un template de la aplicacion erp.
+2. Corregido bug de precio con descuento.
+3. **Nueva App:** venta_catalogo.
+4. **Mejoras estéticas:**
+    * Tamaño general de letra reducido.
+    * Small boxes eliminados de todos los templates excepto 'control_inventario.html'.
+    * Cambio de color a small boxes (gris claro).
+5. **Nueva Vista:** Aniadir_carrito.
+6. Filtro de busqueda en vista venta_por_catalogo.
+7. Mediante un metodo del modelo Venta, se simplifico el codigo para crear el objeto.
+8. **Nueva Vista:** confirmar_venta.
+9. **Nueva Vista:** elegir_cliente.
+10. Campo modelo agregado a tabla Article.
+11. Inventario de clientes y articulos limitados en la primera vista a 50 objetos.

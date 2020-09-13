@@ -1,5 +1,5 @@
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import FileResponse
 from reportlab.pdfgen import canvas
 from datetime import date
@@ -8,10 +8,10 @@ import io
 
 def inventario(param):
 
-    # Almacena todos los objetos del modelo pasado por parámetro
+    # Almacena los primeros 50 objetos del modelo pasado por parámetro (lte=20)
     # en un query_set para mostrar en la vista "control de inventario".
 
-    return param.objects.all()
+    return param.objects.filter(id__lte=50)
 
 def stock_total():
 
@@ -52,11 +52,8 @@ def venta_activa():
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
         nueva_venta = Venta.objects.get(id_state=estado)
     except ObjectDoesNotExist as DoesNotExist:
-        nueva_venta = Venta.objects.create(fecha=date.today(),
-                                            total=0,
-                                            id_state=estado,
-                                            descuento=0
-                                            ) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+        nueva_venta = Venta.crear_venta_vacia(estado)
+
     else:
         lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
         nueva_venta.total = 0
@@ -426,6 +423,8 @@ def crear_articulo(infForm):
         "porcentaje_descuento": porcentaje_descuento,
         "precio_descontado": precio_descontado,
         "seccion": infForm['seccion'],
+        "marca": infForm['marca'],
+        "modelo": infForm['modelo'],
         "stock": infForm['stock']
     }
 
