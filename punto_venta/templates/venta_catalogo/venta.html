@@ -25,6 +25,7 @@
                     <th>% Desc.</th>
                     <th>Precio c/Desc.</th>
                     <th>Marca</th>
+                    <th>Modelo</th>
                     <th>Stock</th>
                     <th>Remover</th>
                   </tr>
@@ -39,6 +40,7 @@
                     <td> {{i.porcentaje_descuento}}% </td>
                     <td> ${{i.descuento }} </td>
                     <td> {{i.id_producto.marca}} </td>
+                    <td> {{i.id_producto.modelo}} </td>
                     <td> {{i.cantidad}} </td>
                     <td> <a href="/cancelar_unidad/{{i.id}}">⛔</a> </td>
                   </tr>
@@ -51,6 +53,7 @@
                     <td><b> ${{totales.total}} </b></td>
                     <td></td>
                     <td><b>${{totales.total_con_descuento}}</b></td>
+                    <td></td>
                     <td></td>
                     <td></td>
                     <td> <a href="confirmar_venta"><button>Confirmar</button></a> </td>

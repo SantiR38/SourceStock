@@ -25,6 +25,7 @@
                     <th>% Desc.</th>
                     <th>Precio c/Desc.</th>
                     <th>Marca</th>
+                    <th>Modelo</th>
                     <th>Stock</th>
                     <th>Remover</th>
                   </tr>
@@ -39,6 +40,7 @@
                     <td> {{i.porcentaje_descuento}}% </td>
                     <td> ${{i.descuento }} </td>
                     <td> {{i.id_producto.marca}} </td>
+                    <td> {{i.id_producto.modelo}} </td>
                     <td> {{i.cantidad}} </td>
                     <td> <a href="/cancelar_unidad/{{i.id}}">⛔</a> </td>
                   </tr>

@@ -28,6 +28,7 @@ class FormNuevoArticulo(forms.Form):
     porcentaje_descuento = forms.DecimalField(max_digits=10, decimal_places=2, initial=0, label_suffix= "*:")
     seccion = forms.CharField(required=False)
     marca = forms.CharField(required=False)
+    modelo = forms.CharField(required=False)
     stock = forms.IntegerField(label_suffix= "*:")
 
 class FormEntrada(forms.Form):
