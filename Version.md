@@ -107,3 +107,5 @@
 7. Mediante un metodo del modelo Venta, se simplifico el codigo para crear el objeto.
 8. **Nueva Vista:** confirmar_venta.
 9. **Nueva Vista:** elegir_cliente.
+10. Campo modelo agregado a tabla Article.
+11. Inventario de clientes y articulos limitados en la primera vista a 50 objetos.

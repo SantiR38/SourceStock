@@ -8,10 +8,10 @@ import io
 
 def inventario(param):
 
-    # Almacena todos los objetos del modelo pasado por parámetro
+    # Almacena los primeros 50 objetos del modelo pasado por parámetro (lte=20)
     # en un query_set para mostrar en la vista "control de inventario".
 
-    return param.objects.all()
+    return param.objects.filter(id__lte=50)
 
 def stock_total():
 
