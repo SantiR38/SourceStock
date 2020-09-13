@@ -169,6 +169,7 @@ def detalle_entrada(request, id_entrada):
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
 
+
 # Funcion util para compra o venta
 @login_required
 def cancelar(request):
@@ -480,7 +481,6 @@ def recibo(request, id_venta):
         return redirect('not_found')
 
 @login_required
-@login_required
 def venta_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',
@@ -509,7 +509,6 @@ def venta_exitosa(request):
     
     return HttpResponse(template.render(ctx, request))
 
-@login_required
 @login_required
 def cancelar_unidad(request, codigo_articulo):
     try:
@@ -746,14 +745,12 @@ def control_proveedores(request):
     return HttpResponse(template.render(ctx, request))
 
 @login_required
-
 def not_found(request):
     template = loader.get_template('error_404.html')
     ctx = {"titulo": "Error 404. Su solicitud no fue encontrada."}
     return HttpResponse(template.render(ctx, request))
 
 @login_required
-
 def error_404(request, exception):
     template = loader.get_template('error/404.html')
     ctx = {"titulo": "Error 404."}
