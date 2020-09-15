@@ -88,7 +88,7 @@
                   <th>Marca</th>
                   <th>Modelo</th>
                   <th>Stock</th>
-                  <th>Añadir</th>
+                  <th style="text-align: right;">Añadir</th>
                 </tr>
                 {% for i in articulos %}
                 
@@ -103,11 +103,12 @@
                     <td> {{i.marca}} </td>
                     <td> {{i.modelo}} </td>
                     <td> {{i.stock}} </td>
+                    <td style="text-align: right;">
                     {% if i.stock > 0 %}
-                      <td> <a href="aniadir_al_carrito/{{i.codigo}}">✅</a> </td>
+                      {% if i.stock <= i.alarma_stock %}<span title="Su stock es igual o inferior al mínimo permitido">❗</span>{% endif %}<a href="aniadir_al_carrito/{{i.codigo}}">✅</a>
                     {% else %}
-                      <td>⚪</td>
-                    {% endif %}
+                      <span title="Su stock es igual o inferior al mínimo permitido">❗</span><span title="Ud no posee stock de este producto">⚪</span>
+                    {% endif %}</td>
                   </tr>
 
                 {% endfor %}
