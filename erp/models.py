@@ -20,6 +20,7 @@ class Article(models.Model):
     marca = models.CharField(max_length=100, blank=True)
     modelo = models.CharField(max_length=100, blank=True)
     stock = models.IntegerField(verbose_name="Cantidad")
+    alarma_stock = models.IntegerField(verbose_name="Stock minimo permitido", null=True)
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):

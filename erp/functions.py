@@ -47,7 +47,8 @@ def venta_activa():
     #   2. Datos de la venta general (cliente y total).
     
     lista = []
-    estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+    # Creamos un ArtState instance para definir una transacción Activa
+    estado = ArtState.objects.get(nombre="Active")
     
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
         nueva_venta = Venta.objects.get(id_state=estado)
@@ -425,7 +426,8 @@ def crear_articulo(infForm):
         "seccion": infForm['seccion'],
         "marca": infForm['marca'],
         "modelo": infForm['modelo'],
-        "stock": infForm['stock']
+        "stock": infForm['stock'],
+        "alarma_stock": infForm['alarma_stock']
     }
 
     return contexto

@@ -30,6 +30,7 @@ class FormNuevoArticulo(forms.Form):
     marca = forms.CharField(required=False)
     modelo = forms.CharField(required=False)
     stock = forms.IntegerField(label_suffix= "*:")
+    alarma_stock = forms.IntegerField(required=False ,label= "Stock mínimo permitido", initial=1,)
 
 class FormEntrada(forms.Form):
     codigo = forms.IntegerField(label_suffix= "*:")

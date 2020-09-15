@@ -1,14 +1,17 @@
+from datetime import date
+from decimal import *
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse, HttpResponseRedirect
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from django.contrib.auth.decorators import login_required
-from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente, FormBusqueda, FormFiltroFecha, FormProveedor
+
+from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
+from erp.forms import FormBusqueda, FormFiltroFecha, FormProveedor
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta, DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
 from erp.functions import stock_total, add_art_state, porcentaje_ganancia, inventario, venta_activa, compra_activa, buscar_cliente
 from erp.functions import crear_articulo, comprar_articulo, buscar_proveedor, dni_cliente, campos_sin_iva, precio_final, emitir_recibo, nombre_proveedor, emitir_detalle_entrada
-from datetime import date
-from decimal import *
 
 
 # Funciones para administrar las compras o entradas.
@@ -35,9 +38,9 @@ def entrada(request):
             infForm = miFormulario.cleaned_data # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
             
             try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_entrada a su id
-                    nueva_venta = Entrada.objects.get(id_state=estado)
-                    nueva_venta.proveedor=buscar_proveedor(infForm['proveedor'])
-                    nueva_venta.save()
+                nueva_venta = Entrada.objects.get(id_state=estado)
+                nueva_venta.proveedor=buscar_proveedor(infForm['proveedor'])
+                nueva_venta.save()
             except ObjectDoesNotExist as DoesNotExist:
                 nueva_venta = Entrada.objects.create(fecha=infForm['fecha'],
                                                         total=0,
@@ -232,7 +235,8 @@ def agregar_articulo(request):
                                                         seccion = crear_articulo(infForm)['seccion'],
                                                         marca = crear_articulo(infForm)['marca'],
                                                         modelo = crear_articulo(infForm)['modelo'],
-                                                        stock = crear_articulo(infForm)['stock'])
+                                                        stock = crear_articulo(infForm)['stock'],
+                                                        alarma_stock = crear_articulo(infForm)['alarma_stock'])
 
                     return redirect('control_inventario')
                 else:
@@ -274,7 +278,7 @@ def articulo(request, codigo_articulo):
     try:
         new_article = Article.objects.get(codigo=codigo_articulo)
     except ObjectDoesNotExist as DoesNotExist:
-            return redirect('not_found')
+        return redirect('not_found')
     else:  
         detalles_formulario = {
             'codigo': new_article.codigo,
@@ -285,7 +289,8 @@ def articulo(request, codigo_articulo):
             'seccion': new_article.seccion,
             'marca': new_article.marca,
             'modelo': new_article.modelo,
-            'stock': new_article.stock
+            'stock': new_article.stock,
+            'alarma_stock': new_article.alarma_stock
         }
         miFormulario = FormNuevoArticulo(detalles_formulario)
         ctx = {
@@ -321,6 +326,7 @@ def articulo(request, codigo_articulo):
                     new_article.marca = infForm['marca']
                     new_article.modelo = infForm['modelo']
                     new_article.stock = infForm['stock']
+                    new_article.alarma_stock = infForm['alarma_stock']
                     
                     new_article.save() # Guardamos los cambios en la base de datos
 
