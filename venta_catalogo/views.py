@@ -4,6 +4,7 @@ from django.template import Template, Context, loader
 from django.contrib.auth.decorators import login_required
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
+from venta_catalogo.forms import FormDescuentoAdicional
 from erp.functions import inventario, stock_total, venta_activa
 from .functions.search_engines import search_articles, search_clients
 
@@ -62,7 +63,6 @@ def confirmar_venta(request):
         "titulo": "Confirmar venta",
         "persona": Cliente.objects.all(),
         "titulo_persona": "Cliente",
-        "articulos": inventario(Article).order_by('descripcion'),
         "form": miFormulario
     }
 
@@ -72,7 +72,7 @@ def confirmar_venta(request):
     if request.method == "POST":
         miFormulario = FormBuscarCliente(request.POST)
         if miFormulario.is_valid():
-            ctx["persona"] = search_clients(miFormulario.cleaned_data)
+            ctx["persona"] = search_clients(miFormulario.cleaned_data) # Coódigo simplificado
     else:
         miFormulario = FormBuscarCliente()
 
@@ -88,3 +88,29 @@ def elegir_cliente(request, codigo_param):
     nueva_venta.save()
 
     return redirect('confirmar_venta')
+
+@login_required
+def descuento_adicional(request):
+    template = loader.get_template('venta_catalogo/descuento_adicional.html')
+    miFormulario = FormDescuentoAdicional()
+    nueva_venta = venta_activa()[1]
+
+    ctx = {
+        "form": miFormulario,
+        "articulo_a_vender": venta_activa()[0],
+        "esta_venta": venta_activa()[1],
+        "titulo": "Añadir descuento adicional",
+        "titulo_persona": "Cliente",
+
+    }
+    if request.method == "POST":
+        miFormulario = FormDescuentoAdicional(request.POST)
+        if miFormulario.is_valid():
+            infForm = miFormulario.cleaned_data
+            nueva_venta.descuento_adicional = nueva_venta.total * infForm['descuento'] / 100
+            nueva_venta.total_con_descuento -= nueva_venta.descuento_adicional
+            nueva_venta.save()
+            return redirect('venta_exitosa')
+
+    return HttpResponse(template.render(ctx, request))
+            

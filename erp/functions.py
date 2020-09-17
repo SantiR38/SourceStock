@@ -1,9 +1,8 @@
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.http import FileResponse
+from django.core.exceptions import ObjectDoesNotExist
 from reportlab.pdfgen import canvas
 from datetime import date
-from decimal import *
+from decimal import Decimal
 import io
 
 def inventario(param):
@@ -47,7 +46,8 @@ def venta_activa():
     #   2. Datos de la venta general (cliente y total).
     
     lista = []
-    estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+    # Creamos un ArtState instance para definir una transacción Activa
+    estado = ArtState.objects.get(nombre="Active")
     
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
         nueva_venta = Venta.objects.get(id_state=estado)
@@ -262,8 +262,13 @@ def emitir_recibo(id_venta):
 
     alto -= 35
     p.drawString(390, alto, "Descuento")
-    p.drawString(480, alto, "$")
+    p.drawString(480, alto, "$-")
     p.drawString(490, alto, str(venta.descuento))
+
+    alto -= 35
+    p.drawString(390, alto, "Dcto. adicional")
+    p.drawString(480, alto, "$-")
+    p.drawString(490, alto, str(venta.descuento_adicional))
 
     alto -= 35
     p.setFont("Helvetica-Bold", 11)
@@ -425,7 +430,8 @@ def crear_articulo(infForm):
         "seccion": infForm['seccion'],
         "marca": infForm['marca'],
         "modelo": infForm['modelo'],
-        "stock": infForm['stock']
+        "stock": infForm['stock'],
+        "alarma_stock": infForm['alarma_stock']
     }
 
     return contexto

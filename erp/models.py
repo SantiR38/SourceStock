@@ -20,6 +20,7 @@ class Article(models.Model):
     marca = models.CharField(max_length=100, blank=True)
     modelo = models.CharField(max_length=100, blank=True)
     stock = models.IntegerField(verbose_name="Cantidad")
+    alarma_stock = models.IntegerField(verbose_name="Stock minimo permitido", null=True)
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -51,6 +52,7 @@ class Venta(models.Model):
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    descuento_adicional = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total_con_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     cliente = models.ForeignKey('Cliente', on_delete=models.SET_NULL, null=True)
 
@@ -59,7 +61,8 @@ class Venta(models.Model):
         venta = cls(fecha=date.today(),
                     total=0,
                     id_state=estado,
-                    descuento=0)
+                    descuento=0,
+                    descuento_adicional=0)
         venta.save()
         return venta
 
