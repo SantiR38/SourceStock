@@ -61,7 +61,8 @@ class Venta(models.Model):
         venta = cls(fecha=date.today(),
                     total=0,
                     id_state=estado,
-                    descuento=0)
+                    descuento=0,
+                    descuento_adicional=0)
         venta.save()
         return venta
 

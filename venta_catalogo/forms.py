@@ -11,4 +11,4 @@ class FormBuscarCliente(forms.Form):
     dni = forms.IntegerField(required=False)
 
 class FormDescuentoAdicional(forms.Form):
-    descuento = forms.DecimalField(initial=0, max_digits=10, decimal_places=2, label_suffix= "*:")
+    descuento = forms.DecimalField(initial=0, max_digits=10, decimal_places=2, label_suffix= "*:", label="Porcentaje de descuento")

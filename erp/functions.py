@@ -262,8 +262,13 @@ def emitir_recibo(id_venta):
 
     alto -= 35
     p.drawString(390, alto, "Descuento")
-    p.drawString(480, alto, "$")
+    p.drawString(480, alto, "$-")
     p.drawString(490, alto, str(venta.descuento))
+
+    alto -= 35
+    p.drawString(390, alto, "Dcto. adicional")
+    p.drawString(480, alto, "$-")
+    p.drawString(490, alto, str(venta.descuento_adicional))
 
     alto -= 35
     p.setFont("Helvetica-Bold", 11)
