@@ -52,6 +52,7 @@ class Venta(models.Model):
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    descuento_adicional = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total_con_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     cliente = models.ForeignKey('Cliente', on_delete=models.SET_NULL, null=True)
 

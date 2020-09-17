@@ -9,3 +9,6 @@ class FormFiltrarArticulos(forms.Form):
 class FormBuscarCliente(forms.Form):
     nombre = forms.CharField(max_length=50, required=False)
     dni = forms.IntegerField(required=False)
+
+class FormDescuentoAdicional(forms.Form):
+    descuento = forms.DecimalField(initial=0, max_digits=10, decimal_places=2, label_suffix= "*:")
