@@ -110,3 +110,4 @@
 10. Campo modelo agregado a tabla Article.
 11. Inventario de clientes y articulos limitados en la primera vista a 50 objetos.
 12. Alarma de stock incluida en venta por catálogo.
+13. Historial de compra y venta agregado al navbar.
