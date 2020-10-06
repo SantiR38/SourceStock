@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
 from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
@@ -77,6 +78,19 @@ def confirmar_venta(request):
         miFormulario = FormBuscarCliente()
 
     return HttpResponse(template.render(ctx, request))
+
+
+class PresupuestoView(ListView):
+    model = Cliente
+    template_name = 'venta_catalogo/presupuesto.html'
+    context_object_name = "persona"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        estado = ArtState.objects.get(nombre="Active")
+        venta_activa = Venta.objects.get(id_state=estado)
+        context['articulo_a_vender'] = DetalleVenta.objects.filter(id_venta=venta_activa)
+        return context
 
 @login_required
 def elegir_cliente(request, codigo_param):
