@@ -455,3 +455,4 @@ def comprar_articulo(infForm):
     }
 
     return contexto
+    

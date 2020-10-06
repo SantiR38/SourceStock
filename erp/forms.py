@@ -88,3 +88,4 @@ class FormProveedor(forms.Form):
     direccion = forms.CharField(max_length=50, required=False)
     telefono = forms.CharField(required=False)
     email = forms.EmailField(required=False)
+    

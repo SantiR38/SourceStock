@@ -745,9 +745,3 @@ def not_found(request):
     template = loader.get_template('error_404.html')
     ctx = {"titulo": "Error 404. Su solicitud no fue encontrada."}
     return HttpResponse(template.render(ctx, request))
-
-@login_required
-def error_404(request, exception):
-    template = loader.get_template('error/404.html')
-    ctx = {"titulo": "Error 404."}
-    return HttpResponse(template.render(ctx, request))
