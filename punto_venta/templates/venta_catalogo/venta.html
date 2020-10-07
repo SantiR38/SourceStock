@@ -1,6 +1,22 @@
 {% extends "base_layout.html" %}
 {% load static %}
 
+{% block styles %}
+<style>
+  input {
+    margin: 0 5px 0 3px;
+    max-width: 15%;
+  }
+  #id_codigo {
+    max-width: 10%;
+  }
+</style>
+{% endblock styles %}
+
+{% block heading %}
+Esta venta
+{% endblock heading %}
+
 {% block content %}
 <div class="container-fluid">
 
@@ -16,7 +32,6 @@
 
             <!-- Carrito de compras -->
             <div>
-              <h4>Esta venta</h4>
               <table style="width:100%;" class="borde-externo">
                 <tr class="intercalado">
                   <th>Código</th>

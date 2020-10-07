@@ -65,6 +65,9 @@ class Venta(models.Model):
                     descuento_adicional=0)
         venta.save()
         return venta
+    
+    def get_active(cls):
+        return Venta.objects.get(id_state=ArtState.objects.get(nombre="Active"))
 
 
 class DetalleVenta(models.Model):
