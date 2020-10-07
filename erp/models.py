@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import date
 
 # *1: CASCADE, significa que cuando se borre un artículo de la tabla padre, el artículo de la
 #     tabla hija que tiene esa clave foranea, también se borra
@@ -15,8 +16,11 @@ class Article(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     porcentaje_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     precio_descontado = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    seccion = models.CharField(max_length=100, blank=True, null=True) # blank=True??
+    seccion = models.CharField(max_length=100, blank=True) # blank=True hace que el valor vacio no se guarde como None, sino como ''.
+    marca = models.CharField(max_length=100, blank=True)
+    modelo = models.CharField(max_length=100, blank=True)
     stock = models.IntegerField(verbose_name="Cantidad")
+    alarma_stock = models.IntegerField(verbose_name="Stock minimo permitido", null=True)
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
@@ -48,8 +52,22 @@ class Venta(models.Model):
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True) # *2
     total = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    descuento_adicional = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total_con_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     cliente = models.ForeignKey('Cliente', on_delete=models.SET_NULL, null=True)
+
+    @classmethod
+    def crear_venta_vacia(cls, estado):
+        venta = cls(fecha=date.today(),
+                    total=0,
+                    id_state=estado,
+                    descuento=0,
+                    descuento_adicional=0)
+        venta.save()
+        return venta
+    
+    def get_active(cls):
+        return Venta.objects.get(id_state=ArtState.objects.get(nombre="Active"))
 
 
 class DetalleVenta(models.Model):

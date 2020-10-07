@@ -29,18 +29,22 @@
   <!-- Google Font: Source Sans Pro -->
   <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
   <style>
+    body {
+  font-size: 77%;
+}
     ul.errorlist {display:none;}
     table, th, td {
       text-align: center;
-      padding: 5px 17px 5px 17px;
+      padding: 5px 10px 5px 10px;
     }
     table.borde-externo {
       border: 1px solid #dddddd;
     }
     tr.intercalado:nth-child(even) { /*Esto es para que se alterne el color de las filas*/
-  background-color: #dddddd;
-}
+      background-color: #dddddd;
+    }
   </style>
+  {% block styles %}{% endblock styles %}
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">

@@ -1,17 +1,16 @@
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
-from django.http import FileResponse
+from django.core.exceptions import ObjectDoesNotExist
 from reportlab.pdfgen import canvas
 from datetime import date
-from decimal import *
+from decimal import Decimal
 import io
 
 def inventario(param):
 
-    # Almacena todos los objetos del modelo pasado por parámetro
+    # Almacena los primeros 50 objetos del modelo pasado por parámetro (lte=20)
     # en un query_set para mostrar en la vista "control de inventario".
 
-    return param.objects.all()
+    return param.objects.filter(id__lte=50)
 
 def stock_total():
 
@@ -47,16 +46,14 @@ def venta_activa():
     #   2. Datos de la venta general (cliente y total).
     
     lista = []
-    estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
+    # Creamos un ArtState instance para definir una transacción Activa
+    estado = ArtState.objects.get(nombre="Active")
     
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
         nueva_venta = Venta.objects.get(id_state=estado)
     except ObjectDoesNotExist as DoesNotExist:
-        nueva_venta = Venta.objects.create(fecha=date.today(),
-                                            total=0,
-                                            id_state=estado,
-                                            descuento=0
-                                            ) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+        nueva_venta = Venta.crear_venta_vacia(estado)
+
     else:
         lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
         nueva_venta.total = 0
@@ -175,7 +172,8 @@ def emitir_recibo(id_venta):
 
     venta = Venta.objects.get(id=id_venta)
     detalle_venta = DetalleVenta.objects.filter(id_venta=venta)
-
+    active = ArtState.objects.get(nombre="Active")
+    recibo_presupuesto = "Presupuesto" if venta.id_state == active else "Recibo"
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
@@ -185,7 +183,8 @@ def emitir_recibo(id_venta):
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
     p.setFont("Helvetica", 26)
-    p.drawString(327, 790, "Recibo") #(Ancho, Alto, "Texto")
+    
+    p.drawString(327, 790, recibo_presupuesto) #(Ancho, Alto, "Texto")
     p.setFont("Helvetica", 10)
     p.drawString(328, 770, "Documento no válido como factura")
     p.drawString(328, 740, "Fecha de emisión:")
@@ -265,8 +264,13 @@ def emitir_recibo(id_venta):
 
     alto -= 35
     p.drawString(390, alto, "Descuento")
-    p.drawString(480, alto, "$")
+    p.drawString(480, alto, "$-")
     p.drawString(490, alto, str(venta.descuento))
+
+    alto -= 35
+    p.drawString(390, alto, "Dcto. adicional")
+    p.drawString(480, alto, "$-")
+    p.drawString(490, alto, str(venta.descuento_adicional))
 
     alto -= 35
     p.setFont("Helvetica-Bold", 11)
@@ -426,7 +430,10 @@ def crear_articulo(infForm):
         "porcentaje_descuento": porcentaje_descuento,
         "precio_descontado": precio_descontado,
         "seccion": infForm['seccion'],
-        "stock": infForm['stock']
+        "marca": infForm['marca'],
+        "modelo": infForm['modelo'],
+        "stock": infForm['stock'],
+        "alarma_stock": infForm['alarma_stock']
     }
 
     return contexto

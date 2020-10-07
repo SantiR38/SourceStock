@@ -1,0 +1,54 @@
+{% extends "registration/base.html" %}
+{% load static %}
+{% block content %}
+
+<div class="login-box">
+    <div class="login-logo">
+        SourceStock
+    </div>
+    <!-- /.login-logo -->
+    <div class="card">
+        <div class="card-body login-card-body">
+            <p class="login-box-msg">Inicia sesión para acceder.</p>
+
+            <form action="{% url 'login' %}" method="post"> {% csrf_token %}
+
+                <table>
+                    <tr>
+                        <th>{{ form.username.label_tag }}</th>
+                        <th>{{ form.username}}</th>
+                    </tr>
+                    <tr>
+                        <th>{{ form.password.label_tag }}</th>
+                        <th>{{ form.password}}</th>
+                    </tr>
+                </table>
+                <br>
+                <div class="row">
+                    <div class="col-12">
+                        <input type="submit" value="Iniciar sesión" class="btn btn-primary btn-block">
+                        <input type="hidden" name="next" value="{{ next }}">
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+
+            {% if form.errors %}
+            <p>Your username and password didn't match. Please try again.</p>
+            {% endif %}
+
+            {% if next %}
+            {% if user.is_authenticated %}
+            <p>Your account doesn't have access to this page. To proceed,
+                please login with an account that has access.</p>
+            {% else %}
+            <p>Please login to see this page.</p>
+            {% endif %}
+            {% endif %}
+
+        </div>
+        <!-- /.login-card-body -->
+    </div>
+</div>
+
+{% endblock %}
