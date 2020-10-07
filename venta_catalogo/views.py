@@ -1,12 +1,14 @@
+from datetime import date
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
-from erp.functions import inventario, stock_total, venta_activa
+from erp.functions import inventario, stock_total, venta_activa, emitir_recibo
 from .functions.search_engines import search_articles, search_clients
 
 @login_required
@@ -73,24 +75,11 @@ def confirmar_venta(request):
     if request.method == "POST":
         miFormulario = FormBuscarCliente(request.POST)
         if miFormulario.is_valid():
-            ctx["persona"] = search_clients(miFormulario.cleaned_data) # Coódigo simplificado
+            ctx["persona"] = search_clients(miFormulario.cleaned_data) # Código simplificado
     else:
         miFormulario = FormBuscarCliente()
 
     return HttpResponse(template.render(ctx, request))
-
-
-class PresupuestoView(ListView):
-    model = Cliente
-    template_name = 'venta_catalogo/presupuesto.html'
-    context_object_name = "persona"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        estado = ArtState.objects.get(nombre="Active")
-        venta_activa = Venta.objects.get(id_state=estado)
-        context['articulo_a_vender'] = DetalleVenta.objects.filter(id_venta=venta_activa)
-        return context
 
 @login_required
 def elegir_cliente(request, codigo_param):
@@ -127,4 +116,10 @@ def descuento_adicional(request):
             return redirect('venta_exitosa')
 
     return HttpResponse(template.render(ctx, request))
-            
+
+@login_required
+def presupuesto(request, id_venta):
+    try:
+        return FileResponse(emitir_recibo(id_venta), as_attachment=True, filename=f'presupuesto_{date.today()}.pdf')
+    except ObjectDoesNotExist as DoesNotExist:
+        return redirect('not_found')

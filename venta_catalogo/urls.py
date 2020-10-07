@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from .views import PresupuestoView
 
 urlpatterns = [
     path('', views.venta_por_catalogo, name='venta_por_catalogo'),
@@ -8,5 +7,5 @@ urlpatterns = [
     path('elegir_cliente/<int:codigo_param>', views.elegir_cliente, name='elegir_cliente'),
     path('confirmar_venta', views.confirmar_venta, name='confirmar_venta'),
     path('descuento_adicional', views.descuento_adicional, name='descuento_adicional'),
-    path('presupuesto/', PresupuestoView.as_view()),
+    path('presupuesto/<int:id_venta>', views.presupuesto, name='presupuesto'),
 ]

@@ -112,3 +112,4 @@
 12. Alarma de stock incluida en venta por catálogo.
 13. Historial de compra y venta agregado al navbar.
 14. Paquetes de tests creados en cada app.
+15. **Nueva Vista**: Emitir presupuesto. Se descarga como archivo adjunto.

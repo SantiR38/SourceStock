@@ -172,7 +172,8 @@ def emitir_recibo(id_venta):
 
     venta = Venta.objects.get(id=id_venta)
     detalle_venta = DetalleVenta.objects.filter(id_venta=venta)
-
+    active = ArtState.objects.get(nombre="Active")
+    recibo_presupuesto = "Presupuesto" if venta.id_state == active else "Recibo"
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
@@ -182,7 +183,8 @@ def emitir_recibo(id_venta):
     # Draw things on the PDF. Here's where the PDF generation happens.
     # See the ReportLab documentation for the full list of functionality.
     p.setFont("Helvetica", 26)
-    p.drawString(327, 790, "Recibo") #(Ancho, Alto, "Texto")
+    
+    p.drawString(327, 790, recibo_presupuesto) #(Ancho, Alto, "Texto")
     p.setFont("Helvetica", 10)
     p.drawString(328, 770, "Documento no válido como factura")
     p.drawString(328, 740, "Fecha de emisión:")
