@@ -66,8 +66,17 @@ class Venta(models.Model):
         venta.save()
         return venta
     
+    @classmethod
     def get_active(cls):
         return Venta.objects.get(id_state=ArtState.objects.get(nombre="Active"))
+    
+    @classmethod
+    def get_inactive(cls):
+        """
+        Muestra las últimas 50 ventas realizadas
+        """
+        estado = ArtState.objects.get(nombre="Inactive")
+        return cls.objects.filter(id_state=estado).order_by('-fecha', '-id')[:50] 
 
 
 class DetalleVenta(models.Model):

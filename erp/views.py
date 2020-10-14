@@ -437,19 +437,10 @@ def venta(request):
 def historial_ventas(request):
     template = loader.get_template('historial_ventas.html')
     miFormulario = FormFiltroFecha()
-    estado = ArtState.objects.get(nombre="Inactive") # Para filtrar solo las ventas que ya se confirmaron.
-    venta_historica = Venta.objects.filter(id_state=estado).order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
-    if venta_historica.exists():
-        ultimas_ventas = []
-        x = 0
-        for i in venta_historica: # Este bucle solo selecciona una cantidad limitada de ventas para mostrar
-            ultimas_ventas.append(i)
-            x += 1
-            if x == 50:
-                break
+    if Venta.get_inactive().exists():
         ctx = {
             "datos_generales": stock_total(),
-            "transaccion": ultimas_ventas,
+            "transaccion": Venta.get_inactive(),
             "form": miFormulario,
             "titulo": "Historial de ventas"
         }
