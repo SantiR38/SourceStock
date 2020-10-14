@@ -113,3 +113,7 @@
 13. Historial de compra y venta agregado al navbar.
 14. Paquetes de tests creados en cada app.
 15. **Nueva Vista**: Emitir presupuesto. Se descarga como archivo adjunto.
+
+## Versión 1.9
+1. Classmethod implementado a modelo Venta. Mostrar las ultimas 50 ventas en el historial.
+2. Classmethod implementado a modelo Entrada. Mostrar las ultimas 50 entradas en el historial.
