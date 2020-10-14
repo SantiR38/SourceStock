@@ -134,19 +134,11 @@ def transaccion_exitosa(request):
 def historial_compras(request):
     template = loader.get_template('historial_ventas.html')
     miFormulario = FormFiltroFecha()
-    estado = ArtState.objects.get(nombre="Inactive") # Para filtrar solo las ventas que ya se confirmaron.
-    compra_historica = Entrada.objects.filter(id_state=estado).order_by('-fecha', '-id') # Trae todos los registros para mostrar en el historial y los ordena por fecha y por id.
-    if compra_historica.exists():
-        ultimas_compras = []
-        x = 0
-        for i in compra_historica: # Este bucle solo selecciona una cantidad limitada de ventas para mostrar
-            ultimas_compras.append(i)
-            x += 1
-            if x == 50:
-                break
+    if Entrada.get_inactive().exists():
+
         ctx = {
             "datos_generales": stock_total(),
-            "transaccion": ultimas_compras,
+            "transaccion": Entrada.get_inactive(),
             "form": miFormulario,
             "titulo": "Historial de compras"
         }

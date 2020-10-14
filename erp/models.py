@@ -97,6 +97,14 @@ class Entrada(models.Model):
 
     def __str__(self):
         return '%s (%s)' % (self.fecha, self.id)
+    
+    @classmethod
+    def get_inactive(cls):
+        """
+        Muestra las últimas 50 compras realizadas
+        """
+        estado = ArtState.objects.get(nombre="Inactive")
+        return cls.objects.filter(id_state=estado).order_by('-fecha', '-id')[:50] 
 
 
 class DetalleEntrada(models.Model):
