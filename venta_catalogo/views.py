@@ -1,10 +1,11 @@
 from datetime import date
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
+
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional

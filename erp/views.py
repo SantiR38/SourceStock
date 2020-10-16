@@ -6,6 +6,7 @@ from django.http import HttpResponse, FileResponse, HttpResponseRedirect
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from django.contrib.auth.decorators import login_required
+from django.views.generic import ListView
 
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
 from erp.forms import FormBusqueda, FormFiltroFecha, FormProveedor
@@ -450,6 +451,10 @@ def historial_ventas(request):
 
     else:
         return redirect('venta_exitosa')
+
+class DetalleDeVenta(ListView):
+    model = DetalleVenta
+
 
 @login_required
 def recibo(request, id_venta):
