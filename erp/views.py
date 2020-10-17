@@ -6,7 +6,7 @@ from django.http import HttpResponse, FileResponse, HttpResponseRedirect
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView, FormView
 
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
 from erp.forms import FormBusqueda, FormFiltroFecha, FormProveedor
@@ -452,8 +452,22 @@ def historial_ventas(request):
     else:
         return redirect('venta_exitosa')
 
-class DetalleDeVenta(ListView):
-    model = DetalleVenta
+class HistorialDeVenta(ListView, FormView):
+    model = Venta
+    form_class = FormFiltroFecha
+    paginate_by = 20
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Historial de ventas"
+        return context
+    
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            infForm = form.cleaned_data
+            queryset=Venta.objects.filter(fecha__range=[infForm['fecha_inicial'], infForm['fecha_final']]).order_by('-fecha', '-id')
+            return render(request, {'form': form})
 
 
 @login_required
