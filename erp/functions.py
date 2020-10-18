@@ -1,9 +1,12 @@
-from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
-from django.core.exceptions import ObjectDoesNotExist
-from reportlab.pdfgen import canvas
+import io
 from datetime import date
 from decimal import Decimal
-import io
+from reportlab.pdfgen import canvas
+
+from django.core.exceptions import ObjectDoesNotExist
+
+from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
+
 
 def inventario(param):
 

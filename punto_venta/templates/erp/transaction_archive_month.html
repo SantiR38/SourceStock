@@ -6,6 +6,7 @@
 {% endblock heading %}
 
 {% block content %}
+
 <div class="container-fluid">
   <!-- Main row -->
   <div class="row">
@@ -15,11 +16,12 @@
       <!-- Custom tabs (Charts with tabs)-->
 
         <div class="card-body">
-
+          <h4>{{month|date:"F Y"}}</h4>
           <div class="tab-content p-0">
             <!-- Morris chart - Sales -->
             <div class="chart tab-pane active" id="revenue-chart" style="position: relative;">
               {% if titulo == "Historial de ventas" %}
+
                 <table style="width:100%;" class="borde-externo">
                   <tr class="intercalado">
                     <th>Cód. Venta</th>
@@ -28,23 +30,23 @@
                     <th>Valor total</th>
 
                   </tr>
-                  {% for i in object_list %}
-                  
+                    {% for i in object_list %}
+                    
 
-                    <tr class="intercalado">
-                      <td><a href="recibo/{{i.id}}" target="_blank">{{i.id}}</a></td>
-                      <td> {{i.fecha}} </td>
-                      <td> 
-                        {% if i.cliente != None %}
-                        {{i.cliente.nombre}} {{i.cliente.apellido}}
-                        {% else %}
-                        -
-                        {% endif %}
-                      </td>
-                      <td> ${{i.total_con_descuento}} </td>
-                    </tr>
+                      <tr class="intercalado">
+                        <td><a href="recibo/{{i.id}}" target="_blank">{{i.id}}</a></td>
+                        <td> {{i.fecha}} </td>
+                        <td> 
+                          {% if i.cliente != None %}
+                          {{i.cliente.nombre}} {{i.cliente.apellido}}
+                          {% else %}
+                          -
+                          {% endif %}
+                        </td>
+                        <td> ${{i.total_con_descuento}} </td>
+                      </tr>
 
-                  {% endfor %}
+                    {% endfor %}
                 </table>
               {% else %}
                 <table style="width:100%;" class="borde-externo">
@@ -55,12 +57,12 @@
                     <th>Valor total</th>
 
                   </tr>
-                  {% for i in transaccion %}
+                  {% for i in object_list %}
                   
 
                     <tr class="intercalado">
                       <td><a href="detalle_entrada/{{i.id}}" target="_blank">{{i.id}}</a></td>
-                      <td> {{i.fecha}} </td>
+                      <td> {{i.fecha | date:"F j, Y"}} </td>
                       <td> 
                         {% if i.proveedor != None %}
                         {{i.proveedor.nombre}}
@@ -78,7 +80,7 @@
 
             </div>
 
-            <div class="pagination">
+            <div class="pagination espaciado">
               <span class="step-links">
                   {% if page_obj.has_previous %}
                       <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
@@ -109,13 +111,36 @@
     <!-- right col (We are only adding the ID to make the widgets sortable)-->
     <section class="col-lg-5 connectedSortable">
 
-      <!-- Map card -->
-        <div class="card-body">
-          <!-- Date filter form -->
-          {% include 'form_filtro_fechas.html' %}
-          <!-- /.Date filter form -->
-        </div>
-      <!-- /.card -->
+      <div>
+        <span class="espaciado">
+          <a href=""> 2020 </a>
+          <a href=""> 2021 </a>
+          <a href=""> 2022 </a>
+        
+        </span>
+        <br>
+        <span class="espaciado">
+          
+          <a href="/{{url}}/{{month|date:'Y'}}/01">Ene</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/02">Feb</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/03">Mar</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/04">Abr</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/05">May</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/06">Jun</a>
+        
+        </span>
+        <br>
+        <span class="espaciado">
+          
+          <a href="/{{url}}/{{month|date:'Y'}}/07">Jul</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/08">Ago</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/09">Sep</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/10">Oct</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/11">Nov</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/12">Dic</a>
+        
+        </span>
+      </div>
 
     </section>
     <!-- right col -->

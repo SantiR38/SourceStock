@@ -7,6 +7,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, FormView
+from django.views.generic.dates import MonthArchiveView, YearArchiveView
 
 from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
 from erp.forms import FormBusqueda, FormFiltroFecha, FormProveedor
@@ -452,22 +453,33 @@ def historial_ventas(request):
     else:
         return redirect('venta_exitosa')
 
-class HistorialDeVenta(ListView, FormView):
-    model = Venta
-    form_class = FormFiltroFecha
-    paginate_by = 20
+class HistorialMixin(MonthArchiveView): # Clase padre de las dos siguientes.
+    date_field = 'fecha'
+    paginate_by = 15
+    allow_future = True
+    allow_empty = True
+    template_name = 'erp/transaction_archive_month.html'
+
+class HistorialDeVenta(HistorialMixin):
+    queryset = Venta.objects.all().order_by('-fecha', '-id')
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Historial de ventas"
+        context['url'] = "historial_de_venta"
         return context
-    
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            infForm = form.cleaned_data
-            queryset=Venta.objects.filter(fecha__range=[infForm['fecha_inicial'], infForm['fecha_final']]).order_by('-fecha', '-id')
-            return render(request, {'form': form})
+
+
+class HistorialDeCompra(HistorialMixin):
+    queryset = Entrada.objects.all()
+
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Historial de compras"
+        context['url'] = "historial_de_compra"
+        return context
 
 
 @login_required
