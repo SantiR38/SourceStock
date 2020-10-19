@@ -110,34 +110,44 @@
 
     <!-- right col (We are only adding the ID to make the widgets sortable)-->
     <section class="col-lg-5 connectedSortable">
+      <br />
 
       <div>
         <span class="espaciado">
-          <a href=""> 2020 </a>
-          <a href=""> 2021 </a>
-          <a href=""> 2022 </a>
+          <a href="/{{url}}/2020/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2020.svg' %}" alt=""> </a>
+          <a href="/{{url}}/2021/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2021.svg' %}" alt=""> </a>
+          <a href="/{{url}}/2022/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2022.svg' %}" alt=""> </a>
+          <a href="/{{url}}/2023/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2023.svg' %}" alt=""> </a>
+          <br />
+          <br />
+          <a href="/{{url}}/2024/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2024.svg' %}" alt=""> </a>
+          <a href="/{{url}}/2025/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2025.svg' %}" alt=""> </a>
+          <a href="/{{url}}/2026/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2026.svg' %}" alt=""> </a>
+          <a href="/{{url}}/2027/{{month|date:'m'}}"> <img src="{% static '/dist/img/years/2027.svg' %}" alt=""> </a>
+        
+        </span>
+        <br />
+        <br />
+        <span class="espaciado">
+          
+          <a href="/{{url}}/{{month|date:'Y'}}/01"><img src="{% static '/dist/img/months/ene.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/02"><img src="{% static '/dist/img/months/feb.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/03"><img src="{% static '/dist/img/months/mar.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/04"><img src="{% static '/dist/img/months/abr.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/05"><img src="{% static '/dist/img/months/may.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/06"><img src="{% static '/dist/img/months/jun.svg' %}" alt=""></a>
         
         </span>
         <br>
-        <span class="espaciado">
-          
-          <a href="/{{url}}/{{month|date:'Y'}}/01">Ene</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/02">Feb</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/03">Mar</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/04">Abr</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/05">May</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/06">Jun</a>
-        
-        </span>
         <br>
         <span class="espaciado">
           
-          <a href="/{{url}}/{{month|date:'Y'}}/07">Jul</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/08">Ago</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/09">Sep</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/10">Oct</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/11">Nov</a>
-          <a href="/{{url}}/{{month|date:'Y'}}/12">Dic</a>
+          <a href="/{{url}}/{{month|date:'Y'}}/07"><img src="{% static '/dist/img/months/jul.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/08"><img src="{% static '/dist/img/months/ago.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/09"><img src="{% static '/dist/img/months/sep.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/10"><img src="{% static '/dist/img/months/oct.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/11"><img src="{% static '/dist/img/months/nov.svg' %}" alt=""></a>
+          <a href="/{{url}}/{{month|date:'Y'}}/12"><img src="{% static '/dist/img/months/dic.svg' %}" alt=""></a>
         
         </span>
       </div>
