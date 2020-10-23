@@ -1,11 +1,12 @@
 from datetime import date
 from decimal import Decimal
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, FileResponse, HttpResponseRedirect
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist, FieldError
 from django.contrib.auth.decorators import login_required
+
 from django.views.generic import ListView, DetailView, FormView
 from django.views.generic.dates import MonthArchiveView, YearArchiveView
 
@@ -470,7 +471,6 @@ class HistorialDeVenta(HistorialMixin):
         context['url'] = "historial_de_venta"
         return context
 
-
 class HistorialDeCompra(HistorialMixin):
     queryset = Entrada.objects.all()
 
@@ -479,6 +479,19 @@ class HistorialDeCompra(HistorialMixin):
         context = super().get_context_data(**kwargs)
         context['titulo'] = "Historial de compras"
         context['url'] = "historial_de_compra"
+        return context
+
+class DetalleDeCompra(DetailView):
+    template_name = "erp/detalle_de_operacion.html"
+
+    def get_object(self):
+        id_ = self.kwargs.get("id")
+        return get_object_or_404(Entrada, id=id_)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['titulo'] = "Historial de compras"
+        context['elementos_vendidos'] = DetalleEntrada.objects.filter(id_entrada=self.kwargs.get("id"))
         return context
 
 

@@ -1,0 +1,71 @@
+{% extends "base_layout.html" %}
+{% load static %}
+
+{% block heading %}
+{{titulo}}
+{% endblock heading %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Main row -->
+  <div class="row">
+
+    <!-- Left col -->
+    <section class="col-lg-7 connectedSortable">
+      <!-- Custom tabs (Charts with tabs)-->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-chart-pie mr-1"></i>
+            Detalle de Entrada
+          </h3>
+        </div><!-- /.card-header -->
+        <div class="card-body">
+          <div class="tab-content p-0">
+            <table style="width:100%;" class="borde-externo">
+              <tr class="intercalado">
+                <td><b>Fecha</b></td>
+                <td><b>Proveedor</b></td>
+              </tr>
+              <tr class="intercalado">
+                <td>{{object.fecha}}</td>
+                <td>{{object.proveedor.nombre}}</td>
+              </tr>
+            </table>
+            <br>
+            <br>
+            <h5>Detalles</h5>
+            <table>
+              <tr class="intercalado">
+                <td><b>Cantidad</b></td>
+                <td><b>Detalles</b></td>
+                <td><b>Costo Unitario</b></td>
+                <td><b>Costo Total</b></td>
+              </tr>
+
+              {% for i in elementos_vendidos %}
+
+              <tr class="intercalado">
+                <td>{{i.cantidad}}</td>
+                <td>{{i.id_producto.descripcion}}</td>
+                <td>{{i.costo_unitario}}</td>
+                <td>{{i.costo_unitario}}</td>
+              </tr>
+
+              {% endfor %}
+
+            </table>
+            
+            
+
+          </div>
+        </div><!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </section>
+    <!-- /.Left col -->
+
+  </div>
+  <!-- /.row (main row) -->
+</div><!-- /.container-fluid -->
+{% endblock content %}

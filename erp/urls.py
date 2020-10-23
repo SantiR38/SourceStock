@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import HistorialDeVenta, HistorialDeCompra
+from .views import HistorialDeVenta, HistorialDeCompra, DetalleDeCompra
 
 
 urlpatterns = [
@@ -27,6 +27,7 @@ urlpatterns = [
     path('historial_de_compra/<int:year>/<int:month>/',
          HistorialDeCompra.as_view(month_format='%m'),
          name="historial_de_compra"),
+    path('detalle_de_compra/<int:id>/', DetalleDeCompra.as_view()),
     path('not_found', views.not_found, name='not_found'),
     path('historial_compras', views.historial_compras, name='historial_compras')
 ]
