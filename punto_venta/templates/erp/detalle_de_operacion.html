@@ -17,7 +17,7 @@
         <div class="card-header">
           <h3 class="card-title">
             <i class="fas fa-chart-pie mr-1"></i>
-            Detalle de Entrada
+            Compra realizada
           </h3>
         </div><!-- /.card-header -->
         <div class="card-body">
@@ -53,6 +53,13 @@
               </tr>
 
               {% endfor %}
+
+              <tr class="intercalado">
+                <td><b>Total</b></td>
+                <td></td>
+                <td></td>
+                <td><b>{{object.total}}</b></td>
+              </tr>
 
             </table>
             
