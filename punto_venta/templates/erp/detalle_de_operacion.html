@@ -65,8 +65,9 @@
             <br />
             <br />
 
-            <form action="" method="post">{% csrf_token %}
-              <a href=""><button style="background-color: #ba2121; color: #fff;">Eliminar</button></a>
+            <form action="" method="post" name="miformulario">{% csrf_token %}
+              <input type=button onclick="pregunta()" value="Eliminar" style="background-color: #ba2121; color: #fff;" >
+
             </form>
           </div>
         </div><!-- /.card-body -->
@@ -79,3 +80,12 @@
   <!-- /.row (main row) -->
 </div><!-- /.container-fluid -->
 {% endblock content %}
+{% block script %}
+<script>
+  function pregunta(){
+    if (confirm("Eliminar elemento. Estas seguro?")){
+      document.miformulario.submit();
+    }
+  }
+</script>
+{% endblock script %}
