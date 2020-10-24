@@ -88,6 +88,14 @@ class DetalleVenta(models.Model):
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
 
+    @classmethod
+    def take_product_back(cls, param):
+        products = cls.objects.filter(id_venta=param)
+        for i in products:
+            if i.id_producto.stock >= i.cantidad:
+                i.id_producto.stock += i.cantidad
+                i.id_producto.save()
+
 
 class Entrada(models.Model):
     fecha = models.DateField()

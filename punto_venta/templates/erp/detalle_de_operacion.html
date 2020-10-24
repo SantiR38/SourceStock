@@ -44,8 +44,13 @@
               <tr class="intercalado">
                 <td><b>Cantidad</b></td>
                 <td><b>Detalles</b></td>
-                <td><b>Costo Unitario</b></td>
-                <td><b>Costo Total</b></td>
+                {% if titulo == "Detalle de compra" %}
+                  <td><b>Costo Unitario</b></td>
+                  <td><b>Costo Total</b></td>
+                {% else %}
+                  <td><b>Precio Unitario</b></td>
+                  <td><b>Precio Total</b></td>
+                {% endif %}
               </tr>
 
               {% for i in elementos_vendidos %}
@@ -53,17 +58,43 @@
               <tr class="intercalado">
                 <td>{{i.cantidad}}</td>
                 <td>{{i.id_producto.descripcion}}</td>
-                <td>{{i.costo_unitario}}</td>
-                <td>{{i.costo_unitario}}</td>
+              {% if titulo == "Detalle de compra" %}
+              <td>{{i.costo_unitario}}</td>
+              <td>{{i.costo_unitario}}</td>
+              {% else %}
+              <td>{{i.costo_unitario}}</td>
+              <td>{{i.costo_unitario}}</td>
+              {% endif %}
+                
               </tr>
-
               {% endfor %}
 
+              {% if titulo == "Detalle de venta" %}
+                <tr class="intercalado">
+                  <td><b>Subtotal</b></td>
+                  <td></td>
+                  <td></td>
+                  <td><b>{{object.total}}</b></td>
+                </tr>
+                <tr class="intercalado">
+                  <td><b>Descuento</b></td>
+                  <td></td>
+                  <td></td>
+                  <td><b>{{object.descuento}}</b></td>
+                </tr>
+                <tr class="intercalado">
+                  <td><b>Descuento Adicional</b></td>
+                  <td></td>
+                  <td></td>
+                  <td><b>{{object.descuento_adicional}}</b></td>
+                </tr>
+              {% endif %}
+              
               <tr class="intercalado">
                 <td><b>Total</b></td>
                 <td></td>
                 <td></td>
-                <td><b>{{object.total}}</b></td>
+                <td><b>{{object.total_con_descuento}}</b></td>
               </tr>
 
             </table>
