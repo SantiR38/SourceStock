@@ -17,7 +17,7 @@
         <div class="card-header">
           <h3 class="card-title">
             <i class="fas fa-chart-pie mr-1"></i>
-            Compra realizada
+            {{subtitulo}}
           </h3>
         </div><!-- /.card-header -->
         <div class="card-body">
@@ -25,11 +25,16 @@
             <table style="width:100%;" class="borde-externo">
               <tr class="intercalado">
                 <td><b>Fecha</b></td>
-                <td><b>Proveedor</b></td>
+                <td><b>{{persona}}</b></td>
               </tr>
               <tr class="intercalado">
                 <td>{{object.fecha}}</td>
-                <td>{{object.proveedor.nombre}}</td>
+                <td>{% if titulo == "Detalle de compra" %}
+                      {{object.proveedor.nombre}}
+                    {% else %}
+                      {{object.cliente.nombre}}
+                    {% endif %}
+                </td>
               </tr>
             </table>
             <br>

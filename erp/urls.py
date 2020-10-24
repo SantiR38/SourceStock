@@ -1,6 +1,6 @@
 from django.urls import path
-from . import views
-from .views import HistorialDeVenta, HistorialDeCompra, DetalleDeCompra
+from .views import views
+from .views.history import HistorialDeVenta, HistorialDeCompra, DetalleDeCompra
 
 
 urlpatterns = [
