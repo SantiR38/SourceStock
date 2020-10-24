@@ -495,8 +495,10 @@ class DetalleDeCompra(DetailView):
         return context
     
     def post(self, request, *args, **kwargs):
-        DetalleEntrada.objects.filter(id_entrada=self.kwargs.get("id")).delete()
-        Entrada.objects.get(id=self.kwargs.get("id")).delete()
+        id_ = self.kwargs.get("id")
+        DetalleEntrada.give_product_back(id_)
+        DetalleEntrada.objects.filter(id_entrada=id_).delete()
+        Entrada.objects.get(id=id_).delete()
         return HttpResponseRedirect('/historial_de_compra/2020/01/')
 
 
