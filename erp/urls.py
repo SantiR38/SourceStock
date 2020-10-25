@@ -23,6 +23,7 @@ urlpatterns = [
     path('detalle_entrada/<int:id_entrada>', views.detalle_entrada, name='detalle_entrada'),
     path('historial_ventas', views.historial_ventas, name='historial_ventas'),
     path('not_found', views.not_found, name='not_found'),
-    path('historial_compras', views.historial_compras, name='historial_compras')
+    path('historial_compras', views.historial_compras, name='historial_compras'),
+    
 ]
 
