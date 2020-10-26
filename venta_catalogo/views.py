@@ -1,11 +1,15 @@
+from datetime import date
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
+
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
-from erp.functions import inventario, stock_total, venta_activa
+from erp.functions import inventario, stock_total, venta_activa, emitir_recibo
 from .functions.search_engines import search_articles, search_clients
 
 @login_required
@@ -72,7 +76,7 @@ def confirmar_venta(request):
     if request.method == "POST":
         miFormulario = FormBuscarCliente(request.POST)
         if miFormulario.is_valid():
-            ctx["persona"] = search_clients(miFormulario.cleaned_data) # Coódigo simplificado
+            ctx["persona"] = search_clients(miFormulario.cleaned_data) # Código simplificado
     else:
         miFormulario = FormBuscarCliente()
 
@@ -113,4 +117,10 @@ def descuento_adicional(request):
             return redirect('venta_exitosa')
 
     return HttpResponse(template.render(ctx, request))
-            
+
+@login_required
+def presupuesto(request, id_venta):
+    try:
+        return FileResponse(emitir_recibo(id_venta), as_attachment=True, filename=f'presupuesto_{date.today()}.pdf')
+    except ObjectDoesNotExist as DoesNotExist:
+        return redirect('not_found')

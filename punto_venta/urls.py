@@ -21,7 +21,7 @@ from api.api import UserAPI, ClientViewSet
 #from erp.views import error_404
 
 urlpatterns = [
-        path('admin/', admin.site.urls),
+        path('syslurl_des/', admin.site.urls),
         path('', include('erp.urls')),
         path('venta_catalogo/', include('venta_catalogo.urls')),
         path('accounts/', include('django.contrib.auth.urls')),

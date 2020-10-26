@@ -65,6 +65,18 @@ class Venta(models.Model):
                     descuento_adicional=0)
         venta.save()
         return venta
+    
+    @classmethod
+    def get_active(cls):
+        return Venta.objects.get(id_state=ArtState.objects.get(nombre="Active"))
+    
+    @classmethod
+    def get_inactive(cls):
+        """
+        Muestra las últimas 50 ventas realizadas
+        """
+        estado = ArtState.objects.get(nombre="Inactive")
+        return cls.objects.filter(id_state=estado).order_by('-fecha', '-id')[:50] 
 
 
 class DetalleVenta(models.Model):
@@ -76,6 +88,14 @@ class DetalleVenta(models.Model):
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
 
+    @classmethod
+    def take_product_back(cls, param):
+        products = cls.objects.filter(id_venta=param)
+        for i in products:
+            if i.id_producto.stock >= i.cantidad:
+                i.id_producto.stock += i.cantidad
+                i.id_producto.save()
+
 
 class Entrada(models.Model):
     fecha = models.DateField()
@@ -85,6 +105,14 @@ class Entrada(models.Model):
 
     def __str__(self):
         return '%s (%s)' % (self.fecha, self.id)
+    
+    @classmethod
+    def get_inactive(cls):
+        """
+        Muestra las últimas 50 compras realizadas
+        """
+        estado = ArtState.objects.get(nombre="Inactive")
+        return cls.objects.filter(id_state=estado).order_by('-fecha', '-id')[:50] 
 
 
 class DetalleEntrada(models.Model):
@@ -93,6 +121,14 @@ class DetalleEntrada(models.Model):
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2
     cantidad = models.IntegerField()
+
+    @classmethod
+    def give_product_back(cls, param):
+        products = cls.objects.filter(id_entrada=param)
+        for i in products:
+            if i.id_producto.stock >= i.cantidad:
+                i.id_producto.stock -= i.cantidad
+                i.id_producto.save()
 
 
 class Cliente(models.Model):
