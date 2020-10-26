@@ -18,7 +18,9 @@ class PrecioDolar(models.Model):
     def actualizar_registro(cls):
         registry = cls.objects.filter(id=1)
         if registry.exists():
-            registry[0].oficial_compra = DOLAR_COMPRA
-            registry[0].oficial_venta = DOLAR_VENTA
+            obj = cls.objects.get(id=1)
+            obj.oficial_compra = DOLAR_COMPRA
+            obj.oficial_venta = DOLAR_VENTA
+            obj.save()
         else:
             cls.objects.create()
