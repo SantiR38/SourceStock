@@ -11,9 +11,11 @@ from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
 from erp.functions import inventario, stock_total, venta_activa, emitir_recibo
 from .functions.search_engines import search_articles, search_clients
+from api.models import PrecioDolar
 
 @login_required
 def venta_por_catalogo(request):
+    PrecioDolar.actualizar_registro()
     template = loader.get_template('venta_catalogo/venta.html')
     miFormulario = FormFiltrarArticulos()
     ctx = {

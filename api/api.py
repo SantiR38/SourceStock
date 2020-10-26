@@ -15,6 +15,7 @@ class UserAPI(APIView):
         else:
             return Response(UserSerializer.errors, status = status.HTTP_400_BAD_REQUEST)
 
+
 class ClientViewSet(viewsets.ModelViewSet):
     """
     This viewset automatically provides `list`, `create`, `retrieve`,
@@ -22,3 +23,5 @@ class ClientViewSet(viewsets.ModelViewSet):
     """
     queryset = Cliente.objects.all()
     serializer_class = ClientSerializer
+
+
