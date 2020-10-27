@@ -22,6 +22,7 @@ class Article(models.Model):
     stock = models.IntegerField(verbose_name="Cantidad")
     alarma_stock = models.IntegerField(verbose_name="Stock minimo permitido", null=True)
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True)
+    en_dolar = models.BooleanField(default=False, null=True)
 
     def __str__(self):
         return self.descripcion

@@ -9,5 +9,5 @@ router = DefaultRouter()
 # The API URLs are now determined automatically by the router.
 urlpatterns = [
     path('', include(router.urls)),
-    path('/dolar', views.dolar, name='dolar')
+    path('dolar', views.dolar, name='dolar')
 ]
