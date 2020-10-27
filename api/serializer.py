@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from erp.models import Cliente
 
 class UserSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -26,10 +25,3 @@ class UserSerializer(serializers.Serializer):
             raise serializers.ValidationError("Este nombre de usuario ya existe. Ingrese uno nuevo.")
         else:
             return data
-
-class ClientSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Cliente
-        fields = ['nombre', 'condicion_iva', 'dni', 'cuit', 'direccion', 'telefono', 'email']
-        
