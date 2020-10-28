@@ -111,12 +111,12 @@ Esta venta
               {% for i in articulos %}
 
 
-              <tr class="intercalado">
+              <tr class="intercalado" style="{% if i.en_dolar %} color: darkgreen; {% endif %}">
                 <td><a href="/articulo/{{i.codigo}}">{{i.codigo}}</a></td>
                 <td> {{i.descripcion}} </td>
-                <td> ${{i.precio}} </td>
+                <td> {% if i.en_dolar %}U$D{% else %}${% endif %} {{i.precio}} </td>
                 <td> {{i.porcentaje_descuento}}% </td>
-                <td> ${{i.precio_descontado}} </td>
+                <td> {% if i.en_dolar %}U$D{% else %}${% endif %} {{i.precio_descontado}} </td>
                 <td> {{i.seccion}} </td>
                 <td> {{i.marca}} </td>
                 <td> {{i.modelo}} </td>
@@ -124,8 +124,8 @@ Esta venta
                 <td style="text-align: right;">
                   {% if i.stock > 0 %}
                   {% if i.stock <= i.alarma_stock %}<span
-                    title="Su stock es igual o inferior al mínimo permitido">❗</span>{% endif %}<a
-                    href="aniadir_al_carrito/{{i.codigo}}">✅</a>
+                    title="Su stock es igual o inferior al mínimo permitido">❗</span>{% endif %}
+                    <a href="aniadir_al_carrito/{{i.codigo}}">✅</a>
                   {% else %}
                   <span title="Su stock es igual o inferior al mínimo permitido">❗</span><span
                     title="Ud no posee stock de este producto">⚪</span>

@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
-from erp.functions import inventario, stock_total, venta_activa, emitir_recibo
+from erp.functions import venta_activa, emitir_recibo
 from .functions.search_engines import search_articles, search_clients
 from api.models import PrecioDolar
 
@@ -21,8 +21,7 @@ def venta_por_catalogo(request):
     ctx = {
         "articulo_a_vender": venta_activa()[0],
         "totales": venta_activa()[1],
-        "datos_generales": stock_total(),
-        "articulos": inventario(Article).order_by('descripcion'),
+        "articulos": Article.objects.filter(id__lte=50).order_by('descripcion'),
         "form": miFormulario
     }
 

@@ -5,39 +5,11 @@ from reportlab.pdfgen import canvas
 
 from django.core.exceptions import ObjectDoesNotExist
 
-from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
+from erp.models import ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
 
-
-def inventario(param):
-
-    # Almacena los primeros 50 objetos del modelo pasado por parámetro (lte=20)
-    # en un query_set para mostrar en la vista "control de inventario".
-
-    return param.objects.filter(id__lte=50)
-
-def stock_total():
-
-    # Se aplica al widget de cabecera donde se muestra:
-    #   1. El stock total todos los productos.
-    #   2. La cantidad de distintos productos que ofrece la empresa.
-
-    cantidad_total = 0
-    diferentes_productos = 0
-    try:
-        query_set = inventario(Article)
-        for i in query_set:
-            cantidad_total += query_set[diferentes_productos].stock
-            diferentes_productos += 1
-    except UnboundLocalError:
-        cantidad_total = 0
-        diferentes_productos = 0
-    resultado = [cantidad_total, diferentes_productos]
-    return resultado
 
 def porcentaje_ganancia(costo, porcentaje):
-
     # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
-
     precio_final = costo + (costo * porcentaje / 100)
     return precio_final
 
@@ -140,25 +112,6 @@ def nombre_proveedor():
         a = None
     return a
 
-def campos_sin_iva():
-
-    # Cuando la tabla solo tiene los costos y precios con iva incluidos, esta formula itera sobre cada producto
-    # agregando el costo y el precio sin iva (se hace solo una vez a la hora de actualizar la app.)
-
-    a = Article.objects.all()
-    x = round((Decimal(1.21)), 2)
-    for i in a:
-        i.costo_sin_iva = i.costo / x
-        i.precio_sin_iva = i.precio / x
-        i.save()
-
-def add_art_state():
-
-    # Esta función es utilizada apenas se lanza el proyecto para registrar los tres campos de ArtState.
-
-    ArtState.objects.create(nombre="Active")
-    ArtState.objects.create(nombre="Inactive")
-    ArtState.objects.create(nombre="Deleted")
 
 def precio_final(costo_s_iva, porc_ganancia):
     
@@ -406,40 +359,6 @@ def lista_clientes():
             lista.append((i.nombre, i.nombre))
     return lista
 
-def crear_articulo(infForm):
-    # Funciona solo para modificar objetos de tipo Article.
-    costo_sin_iva = infForm['costo_sin_iva']
-    costo = infForm['costo']
-    porcentaje_descuento = infForm['porcentaje_descuento']
-    precio_descontado = None
-    if costo_sin_iva != None:
-        costo = porcentaje_ganancia(costo_sin_iva, 21)
-    elif costo != None:
-        costo_sin_iva = costo / Decimal(1.21)
-
-    precio = porcentaje_ganancia(costo, infForm['porcentaje_ganancia'])
-
-    if porcentaje_descuento != None:
-        precio_descontado = porcentaje_ganancia(precio, -porcentaje_descuento)
-
-    contexto = {
-        "codigo": infForm['codigo'],
-        "descripcion": infForm['descripcion'],
-        "costo_sin_iva": costo_sin_iva,
-        "costo": costo,
-        "precio_sin_iva": porcentaje_ganancia(costo_sin_iva, infForm['porcentaje_ganancia']),
-        "precio": precio,
-        "porcentaje_ganancia": infForm['porcentaje_ganancia'],
-        "porcentaje_descuento": porcentaje_descuento,
-        "precio_descontado": precio_descontado,
-        "seccion": infForm['seccion'],
-        "marca": infForm['marca'],
-        "modelo": infForm['modelo'],
-        "stock": infForm['stock'],
-        "alarma_stock": infForm['alarma_stock']
-    }
-
-    return contexto
 
 def comprar_articulo(infForm):
     # Funciona solo para modificar objetos de tipo DetalleEntrada.

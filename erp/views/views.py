@@ -11,10 +11,10 @@ from erp.forms import FormVenta, FormNuevoArticulo, FormEntrada, FormCliente
 from erp.forms import FormBusqueda, FormFiltroFecha, FormProveedor
 from erp.models import Article, ArtState, Entrada, DetalleEntrada, Venta
 from erp.models import DetalleVenta, Perdida, DetallePerdida, Cliente, Proveedor
-from erp.functions import stock_total, add_art_state, porcentaje_ganancia
-from erp.functions import inventario, venta_activa, compra_activa, buscar_cliente
-from erp.functions import crear_articulo, comprar_articulo, buscar_proveedor
-from erp.functions import dni_cliente, campos_sin_iva, precio_final, emitir_recibo
+from erp.functions import porcentaje_ganancia
+from erp.functions import venta_activa, compra_activa, buscar_cliente
+from erp.functions import comprar_articulo, buscar_proveedor
+from erp.functions import dni_cliente, precio_final, emitir_recibo
 from erp.functions import nombre_proveedor, emitir_detalle_entrada
 
 
@@ -28,7 +28,6 @@ def entrada(request):
     lista = []
     ctx = {
         "articulo_a_comprar": compra_activa()[0],
-        "datos_generales": stock_total(),
         "form": miFormulario,
         "total": compra_activa()[1].total,
         "porcentaje_inexistente": "",
@@ -137,7 +136,6 @@ def historial_compras(request):
     if Entrada.get_inactive().exists():
 
         ctx = {
-            "datos_generales": stock_total(),
             "transaccion": Entrada.get_inactive(),
             "form": miFormulario,
             "titulo": "Historial de compras"
@@ -192,7 +190,6 @@ def agregar_articulo(request):
     template = loader.get_template('agregar_modificar.html')
     miFormulario = FormNuevoArticulo()
     ctx = {
-        "datos_generales": stock_total(),
         "form": miFormulario,
         "titulo": "Agregar artículo"
     }
@@ -200,33 +197,8 @@ def agregar_articulo(request):
     if request.method == "POST":
         miFormulario = FormNuevoArticulo(request.POST)
         if miFormulario.is_valid():
-            infForm = miFormulario.cleaned_data
-            try:
-                Article.objects.get(codigo=infForm['codigo'])
-                ctx['mensaje'] = "El código ya está siendo utilizado por otro producto."
-            except ObjectDoesNotExist as DoesNotExist:
-                if infForm['costo'] is not None and infForm['costo_sin_iva'] is not None:
-                    ctx['mensaje'] = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
-                elif infForm['costo'] is not None or infForm['costo_sin_iva'] is not None:
-                    Article.objects.create(codigo=crear_articulo(infForm)['codigo'],
-                                           descripcion=crear_articulo(infForm)['descripcion'],
-                                           costo_sin_iva=crear_articulo(infForm)['costo_sin_iva'],
-                                           costo=crear_articulo(infForm)['costo'],
-                                           precio_sin_iva=crear_articulo(infForm)['precio_sin_iva'],
-                                           precio=crear_articulo(infForm)['precio'],
-                                           porcentaje_ganancia=crear_articulo(infForm)['porcentaje_ganancia'],
-                                           porcentaje_descuento=crear_articulo(infForm)['porcentaje_descuento'],
-                                           precio_descontado=crear_articulo(infForm)['precio_descontado'],
-                                           seccion=crear_articulo(infForm)['seccion'],
-                                           marca=crear_articulo(infForm)['marca'],
-                                           modelo=crear_articulo(infForm)['modelo'],
-                                           stock=crear_articulo(infForm)['stock'],
-                                           alarma_stock=crear_articulo(infForm)['alarma_stock'])
-                    return redirect('control_inventario')
-                else:
-                    ctx['mensaje'] = "PROBLEMA: Debes rellenar uno de los dos costos."
-                ctx['datos_generales'] = stock_total() # Actualiza el stock cuando se hace la compra, asi no va atrasado
-                miFormulario = FormNuevoArticulo()
+            ctx['mensaje'] = Article.create_new(miFormulario.cleaned_data)
+            miFormulario = FormNuevoArticulo()
     else:
         miFormulario = FormNuevoArticulo()
     return HttpResponse(template.render(ctx, request))
@@ -236,8 +208,7 @@ def control_inventario(request):
     template = loader.get_template('control_inventario.html')
     miFormulario = FormBusqueda()
     ctx = {
-        "datos_generales": stock_total(),
-        "articulos": inventario(Article).order_by('descripcion'),
+        "articulos": Article.objects.filter(id__lte=50).order_by('descripcion'),
         "form": miFormulario
     }
 
@@ -264,6 +235,7 @@ def articulo(request, codigo_articulo):
         detalles_formulario = {
             'codigo': new_article.codigo,
             'descripcion': new_article.descripcion,
+            'en_dolar': new_article.en_dolar,
             'costo': new_article.costo,
             'porcentaje_ganancia': new_article.porcentaje_ganancia,
             'porcentaje_descuento': new_article.porcentaje_descuento,
@@ -275,8 +247,7 @@ def articulo(request, codigo_articulo):
         }
         miFormulario = FormNuevoArticulo(detalles_formulario)
         ctx = {
-            "datos_generales": stock_total(),
-            "articulos": inventario(Article),
+            "articulos": Article.objects.filter(id__lte=50),
             "form": miFormulario,
             "titulo": "Modificar Artículo"
         }
@@ -287,7 +258,6 @@ def articulo(request, codigo_articulo):
                 infForm = miFormulario.cleaned_data
 
                 if infForm['costo'] != None and infForm['costo_sin_iva'] != None:
-
                     ctx['mensaje'] = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
 
                 elif infForm['costo'] != None or infForm['costo_sin_iva'] != None:
@@ -295,13 +265,14 @@ def articulo(request, codigo_articulo):
                     new_article.codigo = infForm['codigo']
                     if infForm['descripcion'] != "":
                         new_article.descripcion = infForm['descripcion']
+                    new_article.en_dolar = infForm['en_dolar']
                     new_article.costo_sin_iva = infForm['costo_sin_iva']
-                    new_article.costo = crear_articulo(infForm)['costo']
+                    new_article.costo = Article.get_context(infForm)['costo']
                     new_article.porcentaje_ganancia = infForm['porcentaje_ganancia']
-                    new_article.precio_sin_iva = crear_articulo(infForm)['precio_sin_iva']
-                    new_article.precio = crear_articulo(infForm)['precio']
-                    new_article.porcentaje_descuento = crear_articulo(infForm)['porcentaje_descuento']
-                    new_article.precio_descontado = crear_articulo(infForm)['precio_descontado']
+                    new_article.precio_sin_iva = Article.get_context(infForm)['precio_sin_iva']
+                    new_article.precio = Article.get_context(infForm)['precio']
+                    new_article.porcentaje_descuento = Article.get_context(infForm)['porcentaje_descuento']
+                    new_article.precio_descontado = Article.get_context(infForm)['precio_descontado']
                     if infForm['seccion'] != "":
                         new_article.seccion = infForm['seccion']
                     new_article.marca = infForm['marca']
@@ -331,7 +302,6 @@ def venta(request):
     lista = []
     ctx = {
         "articulo_a_vender": venta_activa()[0],
-        "datos_generales": stock_total(),
         "form": miFormulario,
         "total": venta_activa()[1].total,
         "cliente": "",
@@ -431,7 +401,6 @@ def historial_ventas(request):
     miFormulario = FormFiltroFecha()
     if Venta.get_inactive().exists():
         ctx = {
-            "datos_generales": stock_total(),
             "transaccion": Venta.get_inactive(),
             "form": miFormulario,
             "titulo": "Historial de ventas"
@@ -499,25 +468,6 @@ def cancelar_unidad(request, codigo_articulo):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER')) # esto hace que se redirija a la url anterior.
 
 
-# Funcion que debe ejecutarse en la instalacion del programa
-@login_required
-def script_actualizacion(request):
-    template = loader.get_template('mje_sin_redireccion.html')
-    ctx = {'titulo': 'Se agregaron los nuevos valores',
-           'mensaje': 'Checkear en DB...'}
-    '''campos_sin_iva()
-    if not ArtState.objects.all().exists():
-        add_art_state()'''
-    '''
-    articulos = Article.objects.all()
-    for i in articulos:
-        i.porcentaje_descuento = 0
-        i.precio_descontado = 0
-        i.save()
-    '''
-
-    return HttpResponse(template.render(ctx, request))
-
 
 #Funciones para administrar los clientes
 @login_required
@@ -527,7 +477,6 @@ def cliente(request):
     lista = []
     ctx = {
         "articulo_a_vender": lista,
-        "datos_generales": stock_total(),
         "form": miFormulario,
         "mensaje": "",
         "titulo": "Añadir cliente"
@@ -563,8 +512,7 @@ def control_clientes(request):
     miFormulario = FormBusqueda()
     ctx = {
         "titulo": "Clientes",
-        "datos_generales": stock_total(),
-        "articulos": inventario(Cliente).order_by('nombre'),
+        "articulos": Cliente.objects.filter(id__lte=50).order_by('nombre'),
         "agregar_persona": "+ Agregar Cliente",
         "link_agregar": "/cliente",
         "link_modificar": "/modificar_cliente/",
@@ -601,8 +549,7 @@ def modificar_cliente(request, id_param):
         }
         miFormulario = FormCliente(detalles_formulario)
         ctx = {
-            "datos_generales": stock_total(),
-            "articulos": inventario(Cliente),
+            "articulos": Cliente.objects.filter(id__lte=50),
             "form": miFormulario,
             "mensaje": "",
             "titulo": "Modificar cliente"
@@ -636,7 +583,6 @@ def proveedor(request):
     lista = []
     ctx = {
         "articulo_a_vender": lista,
-        "datos_generales": stock_total(),
         "form": miFormulario,
         "mensaje": "",
         "titulo": "Añadir proveedor"
@@ -683,8 +629,7 @@ def modificar_proveedor(request, id_param):
         }
         miFormulario = FormProveedor(detalles_formulario)
         ctx = {
-            "datos_generales": stock_total(),
-            "articulos": inventario(Proveedor),
+            "articulos": Proveedor.objects.filter(id__lte=50),
             "form": miFormulario,
             "mensaje": "",
             "titulo": "Modificar proveedor"
@@ -714,8 +659,7 @@ def control_proveedores(request):
     template = loader.get_template('control_personas.html')
     ctx = {
         "titulo": "Proveedores",
-        "datos_generales": stock_total(),
-        "articulos": inventario(Proveedor).order_by('nombre'),
+        "articulos": Proveedor.objects.filter(id__lte=50).order_by('nombre'),
         "agregar_persona": "+ Agregar Proveedor",
         "link_agregar": "/proveedor",
         "link_modificar": "/modificar_proveedor/"
