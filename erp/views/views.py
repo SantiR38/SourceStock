@@ -16,6 +16,7 @@ from erp.functions import venta_activa, compra_activa, buscar_cliente
 from erp.functions import comprar_articulo, buscar_proveedor
 from erp.functions import dni_cliente, precio_final, emitir_recibo
 from erp.functions import nombre_proveedor, emitir_detalle_entrada
+from api.models import PrecioDolar
 
 
 # Funciones para administrar las compras o entradas.
@@ -65,6 +66,7 @@ def entrada(request):
                                                   costo_unitario=comprar_articulo(infForm)['costo'],
                                                   cantidad=comprar_articulo(infForm)['cantidad'],
                                                   id_entrada=Entrada.objects.get(id_state=estado),
+                                                  en_dolar=comprar_articulo(infForm)['en_dolar'],
                                                   id_producto=Article.objects.get(codigo=infForm['codigo']))
                     ctx['inexistente'] = ''
                 else:
@@ -75,7 +77,10 @@ def entrada(request):
             lista = DetalleEntrada.objects.filter(id_entrada=nueva_venta)
             nueva_venta.total = 0
             for i in lista:
-                nueva_venta.total += (i.costo_unitario * i.cantidad) # Se suman los precios unitarios al precio total de la compra
+                if i.en_dolar:
+                    nueva_venta.total += (i.costo_unitario * i.cantidad * PrecioDolar.cotizacion_venta())
+                else:
+                    nueva_venta.total += (i.costo_unitario * i.cantidad) # Se suman los precios unitarios al precio total de la compra
             nueva_venta.save()
             ctx['total'] = nueva_venta.total
             ctx['articulo_a_comprar'] = lista
@@ -107,6 +112,7 @@ def transaccion_exitosa(request):
             for j in producto_leido: # Esto es simplemente para que cancele la compra completa y no se actualicen el stock y precio solo de algunos productos
                 test_porcentaje = j.id_producto.porcentaje_ganancia * 1 # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
             for i in producto_leido: # Se actualiza el costo y el stock de cada objeto Article
+                i.id_producto.en_dolar = i.en_dolar
                 i.id_producto.costo_sin_iva = i.costo_sin_iva
                 i.id_producto.costo = i.costo_unitario
                 i.id_producto.precio_sin_iva = porcentaje_ganancia(i.costo_sin_iva, i.id_producto.porcentaje_ganancia)

@@ -24,3 +24,7 @@ class PrecioDolar(models.Model):
             obj.save()
         else:
             cls.objects.create()
+    
+    @classmethod
+    def cotizacion_venta(cls):
+        return cls.objects.get(id=1).oficial_venta

@@ -6,7 +6,7 @@ from reportlab.pdfgen import canvas
 from django.core.exceptions import ObjectDoesNotExist
 
 from erp.models import ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
-
+from api.models import PrecioDolar
 
 def porcentaje_ganancia(costo, porcentaje):
     # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
@@ -61,7 +61,10 @@ def compra_activa():
         lista = DetalleEntrada.objects.filter(id_entrada = nueva_compra)
         nueva_compra.total = 0
         for i in lista:
-            nueva_compra.total += (i.costo_unitario * i.cantidad)
+            if i.en_dolar:
+                nueva_compra.total += (i.costo_unitario * i.cantidad * PrecioDolar.cotizacion_venta())
+            else:
+                nueva_compra.total += (i.costo_unitario * i.cantidad)
         nueva_compra.save()
     return [lista, nueva_compra]
 
@@ -375,7 +378,8 @@ def comprar_articulo(infForm):
         "codigo": infForm['codigo'],
         "costo_sin_iva": costo_sin_iva,
         "costo": costo,
-        "cantidad": infForm['cantidad']
+        "cantidad": infForm['cantidad'],
+        "en_dolar": infForm['en_dolar']
     }
 
     return contexto

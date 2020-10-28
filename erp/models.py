@@ -198,6 +198,7 @@ class Entrada(models.Model):
 
 class DetalleEntrada(models.Model):
     id_entrada = models.ForeignKey('Entrada', on_delete=models.CASCADE) # *1
+    en_dolar = models.BooleanField(default=False, null=True)
     costo_sin_iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True) # *2

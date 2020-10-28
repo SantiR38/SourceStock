@@ -59,23 +59,24 @@
                 <td>{{i.cantidad}}</td>
                 <td>{{i.id_producto.descripcion}}</td>
                 {% if titulo == "Detalle de compra" %}
-                <td>{{i.costo_unitario}}</td>
-                <td>{{i.costo_unitario}}</td>
+                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
+                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
                 {% else %}
-                <td>{{i.costo_unitario}}</td>
-                <td>{{i.costo_unitario}}</td>
+                <td>${{i.costo_unitario}}</td>
+                <td>${{i.costo_unitario}}</td>
                 {% endif %}
 
               </tr>
               {% endfor %}
 
-              {% if titulo == "Detalle de venta" %}
+              
               <tr class="intercalado">
-                <td><b>Subtotal</b></td>
+                <td><b>Total</b></td>
                 <td></td>
                 <td></td>
-                <td><b>{{object.total}}</b></td>
+                <td><b>$ {{object.total}}</b></td>
               </tr>
+              {% if titulo == "Detalle de venta" %}
               <tr class="intercalado">
                 <td><b>Descuento</b></td>
                 <td></td>
@@ -88,14 +89,15 @@
                 <td></td>
                 <td><b>{{object.descuento_adicional}}</b></td>
               </tr>
-              {% endif %}
-
               <tr class="intercalado">
-                <td><b>Total</b></td>
+                <td><b>Total con descuento</b></td>
                 <td></td>
                 <td></td>
                 <td><b>{{object.total_con_descuento}}</b></td>
               </tr>
+              {% endif %}
+
+              
 
             </table>
             <br />

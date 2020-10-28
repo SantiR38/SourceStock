@@ -14,7 +14,7 @@ class FormVenta(forms.Form): # Sirve para la actualización inventario en genera
 class FormNuevoArticulo(forms.Form):
     codigo = forms.IntegerField(label_suffix= "*:")
     descripcion = forms.CharField(required=False)
-    en_dolar = forms.BooleanField(label="Cotiza en dolar")
+    en_dolar = forms.BooleanField(label="Cotiza en dolar", required=False)
     costo_sin_iva = forms.DecimalField(max_digits=10,
                                        decimal_places=2,
                                        label_suffix= "*:",
@@ -35,6 +35,7 @@ class FormNuevoArticulo(forms.Form):
 
 class FormEntrada(forms.Form):
     codigo = forms.IntegerField(label_suffix= "*:")
+    en_dolar = forms.BooleanField(label="Cotiza en dolar", required=False)
     costo_sin_iva = forms.DecimalField(max_digits=10,
                                        decimal_places=2,
                                        label="Costo sin IVA",
