@@ -359,11 +359,12 @@ def venta(request):
                 ##
                 # Detalle de venta
                 ##
-
+                precio_peso_argentino = new_article.precio * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.precio
                 if new_article.stock >= infForm['cantidad']:
                     DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
-                                                precio_unitario=new_article.precio,
+                                                precio_unitario=precio_peso_argentino,
                                                 porcentaje_descuento=new_article.porcentaje_descuento,
+                                                precio_por_cantidad=precio_peso_argentino * infForm['cantidad'],
                                                 descuento=new_article.precio * new_article.porcentaje_descuento / 100,
                                                 cantidad=infForm['cantidad'],
                                                 id_venta=Venta.objects.get(id_state=estado),
