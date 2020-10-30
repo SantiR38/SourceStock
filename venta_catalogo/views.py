@@ -21,6 +21,7 @@ def venta_por_catalogo(request):
     ctx = {
         "articulo_a_vender": venta_activa()[0],
         "totales": venta_activa()[1],
+        "titulo": "Venta por catálogo",
         "articulos": Article.objects.filter(id__lte=50).order_by('descripcion'),
         "form": miFormulario
     }

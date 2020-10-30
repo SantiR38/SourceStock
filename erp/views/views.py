@@ -30,6 +30,7 @@ def entrada(request):
     ctx = {
         "articulo_a_comprar": compra_activa()[0],
         "form": miFormulario,
+        "titulo": "Compra",
         "total": compra_activa()[1].total,
         "porcentaje_inexistente": "",
         "proveedor": ""
@@ -100,6 +101,7 @@ def entrada(request):
 def transaccion_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',
+           'titulo': 'Transacción exitosa',
            'redireccion': 'Volviendo a la página de ventas...'}
 
     estado = ArtState.objects.get(nombre="Active")
@@ -164,7 +166,7 @@ def historial_compras(request):
 @login_required
 def detalle_entrada(request, id_entrada):
     try:
-        return FileResponse(emitir_detalle_entrada(id_entrada), as_attachment=False, filename='hello.pdf')
+        return FileResponse(emitir_detalle_entrada(id_entrada), as_attachment=False, filename='detalle_entrada.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
 
@@ -185,6 +187,7 @@ def cancelar(request):
             return redirect('not_found')
 
     ctx = {'mensaje': 'Se ha cancelado la transacción.',
+           'titulo': 'Transacción cancelada',
            'redireccion': 'Volviendo a la página de ventas...'}
 
     return HttpResponse(template.render(ctx, request))
@@ -215,7 +218,8 @@ def control_inventario(request):
     miFormulario = FormBusqueda()
     ctx = {
         "articulos": Article.objects.filter(id__lte=50).order_by('descripcion'),
-        "form": miFormulario
+        "form": miFormulario,
+        "titulo": "Control de inventario"
     }
 
     if request.method == "POST":
@@ -309,6 +313,7 @@ def venta(request):
     ctx = {
         "articulo_a_vender": venta_activa()[0],
         "form": miFormulario,
+        "titulo": "Venta",
         "total": venta_activa()[1].total,
         "cliente": "",
         "descuento": venta_activa()[1].descuento,
@@ -430,7 +435,7 @@ def historial_ventas(request):
 @login_required
 def recibo(request, id_venta):
     try:
-        return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='hello.pdf')
+        return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename='recibo.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
 
@@ -438,6 +443,7 @@ def recibo(request, id_venta):
 def venta_exitosa(request):
     template = loader.get_template('mensaje.html')
     ctx = {'mensaje': 'Su transacción fue un éxito.',
+           'titulo': 'Venta exitosa',
            'hay_recibo': False}
 
     estado = ArtState.objects.get(nombre="Active")
@@ -518,7 +524,7 @@ def control_clientes(request):
     template = loader.get_template('control_personas.html')
     miFormulario = FormBusqueda()
     ctx = {
-        "titulo": "Clientes",
+        "titulo": "Lista de clientes",
         "articulos": Cliente.objects.filter(id__lte=50).order_by('nombre'),
         "agregar_persona": "+ Agregar Cliente",
         "link_agregar": "/cliente",
