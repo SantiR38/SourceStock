@@ -48,10 +48,13 @@ def aniadir_al_carrito(request, codigo_param):
     ##
     # Detalle de venta
     ##
-    DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
-                                precio_unitario=new_article.precio,
+    costo_peso_argentino = new_article.costo * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.costo
+    precio_peso_argentino = new_article.precio * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.precio
+    DetalleVenta.objects.create(costo_unitario=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
+                                precio_unitario=precio_peso_argentino,
                                 porcentaje_descuento=new_article.porcentaje_descuento,
-                                descuento=new_article.precio * new_article.porcentaje_descuento / 100,
+                                precio_por_cantidad= precio_peso_argentino,
+                                descuento=precio_peso_argentino * new_article.porcentaje_descuento / 100,
                                 cantidad=1,
                                 id_venta=nueva_venta,
                                 id_producto=new_article)

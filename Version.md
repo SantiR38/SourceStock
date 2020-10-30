@@ -120,3 +120,5 @@
 3. Historial de compra y venta implementado con class based views.
 4. Paginación de a 15 elementos.
 5. Detalle de compra agregado.
+6. Las páginas tienen su nombre correcto en el title del head.
+7. Los archivos pdf se descargan con nombre y fecha de emisión.
