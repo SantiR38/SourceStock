@@ -166,7 +166,7 @@ def historial_compras(request):
 @login_required
 def detalle_entrada(request, id_entrada):
     try:
-        return FileResponse(emitir_detalle_entrada(id_entrada), as_attachment=False, filename=f'detalle_entrada_{date.today()}.pdf')
+        return FileResponse(emitir_detalle_entrada(id_entrada), as_attachment=False, filename=f'detalle_entrada_{Entrada.objects.get(id=id_entrada).fecha}.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
 
@@ -435,7 +435,7 @@ def historial_ventas(request):
 @login_required
 def recibo(request, id_venta):
     try:
-        return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename=f'recibo_{date.today()}.pdf')
+        return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename=f'recibo_{Venta.objects.get(id=id_venta).fecha}.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
 
