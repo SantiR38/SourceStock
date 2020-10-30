@@ -2,6 +2,13 @@ from django import forms
 from datetime import date
 from erp.functions import lista_proveedores, lista_clientes
 
+CONDICIONES_IVA = [("Consumidor Final", "Consumidor Final"),
+                   ("Responsable Inscripto", "Responsable Inscripto"),
+                   ("Monotributista", "Monotributista"),
+                   ("IVA Excento", "IVA Excento"),
+                   ("No Alcanzado", "No Alcanzado"),
+                  ]
+
 class FormBusqueda(forms.Form):
     buscar = forms.IntegerField(label="")
 
@@ -53,15 +60,9 @@ class FormEntrada(forms.Form):
                                 initial=date.today())
 
 class FormCliente(forms.Form):
-    OPTIONS = [("Consumidor Final", "Consumidor Final"),
-               ("Responsable Inscripto", "Responsable Inscripto"),
-               ("Monotributista", "Monotributista"),
-               ("IVA Excento", "IVA Excento"),
-               ("No Alcanzado", "No Alcanzado"),
-               ]
 
     nombre = forms.CharField(max_length=50,label= "Nombre o Empresa", label_suffix= "*:")
-    condicion_iva = forms.ChoiceField(choices=OPTIONS, label= "Condición IVA", label_suffix= "*:")
+    condicion_iva = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
     dni = forms.IntegerField(label= "DNI", required=False)
     cuit = forms.CharField(required=False)
     direccion = forms.CharField(max_length=50, required=False)
@@ -77,15 +78,9 @@ class FormFiltroFecha(forms.Form):
                                 initial=date.today())
 
 class FormProveedor(forms.Form):
-    OPTIONS = [("Consumidor Final", "Consumidor Final"),
-               ("Responsable Inscripto", "Responsable Inscripto"),
-               ("Monotributista", "Monotributista"),
-               ("IVA Excento", "IVA Excento"),
-               ("No Alcanzado", "No Alcanzado"),
-               ]
 
     nombre = forms.CharField(max_length=100, label= "Nombre Empresa", label_suffix= "*:")
-    condicion_iva = forms.ChoiceField(choices=OPTIONS, label= "Condición IVA", label_suffix= "*:")
+    condicion_iva = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
     cuit = forms.CharField(required=False)
     direccion = forms.CharField(max_length=50, required=False)
     telefono = forms.CharField(required=False)

@@ -122,3 +122,4 @@
 5. Detalle de compra agregado.
 6. Las páginas tienen su nombre correcto en el title del head.
 7. Los archivos pdf se descargan con nombre y fecha de emisión.
+8. Implementación de cotización en dolar.
