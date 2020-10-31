@@ -17,7 +17,7 @@
           <img src="{% static '/dist/img/avatar5.png' %}" class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Sergio Ordoñez</a>
+          <a href="#" class="d-block">{{ request.user.first_name }} {{ request.user.last_name }}</a>
         </div>
       </div>
 
