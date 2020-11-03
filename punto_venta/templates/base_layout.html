@@ -6,7 +6,7 @@
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>SourceStock</title>
+  <title>{{titulo}} - SourceStock</title>
   <!-- Tell the browser to be responsive to screen width -->
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Font Awesome -->
@@ -42,6 +42,13 @@
     }
     tr.intercalado:nth-child(even) { /*Esto es para que se alterne el color de las filas*/
       background-color: #dddddd;
+    }
+    .espaciado a {
+      padding: 10px;
+    }
+    .dolar{
+      padding-right: 20px;
+      color:darkgreen;
     }
   </style>
   {% block styles %}{% endblock styles %}
@@ -86,6 +93,7 @@
 
     {% block redirect %} {% endblock redirect %}
     {% include "scripts.html" %}
+    {% block script %}{% endblock script %}
     
 </body>
 

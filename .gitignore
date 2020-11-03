@@ -1,12 +1,20 @@
+# Cache and binary files
 __pycache__/
 *.pyc
 
+# Environment
 venv/
 
+# Pdf files
 erp/pdf_files/
 
+# Settings
 local.py
 deploy.py
 production.py
-deploy.py
+
+# Settings - environment variables
+env_variables.py
+
+# Commands for terminal
 SourceStock.bat

@@ -3,7 +3,6 @@
 
 {% block content %}
 <div class="container-fluid">
-  {% include "small_boxes.html" %}
 
   <!-- Main row -->
   <div class="row">
@@ -45,15 +44,14 @@
                 </tr>
                 {% for i in articulos %}
                 
-
-                  <tr class="intercalado">
+              <tr class="intercalado" style="{% if i.en_dolar %} color: darkgreen; {% endif %}">
                     <td><a href="articulo/{{i.codigo}}">{{i.codigo}}</a></td>
                     <td> {{i.descripcion}} </td>
-                    <td> ${{i.costo}} </td>
+                    <td> {% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo}} </td>
                     <td> {{i.porcentaje_ganancia}}% </td>
-                    <td> ${{i.precio}} </td>
+                    <td> {% if i.en_dolar %}U$D{% else %}${% endif %}{{i.precio}} </td>
                     <td> {{i.porcentaje_descuento}}% </td>
-                    <td> ${{i.precio_descontado}} </td>
+                    <td> {% if i.en_dolar %}U$D{% else %}${% endif %}{{i.precio_descontado}} </td>
                     <td> {{i.seccion}} </td>
                     <td> {{i.marca}} </td>
                     <td> {{i.modelo}} </td>
