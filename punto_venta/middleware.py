@@ -17,7 +17,7 @@ class ExpirationMiddleware:
         """Init method."""
 
         self.get_response = get_response
-    
+
     def __call__(self, request):
         """Call method."""
 
@@ -26,7 +26,7 @@ class ExpirationMiddleware:
 
     def process_view(self, request, view_func, view_args, view_kwargs):
         """Process view.
-        
+
         Here is were the redirection happens.
         """
 
