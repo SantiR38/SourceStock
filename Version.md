@@ -124,3 +124,4 @@
 7. Los archivos pdf se descargan con nombre y fecha de emisión.
 8. Implementación de cotización en dolar.
 9. Mejoras en documentación.
+10. Creadas variables de entorno para la informacion de la empresa. Ignorada en git.

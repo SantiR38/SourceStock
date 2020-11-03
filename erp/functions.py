@@ -1,12 +1,25 @@
+"""Functions as services."""
+
+# Python
 import io
 from datetime import date
 from decimal import Decimal
 from reportlab.pdfgen import canvas
 
+# Django
 from django.core.exceptions import ObjectDoesNotExist
 
+# SourceStock - Main
+from punto_venta.env_variables import enterprise
+
+# SourceStock - Erp
 from erp.models import ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
+
+# SourceStock - Api
 from api.models import PrecioDolar
+
+
+# ------ SERVICES ------ #
 
 def porcentaje_ganancia(costo, porcentaje):
     # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
@@ -148,16 +161,16 @@ def emitir_recibo(id_venta):
     p.drawString(328, 770, "Documento no válido como factura")
     p.drawString(328, 740, "Fecha de emisión:")
     p.drawString(420, 740, str(venta.fecha))
-    p.drawString(328, 710, "Responsable Inscripto")
-    p.drawString(462, 710, "CUIT: 20-35212998-5")
+    p.drawString(328, 710, enterprise['iva_situation'])
+    p.drawString(462, 710, f"CUIT: {enterprise['cuit']}")
 
-    p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
-    p.drawString(297.5, 693, "Tel: 358 517-0913")
+    p.drawString(38, 693, f"Dir: {enterprise['address']}")
+    p.drawString(297.5, 693, f"Tel: {enterprise['phone']}")
     # p.drawString(420, 693, "Inicio Actividad: 01/01/2020") Esto se pondrá recien cuando sea factura
     p.setFont("Helvetica-Bold", 12)
     ##p.drawString(80, 790, "LA CASA DE LAS BATERÍAS")
-    p.drawInlineImage("erp/static/dist/img/logo_recibo.jpg", 95, 725, width=127.8,height=89.4) 
-    p.drawString(80, 710, "LA CASA DE LAS BATERÍAS")
+    p.drawInlineImage(enterprise['imagen'], 95, 725, width=127.8,height=89.4) 
+    p.drawString(80, 710, enterprise['name'])
 
     p.setFont("Helvetica-Bold", 10)
     p.drawString(38, 673, "Cliente: ")
@@ -267,14 +280,14 @@ def emitir_detalle_entrada(id_entrada):
     p.drawString(38, 780, "Registro de compra") #(Ancho, Alto, "Texto")
     
     p.setFont("Helvetica-Bold", 12)
-    p.drawString(38, 740, "LA CASA DE LAS BATERÍAS")
+    p.drawString(38, 740, enterprise['name'])
     
     p.setFont("Helvetica", 10)
     p.drawString(38, 715, "Fecha de emisión:")
     p.drawString(130, 715, str(entrada.fecha))
 
-    p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
-    p.drawString(297.5, 693, "Tel: 358 517-0913")
+    p.drawString(38, 693, f"Dir: {enterprise['address']}")
+    p.drawString(297.5, 693, f"Tel: {enterprise['phone']}")
 
 
     p.setFont("Helvetica-Bold", 10)
