@@ -127,3 +127,5 @@
 10. Creadas variables de entorno para la informacion de la empresa. Ignorada en git.
 11. Instalation steps documented in readme.md.
 12. Middleware created for demo expiration.
+13. **New App:** Messages.
+14. Created view for demo expiration.

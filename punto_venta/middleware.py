@@ -6,6 +6,7 @@ from datetime import date
 
 # Django
 from django.shortcuts import redirect
+from django.urls import reverse
 
 
 class ExpirationMiddleware:
@@ -30,6 +31,7 @@ class ExpirationMiddleware:
         Here is were the redirection happens.
         """
 
-        if date.today() > date(2020, 12, 4):
-            return redirect('/messages/times_up')
+        if date.today() > date(2020, 12, 4) and request.path != reverse('times_up'):
+            return redirect('times_up')
+
         pass

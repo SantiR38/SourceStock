@@ -16,7 +16,6 @@ Including another URLconf
 #from datetime import date
 from django.contrib import admin
 from django.urls import include, path
-from api.api import UserAPI
 #from django.conf.urls import handler404
 #from erp.views import error_404
 
@@ -27,6 +26,7 @@ urlpatterns = [
         path('accounts/', include('django.contrib.auth.urls')),
         path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
         path('api/', include('api.urls')),
+        path('messages/', include('messages.urls')),
     ]
 '''
 #Opcion para que caduque un sitio de pruebas
