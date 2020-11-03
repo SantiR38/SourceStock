@@ -113,3 +113,16 @@
 13. Historial de compra y venta agregado al navbar.
 14. Paquetes de tests creados en cada app.
 15. **Nueva Vista**: Emitir presupuesto. Se descarga como archivo adjunto.
+
+## Versión 1.9
+1. Classmethod implementado a modelo Venta. Mostrar las ultimas 50 ventas en el historial.
+2. Classmethod implementado a modelo Entrada. Mostrar las ultimas 50 entradas en el historial.
+3. Historial de compra y venta implementado con class based views.
+4. Paginación de a 15 elementos.
+5. Detalle de compra agregado.
+6. Las páginas tienen su nombre correcto en el title del head.
+7. Los archivos pdf se descargan con nombre y fecha de emisión.
+8. Implementación de cotización en dolar.
+9. Mejoras en documentación.
+10. Creadas variables de entorno para la informacion de la empresa. Ignorada en git.
+11. Instalation steps documented in readme.md.

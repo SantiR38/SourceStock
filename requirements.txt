@@ -1,8 +1,21 @@
+# Pdf handler
 reportlab==3.5
+
+# Django
 Django==3.1
+
+# Postgres libraries
 psycopg2-binary==2.8.5
 psycopg2==2.8.5
+
+# Images
 Pillow==7.0
+
+# Requests
 requests
+
+# Server conect
 gunicorn
+
+# API Rest
 djangorestframework

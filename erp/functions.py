@@ -1,40 +1,28 @@
-from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
-from django.core.exceptions import ObjectDoesNotExist
-from reportlab.pdfgen import canvas
+"""Functions as services."""
+
+# Python
+import io
 from datetime import date
 from decimal import Decimal
-import io
+from reportlab.pdfgen import canvas
 
-def inventario(param):
+# Django
+from django.core.exceptions import ObjectDoesNotExist
 
-    # Almacena los primeros 50 objetos del modelo pasado por parámetro (lte=20)
-    # en un query_set para mostrar en la vista "control de inventario".
+# SourceStock - Main
+from punto_venta.env_variables import enterprise
 
-    return param.objects.filter(id__lte=50)
+# SourceStock - Erp
+from erp.models import ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
 
-def stock_total():
+# SourceStock - Api
+from api.models import PrecioDolar
 
-    # Se aplica al widget de cabecera donde se muestra:
-    #   1. El stock total todos los productos.
-    #   2. La cantidad de distintos productos que ofrece la empresa.
 
-    cantidad_total = 0
-    diferentes_productos = 0
-    try:
-        query_set = inventario(Article)
-        for i in query_set:
-            cantidad_total += query_set[diferentes_productos].stock
-            diferentes_productos += 1
-    except UnboundLocalError:
-        cantidad_total = 0
-        diferentes_productos = 0
-    resultado = [cantidad_total, diferentes_productos]
-    return resultado
+# ------ SERVICES ------ #
 
 def porcentaje_ganancia(costo, porcentaje):
-
     # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
-
     precio_final = costo + (costo * porcentaje / 100)
     return precio_final
 
@@ -86,7 +74,10 @@ def compra_activa():
         lista = DetalleEntrada.objects.filter(id_entrada = nueva_compra)
         nueva_compra.total = 0
         for i in lista:
-            nueva_compra.total += (i.costo_unitario * i.cantidad)
+            if i.en_dolar:
+                nueva_compra.total += (i.costo_unitario * i.cantidad * PrecioDolar.cotizacion_venta())
+            else:
+                nueva_compra.total += (i.costo_unitario * i.cantidad)
         nueva_compra.save()
     return [lista, nueva_compra]
 
@@ -137,25 +128,6 @@ def nombre_proveedor():
         a = None
     return a
 
-def campos_sin_iva():
-
-    # Cuando la tabla solo tiene los costos y precios con iva incluidos, esta formula itera sobre cada producto
-    # agregando el costo y el precio sin iva (se hace solo una vez a la hora de actualizar la app.)
-
-    a = Article.objects.all()
-    x = round((Decimal(1.21)), 2)
-    for i in a:
-        i.costo_sin_iva = i.costo / x
-        i.precio_sin_iva = i.precio / x
-        i.save()
-
-def add_art_state():
-
-    # Esta función es utilizada apenas se lanza el proyecto para registrar los tres campos de ArtState.
-
-    ArtState.objects.create(nombre="Active")
-    ArtState.objects.create(nombre="Inactive")
-    ArtState.objects.create(nombre="Deleted")
 
 def precio_final(costo_s_iva, porc_ganancia):
     
@@ -189,16 +161,16 @@ def emitir_recibo(id_venta):
     p.drawString(328, 770, "Documento no válido como factura")
     p.drawString(328, 740, "Fecha de emisión:")
     p.drawString(420, 740, str(venta.fecha))
-    p.drawString(328, 710, "Responsable Inscripto")
-    p.drawString(462, 710, "CUIT: 20-35212998-5")
+    p.drawString(328, 710, enterprise['iva_situation'])
+    p.drawString(462, 710, f"CUIT: {enterprise['cuit']}")
 
-    p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
-    p.drawString(297.5, 693, "Tel: 358 517-0913")
+    p.drawString(38, 693, f"Dir: {enterprise['address']}")
+    p.drawString(297.5, 693, f"Tel: {enterprise['phone']}")
     # p.drawString(420, 693, "Inicio Actividad: 01/01/2020") Esto se pondrá recien cuando sea factura
     p.setFont("Helvetica-Bold", 12)
     ##p.drawString(80, 790, "LA CASA DE LAS BATERÍAS")
-    p.drawInlineImage("erp/static/dist/img/logo_recibo.jpg", 95, 725, width=127.8,height=89.4) 
-    p.drawString(80, 710, "LA CASA DE LAS BATERÍAS")
+    p.drawInlineImage(enterprise['imagen'], 95, 725, width=127.8,height=89.4) 
+    p.drawString(80, 710, enterprise['name'])
 
     p.setFont("Helvetica-Bold", 10)
     p.drawString(38, 673, "Cliente: ")
@@ -308,14 +280,14 @@ def emitir_detalle_entrada(id_entrada):
     p.drawString(38, 780, "Registro de compra") #(Ancho, Alto, "Texto")
     
     p.setFont("Helvetica-Bold", 12)
-    p.drawString(38, 740, "LA CASA DE LAS BATERÍAS")
+    p.drawString(38, 740, enterprise['name'])
     
     p.setFont("Helvetica", 10)
     p.drawString(38, 715, "Fecha de emisión:")
     p.drawString(130, 715, str(entrada.fecha))
 
-    p.drawString(38, 693, "Dir: Av. Amadeo Sabattini 2917, Río Cuarto (Cba.)")
-    p.drawString(297.5, 693, "Tel: 358 517-0913")
+    p.drawString(38, 693, f"Dir: {enterprise['address']}")
+    p.drawString(297.5, 693, f"Tel: {enterprise['phone']}")
 
 
     p.setFont("Helvetica-Bold", 10)
@@ -403,40 +375,6 @@ def lista_clientes():
             lista.append((i.nombre, i.nombre))
     return lista
 
-def crear_articulo(infForm):
-    # Funciona solo para modificar objetos de tipo Article.
-    costo_sin_iva = infForm['costo_sin_iva']
-    costo = infForm['costo']
-    porcentaje_descuento = infForm['porcentaje_descuento']
-    precio_descontado = None
-    if costo_sin_iva != None:
-        costo = porcentaje_ganancia(costo_sin_iva, 21)
-    elif costo != None:
-        costo_sin_iva = costo / Decimal(1.21)
-
-    precio = porcentaje_ganancia(costo, infForm['porcentaje_ganancia'])
-
-    if porcentaje_descuento != None:
-        precio_descontado = porcentaje_ganancia(precio, -porcentaje_descuento)
-
-    contexto = {
-        "codigo": infForm['codigo'],
-        "descripcion": infForm['descripcion'],
-        "costo_sin_iva": costo_sin_iva,
-        "costo": costo,
-        "precio_sin_iva": porcentaje_ganancia(costo_sin_iva, infForm['porcentaje_ganancia']),
-        "precio": precio,
-        "porcentaje_ganancia": infForm['porcentaje_ganancia'],
-        "porcentaje_descuento": porcentaje_descuento,
-        "precio_descontado": precio_descontado,
-        "seccion": infForm['seccion'],
-        "marca": infForm['marca'],
-        "modelo": infForm['modelo'],
-        "stock": infForm['stock'],
-        "alarma_stock": infForm['alarma_stock']
-    }
-
-    return contexto
 
 def comprar_articulo(infForm):
     # Funciona solo para modificar objetos de tipo DetalleEntrada.
@@ -453,7 +391,9 @@ def comprar_articulo(infForm):
         "codigo": infForm['codigo'],
         "costo_sin_iva": costo_sin_iva,
         "costo": costo,
-        "cantidad": infForm['cantidad']
+        "cantidad": infForm['cantidad'],
+        "en_dolar": infForm['en_dolar']
     }
 
     return contexto
+    

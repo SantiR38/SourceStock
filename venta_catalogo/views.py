@@ -1,25 +1,28 @@
 from datetime import date
+
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
 from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
-from django.views.generic import ListView
+
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
-from erp.functions import inventario, stock_total, venta_activa, emitir_recibo
+from erp.functions import venta_activa, emitir_recibo
 from .functions.search_engines import search_articles, search_clients
+from api.models import PrecioDolar
 
 @login_required
 def venta_por_catalogo(request):
+    PrecioDolar.actualizar_registro()
     template = loader.get_template('venta_catalogo/venta.html')
     miFormulario = FormFiltrarArticulos()
     ctx = {
         "articulo_a_vender": venta_activa()[0],
         "totales": venta_activa()[1],
-        "datos_generales": stock_total(),
-        "articulos": inventario(Article).order_by('descripcion'),
+        "titulo": "Venta por catálogo",
+        "articulos": Article.objects.filter(id__lte=50).order_by('descripcion'),
         "form": miFormulario
     }
 
@@ -45,10 +48,13 @@ def aniadir_al_carrito(request, codigo_param):
     ##
     # Detalle de venta
     ##
-    DetalleVenta.objects.create(costo_unitario=new_article.costo, # Iniciar un objeto de tipo detalle_venta
-                                precio_unitario=new_article.precio,
+    costo_peso_argentino = new_article.costo * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.costo
+    precio_peso_argentino = new_article.precio * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.precio
+    DetalleVenta.objects.create(costo_unitario=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
+                                precio_unitario=precio_peso_argentino,
                                 porcentaje_descuento=new_article.porcentaje_descuento,
-                                descuento=new_article.precio * new_article.porcentaje_descuento / 100,
+                                precio_por_cantidad= precio_peso_argentino,
+                                descuento=precio_peso_argentino * new_article.porcentaje_descuento / 100,
                                 cantidad=1,
                                 id_venta=nueva_venta,
                                 id_producto=new_article)

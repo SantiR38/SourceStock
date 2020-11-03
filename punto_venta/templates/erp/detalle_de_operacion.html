@@ -1,0 +1,152 @@
+{% extends "base_layout.html" %}
+{% load static %}
+
+{% block heading %}
+{{titulo}}
+{% endblock heading %}
+
+{% block content %}
+<div class="container-fluid">
+  <!-- Main row -->
+  <div class="row">
+
+    <!-- Left col -->
+    <section class="col-lg-7 connectedSortable">
+      <!-- Custom tabs (Charts with tabs)-->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">
+            <i class="fas fa-chart-pie mr-1"></i>
+            {{subtitulo}}
+          </h3>
+        </div><!-- /.card-header -->
+        <div class="card-body">
+          <div class="tab-content p-0">
+            <table style="width:100%;" class="borde-externo">
+              <tr class="intercalado">
+                <td><b>Fecha</b></td>
+                <td><b>{{persona}}</b></td>
+              </tr>
+              <tr class="intercalado">
+                <td>{{object.fecha}}</td>
+                <td>{% if titulo == "Detalle de compra" %}
+                  {{object.proveedor.nombre}}
+                  {% else %}
+                  {{object.cliente.nombre}}
+                  {% endif %}
+                </td>
+              </tr>
+            </table>
+            <br>
+            <br>
+            <h5>Detalles</h5>
+            <table>
+              <tr class="intercalado">
+                <td><b>Cantidad</b></td>
+                <td><b>Detalles</b></td>
+                {% if titulo == "Detalle de compra" %}
+                <td><b>Costo Unitario</b></td>
+                <td><b>Costo Total</b></td>
+                {% else %}
+                <td><b>Precio Unitario</b></td>
+                <td><b>Precio Total</b></td>
+                {% endif %}
+              </tr>
+
+              {% for i in elementos_vendidos %}
+
+              <tr class="intercalado">
+                <td>{{i.cantidad}}</td>
+                <td>{{i.id_producto.descripcion}}</td>
+                {% if titulo == "Detalle de compra" %}
+                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
+                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
+                {% else %}
+                <td>${{i.precio_unitario}}</td>
+                <td>${{i.precio_por_cantidad}}</td>
+                {% endif %}
+
+              </tr>
+              {% endfor %}
+
+              
+              <tr class="intercalado">
+                <td><b>Total</b></td>
+                <td></td>
+                <td></td>
+                <td><b>$ {{object.total}}</b></td>
+              </tr>
+              {% if titulo == "Detalle de venta" %}
+              <tr class="intercalado">
+                <td><b>Descuento</b></td>
+                <td></td>
+                <td></td>
+                <td><b>{{object.descuento}}</b></td>
+              </tr>
+              <tr class="intercalado">
+                <td><b>Descuento Adicional</b></td>
+                <td></td>
+                <td></td>
+                <td><b>{{object.descuento_adicional}}</b></td>
+              </tr>
+              <tr class="intercalado">
+                <td><b>Total con descuento</b></td>
+                <td></td>
+                <td></td>
+                <td><b>{{object.total_con_descuento}}</b></td>
+              </tr>
+              {% endif %}
+
+              
+
+            </table>
+            <br />
+            <br />
+
+            <table>
+              <tr>
+                <td>
+                  <form action="" method="post" name="miformulario">{% csrf_token %}
+                    <input type=button onclick="pregunta()" value="🗑 Eliminar"
+                      style="background-color: #ba2121; color: #fff;">
+                  </form>
+                </td>
+                {% if titulo == "Detalle de venta" %}
+                <td>
+                  <a href="/historial_de_venta/2020/01"><button>⬅ Volver</button></a>
+                </td>
+
+                <td>
+                  <a href="/recibo/{{object.id}}" target="_blank"><button>🖨 Imprimir</button></a>
+                </td>
+                {% else %}
+                <td>
+                  <a href="/historial_de_compra/2020/01"><button>⬅ Volver</button></a>
+                </td>
+
+                <td>
+                  <a href="/detalle_entrada/{{object.id}}" target="_blank"><button>🖨 Imprimir</button></a>
+                </td>
+                {% endif %}
+              </tr>
+            </table>
+          </div>
+        </div><!-- /.card-body -->
+      </div>
+      <!-- /.card -->
+    </section>
+    <!-- /.Left col -->
+
+  </div>
+  <!-- /.row (main row) -->
+</div><!-- /.container-fluid -->
+{% endblock content %}
+{% block script %}
+<script>
+  function pregunta() {
+    if (confirm("Eliminar elemento. Estas seguro?")) {
+      document.miformulario.submit();
+    }
+  }
+</script>
+{% endblock script %}
