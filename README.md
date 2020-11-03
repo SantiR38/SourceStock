@@ -9,19 +9,57 @@ El proyecto cuenta con 2 branches:
   * **Master:** Contiene las versiones oficiales de la aplicación.</li>
   * **Development:** Contiene el proceso de desarrollo y es la rama que debe recibir los pull requests.</li>
 
-## Instalación
+## Setting up
 
-Para poder correr el proyecto en local será necesario instalar lo siguiente:
+For running this project it will be necesary to **download and install** the following things:
 
-  * <a href='https://www.python.org/downloads/'>Python 3.8 32-bit</a>
-  * <a href='https://www.postgresql.org/download/'>PostgreSQL</a>
+  1. [Python 3.8 32-bit](https://www.python.org/downloads/).
 
-Las librerías de python instalables con PyPi están en el documento requirements.txt.
+  2. [PostgreSQL](https://www.postgresql.org/download/).
 
-## Configuracion de la base de datos
+  3. [Git](https://git-scm.com/download/win).
 
-En el archivo settings.py, se debe modificar el diccionario DATABASES, 
-colocando la configuración de la base de datos del servidor local
+  4. [Pip](https://www.neoguias.com/como-instalar-pip-python/#Como_instalar_PIP_en_Windows).
+
+  5. Virtualenv: `pip install virtualenv`.
+
+
+**Clone this project** in your local machine:
+
+  6. Use `git clone` and the url of this project.
+
+
+**Launch a virtual enviroment** in the directory where is the project saved on your system:
+
+  7. [Info](https://programwithus.com/learn/python/pip-virtualenv-windows)
+
+  8. Install the requirements.txt
+
+
+Now you need to **configurate the data base**.
+
+  9. Create a data base in postgres.
+  10. In punto_venta/settings/ create two files called local.py and production.py, and put there the following things:
+    * Import base
+    * DEBUG: True or False
+    * ALLOWED HOSTS: Url address
+    * DATABASES: Dict with your database info (see the [docs](https://docs.djangoproject.com/en/3.0/ref/settings/#databases))
+    * STATIC_URL
+  11. In punto_venta/ create a file called env_variables.py and there create a dict called 'enterprise' with the following keys:
+    * name
+    * iva_situation
+    * cuit
+    * phone
+    * address
+    * image: the image should be in static directory.
+
+  This will be displayed in the tickets and estimations pdfs.
+
+
+Next, you have to create a superuser:
+
+  12. `python manage.py createsuperuser`
+
 
 ## Despliegue
 

@@ -125,3 +125,4 @@
 8. Implementación de cotización en dolar.
 9. Mejoras en documentación.
 10. Creadas variables de entorno para la informacion de la empresa. Ignorada en git.
+11. Instalation steps documented in readme.md.
