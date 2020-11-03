@@ -163,13 +163,16 @@ def emitir_recibo(id_venta):
     p.drawString(420, 740, str(venta.fecha))
     p.drawString(328, 710, enterprise['iva_situation'])
     p.drawString(462, 710, f"CUIT: {enterprise['cuit']}")
+    if 'cuit2' in enterprise:
+        p.drawString(462, 725, f"CUIT: {enterprise['cuit2']}")
 
     p.drawString(38, 693, f"Dir: {enterprise['address']}")
     p.drawString(297.5, 693, f"Tel: {enterprise['phone']}")
     # p.drawString(420, 693, "Inicio Actividad: 01/01/2020") Esto se pondrá recien cuando sea factura
     p.setFont("Helvetica-Bold", 12)
     ##p.drawString(80, 790, "LA CASA DE LAS BATERÍAS")
-    p.drawInlineImage(enterprise['imagen'], 95, 725, width=127.8,height=89.4) 
+    if 'image' in enterprise:
+        p.drawInlineImage(enterprise['image'], 95, 725, width=127.8,height=89.4)
     p.drawString(80, 710, enterprise['name'])
 
     p.setFont("Helvetica-Bold", 10)
