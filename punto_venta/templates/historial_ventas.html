@@ -32,7 +32,7 @@
                   
 
                     <tr class="intercalado">
-                      <td><a href="recibo/{{i.id}}" target="_blank">{{i.id}}</a></td>
+                      <td><a href="/detalle_de_venta/{{i.id}}">{{i.id}}</a></td>
                       <td> {{i.fecha}} </td>
                       <td> 
                         {% if i.cliente != None %}
@@ -59,7 +59,7 @@
                   
 
                     <tr class="intercalado">
-                      <td><a href="detalle_entrada/{{i.id}}" target="_blank">{{i.id}}</a></td>
+                      <td><a href="/detalle_de_compra/{{i.id}}">{{i.id}}</a></td>
                       <td> {{i.fecha}} </td>
                       <td> 
                         {% if i.proveedor != None %}

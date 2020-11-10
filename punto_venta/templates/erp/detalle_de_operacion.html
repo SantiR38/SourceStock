@@ -60,7 +60,7 @@
                 <td>{{i.id_producto.descripcion}}</td>
                 {% if titulo == "Detalle de compra" %}
                 <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
-                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
+                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_por_cantidad}}</td>
                 {% else %}
                 <td>${{i.precio_unitario}}</td>
                 <td>${{i.precio_por_cantidad}}</td>
@@ -113,7 +113,7 @@
                 </td>
                 {% if titulo == "Detalle de venta" %}
                 <td>
-                  <a href="/historial_de_venta/2020/01"><button>⬅ Volver</button></a>
+                  <a href="/historial_ventas/"><button>⬅ Volver</button></a>
                 </td>
 
                 <td>
@@ -121,7 +121,7 @@
                 </td>
                 {% else %}
                 <td>
-                  <a href="/historial_de_compra/2020/01"><button>⬅ Volver</button></a>
+                  <a href="/historial_compras/"><button>⬅ Volver</button></a>
                 </td>
 
                 <td>
