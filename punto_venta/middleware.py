@@ -31,7 +31,7 @@ class ExpirationMiddleware:
         Here is were the redirection happens.
         """
 
-        if date.today() > date(2020, 12, 4) and request.path != reverse('times_up'):
+        if date.today() > date(2025, 12, 4) and request.path != reverse('times_up'):
             return redirect('times_up')
 
         pass
