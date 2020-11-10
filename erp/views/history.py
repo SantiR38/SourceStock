@@ -2,37 +2,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 
 from django.views.generic import DetailView
-from django.views.generic.dates import MonthArchiveView
 
 from erp.models import Venta, DetalleVenta, Entrada, DetalleEntrada
-
-
-class HistorialMixin(MonthArchiveView): # Clase padre de las dos siguientes.
-    date_field = 'fecha'
-    paginate_by = 15
-    allow_future = True
-    allow_empty = True
-    template_name = 'erp/transaction_archive_month.html'
-
-class HistorialDeVenta(HistorialMixin):
-    queryset = Venta.objects.all().order_by('-fecha', '-id')
-
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['titulo'] = "Historial de ventas"
-        context['url'] = "historial_de_venta"
-        return context
-
-class HistorialDeCompra(HistorialMixin):
-    queryset = Entrada.objects.all()
-
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['titulo'] = "Historial de compras"
-        context['url'] = "historial_de_compra"
-        return context
 
 class DetalleDeCompra(DetailView):
     template_name = "erp/detalle_de_operacion.html"
