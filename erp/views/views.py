@@ -65,6 +65,7 @@ def entrada(request):
                 elif infForm['costo'] is not None or infForm['costo_sin_iva'] is not None:
                     DetalleEntrada.objects.create(costo_sin_iva=comprar_articulo(infForm)['costo_sin_iva'], # Iniciar un objeto de tipo detalle_entrada
                                                   costo_unitario=comprar_articulo(infForm)['costo'],
+                                                  costo_por_cantidad=comprar_articulo(infForm)['costo']*comprar_articulo(infForm)['cantidad'],
                                                   cantidad=comprar_articulo(infForm)['cantidad'],
                                                   id_entrada=Entrada.objects.get(id_state=estado),
                                                   en_dolar=comprar_articulo(infForm)['en_dolar'],
