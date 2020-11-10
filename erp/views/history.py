@@ -54,7 +54,7 @@ class DetalleDeCompra(DetailView):
         DetalleEntrada.give_product_back(id_)
         DetalleEntrada.objects.filter(id_entrada=id_).delete()
         Entrada.objects.get(id=id_).delete()
-        return HttpResponseRedirect('/historial_de_compra/2020/01/')
+        return HttpResponseRedirect('/historial_compras/')
 
 class DetalleDeVenta(DetailView):
     template_name = "erp/detalle_de_operacion.html"
@@ -76,4 +76,4 @@ class DetalleDeVenta(DetailView):
         DetalleVenta.take_product_back(id_)
         DetalleVenta.objects.filter(id_venta=id_).delete()
         Venta.objects.get(id=id_).delete()
-        return HttpResponseRedirect('/historial_de_venta/2020/01/')
+        return HttpResponseRedirect('/historial_ventas/')
