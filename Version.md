@@ -117,9 +117,8 @@
 ## Versión 1.9
 1. Classmethod implementado a modelo Venta. Mostrar las ultimas 50 ventas en el historial.
 2. Classmethod implementado a modelo Entrada. Mostrar las ultimas 50 entradas en el historial.
-3. Historial de compra y venta implementado con class based views.
 4. Paginación de a 15 elementos.
-5. Detalle de compra agregado.
+5. Detalle de compra y venta agregado.
 6. Las páginas tienen su nombre correcto en el title del head.
 7. Los archivos pdf se descargan con nombre y fecha de emisión.
 8. Implementación de cotización en dolar.
