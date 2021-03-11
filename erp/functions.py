@@ -12,8 +12,8 @@ from django.core.exceptions import ObjectDoesNotExist
 # SourceStock - Main
 from punto_venta.env_variables import enterprise
 
-# SourceStock - Erp
-from erp.models import ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada
+# Models
+from erp.models import ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada, Article
 
 # SourceStock - Api
 from api.models import PrecioDolar
@@ -55,6 +55,14 @@ def venta_activa():
         
         nueva_venta.save()
     return [lista, nueva_venta]
+
+def venta_activa_dict():
+    venta = venta_activa()[0].values()
+    for i in range(len(venta)):
+        article = Article.objects.filter(id=venta[i]["id_producto_id"]).values()[0]
+        venta[i]["precio_descontado"] = venta[i]["precio_unitario"] - venta[i]["descuento"]
+        venta[i]["id_producto"] = article
+    return venta
 
 def compra_activa():
 

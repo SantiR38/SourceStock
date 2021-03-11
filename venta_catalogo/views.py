@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
-from erp.functions import venta_activa, emitir_recibo
+from erp.functions import venta_activa, emitir_recibo, venta_activa_dict
 from .functions.search_engines import search_articles, search_clients
 from api.models import PrecioDolar
 
@@ -67,13 +67,14 @@ def confirmar_venta(request):
     miFormulario = FormBuscarCliente()
 
     ctx = {
-        "articulo_a_vender": venta_activa()[0],
+        "articulo_a_vender": venta_activa_dict(),
         "esta_venta": venta_activa()[1],
         "titulo": "Confirmar venta",
         "persona": Cliente.objects.all(),
         "titulo_persona": "Cliente",
         "form": miFormulario
     }
+
 
     estado = ArtState.objects.get(nombre="Active")
     nueva_venta = Venta.objects.get(id_state=estado)
