@@ -9,7 +9,7 @@ psycopg2-binary==2.8.5
 psycopg2==2.8.5
 
 # Images
-Pillow==7.0
+Pillow==7.1.0
 
 # Requests
 requests
