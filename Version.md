@@ -128,3 +128,9 @@
 12. Middleware created for demo expiration.
 13. **New App:** Messages.
 14. Created view for demo expiration.
+
+## Versión 1.10
+1. Estados de las instancias automáticamente migrados.
+2. Precio con descuento mostrado en venta_catálogo.
+3. Artículo detallado en pestaña `Venta` aun si no hay suficiente stock.
+4. Comandos de terminal ignorados.

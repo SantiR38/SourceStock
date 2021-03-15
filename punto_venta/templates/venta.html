@@ -29,11 +29,35 @@ Venta
             <div class="chart tab-pane" id="sales-chart" style="position: relative; height: 300px;">
               <canvas id="sales-chart-canvas" height="300" style="height: 300px;"></canvas>
             </div>
+            {% if article_detail %}
+            <div>
+              <h4>Detalles del producto</h4>
+              <table style="width:100%;" class="borde-externo">
+                <tr class="intercalado">
+                  <th>Cód.</th>
+                  <th>Descripción</th>
+                  <th>Precio</th>
+                  <th>Precio c/dcto.</th>
+                  <th>Marca</th>
+                  <th>Modelo</th>
+                  <th>Stock</th>
+                </tr>
+                <tr class="intercalado">
+                  <td>{{article_detail.codigo}}</td>
+                  <td>{{article_detail.descripcion}}</td>
+                  <td>{{article_detail.precio}}</td>
+                  <td>{{article_detail.precio_descontado}}</td>
+                  <td>{{article_detail.marca}}</td>
+                  <td>{{article_detail.modelo}}</td>
+                  <td>{{article_detail.stock}}</td>
+                </tr>
+              </table>
+            </div>
+            {% endif %}
           </div>
         </div><!-- /.card-body -->
       </div>
       <!-- /.card -->
-
     </section>
     <!-- /.Left col -->
 

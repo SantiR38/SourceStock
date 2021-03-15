@@ -18,3 +18,4 @@ env_variables.py
 
 # Commands for terminal
 SourceStock.bat
+*.sh

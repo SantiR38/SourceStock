@@ -361,7 +361,7 @@ def venta(request):
             try: # Si el producto existe en la base de datos
                 new_article = Article.objects.get(codigo=infForm['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
-
+                ctx["article_detail"] = new_article
                 ##
                 # Detalle de venta
                 ##
