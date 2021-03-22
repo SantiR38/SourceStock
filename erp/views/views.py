@@ -175,17 +175,14 @@ def detalle_entrada(request, id_entrada):
 # Funcion util para compra o venta
 @login_required
 def cancelar(request):
+    """Cancel transacciont view.
+    ---
+    Delete all the instances `Entrada` and `Venta` with `ArtState="Active"`
+    """
     template = loader.get_template('mensaje.html')
-    estado = ArtState.objects.get(nombre="Active")
-    try:
-        nueva_venta = Entrada.objects.get(id_state=estado)
-        nueva_venta.delete() # Se borra el registro de la entrada que está activa, y los detalles se borran automaticamente al estar en modo CASCADE (models.py)
-    except ObjectDoesNotExist as DoesNotExist:
-        try:
-            nueva_venta = Venta.objects.get(id_state=estado)
-            nueva_venta.delete()
-        except ObjectDoesNotExist as DoesNotExist:
-            return redirect('not_found')
+    state = ArtState.objects.get(nombre="Active")
+    Entrada.objects.filter(id_state=state).delete()
+    Venta.objects.filter(id_state=state).delete()
 
     ctx = {'mensaje': 'Se ha cancelado la transacción.',
            'titulo': 'Transacción cancelada',
