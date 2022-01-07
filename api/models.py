@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.db import models
 
 from .services import get_dolar_value
-# Create your models here.
+
 
 DOLAR_VALUES = get_dolar_value()
 DOLAR_COMPRA = Decimal(DOLAR_VALUES[0].replace(',','.'))
@@ -16,15 +16,14 @@ class PrecioDolar(models.Model):
 
     @classmethod
     def actualizar_registro(cls):
-        registry = cls.objects.filter(id=1)
-        if registry.exists():
-            obj = cls.objects.get(id=1)
-            obj.oficial_compra = DOLAR_COMPRA
-            obj.oficial_venta = DOLAR_VENTA
-            obj.save()
+        registry = cls.objects.filter(id=1).first()
+        if registry is not None:
+            registry.oficial_compra = DOLAR_COMPRA
+            registry.oficial_venta = DOLAR_VENTA
+            registry.save()
         else:
             cls.objects.create()
-    
+
     @classmethod
     def cotizacion_venta(cls):
         return cls.objects.get(id=1).oficial_venta

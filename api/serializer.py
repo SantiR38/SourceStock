@@ -1,5 +1,6 @@
-from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework import serializers
+
 
 class UserSerializer(serializers.Serializer):
     id = serializers.ReadOnlyField()
@@ -17,11 +18,12 @@ class UserSerializer(serializers.Serializer):
         instance.email = validate_data.get('email')
         instance.set_password(validate_data.get('password'))
         instance.save()
+
         return instance
-    
+
     def validate_username(self, data):
         users = User.objects.filter(username=data)
         if len(users) != 0:
             raise serializers.ValidationError("Este nombre de usuario ya existe. Ingrese uno nuevo.")
-        else:
-            return data
+
+        return data
