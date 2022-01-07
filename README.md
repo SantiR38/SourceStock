@@ -63,19 +63,19 @@ Next, you have to create a superuser:
 
 ## Despliegue
 
-Para poder ejecutar correctamente la aplicación, debemos entrar por consola al directorio 
-principal del proyecto y escribir "python manage.py runserver". En algunos casos se ejecuta otra versión de 
-python no compatible con el proyecto. De ser así, escribir en consola "python3 manage.py runserver" o el 
-comando que sea necesario para invocar al entorno de Python 3.8
-Una forma de automatizar esto es creando un archivo .bat con la línea de comandos descripta en el párrafo anterior.
+In order to execute the app correctly, you should create an isolated environment with venv (python 3.8), and run the following command.
+```bash
+python manage.py runserver
+```
+You can do this automatically creating a script with the previous command (`.bat`on windows or `.sh`on linux).
 
 ## Interfaz
 
-La aplicación tiene el siguiente aspecto:
+The interface has the following aspect:
 
 <img src="https://raw.githubusercontent.com/SantiR38/SourceStock/development/erp/static/dist/img/interfaz.png" />
 
-El frontend está realizado con la plantilla de código abierto <a href="https://adminlte.io/">AdminLTE.io</a>
+The visual has been made with the open source template <a href="https://adminlte.io/">AdminLTE.io</a>
 
 
-### Para elegir que archivo de settings estará en nuestro path, editarlo en wsgi.py y manage.py
+### You can set in wsgi.py and in manage.py the settings file that you need to use.
