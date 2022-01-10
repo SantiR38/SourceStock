@@ -1,3 +1,7 @@
 {
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
+    // ignore line too long
+    "python.linting.flake8Args": [
+        "--ignore=E501, E128"
+    ]
 }
