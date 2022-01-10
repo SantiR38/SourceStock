@@ -5,14 +5,14 @@ reportlab==3.5
 Django==3.1
 
 # Postgres libraries
-psycopg2-binary==2.8.5
-psycopg2==2.8.5
+psycopg2-binary==2.9.3
+# psycopg2
 
 # Images
-Pillow==7.1.0
+Pillow==9.0.0
 
 # Requests
-requests
+requests==2.27.1
 
 # Server conect
 gunicorn

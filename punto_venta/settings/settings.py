@@ -75,3 +75,8 @@ USE_L10N = True
 USE_TZ = True
 
 LOGIN_REDIRECT_URL = '/'
+
+try:
+    from .settings_local import *  # noqa
+except:  # noqa
+    pass
