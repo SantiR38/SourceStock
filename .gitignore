@@ -15,6 +15,7 @@ production.py
 
 # Settings - environment variables
 env_variables.py
+settings_local.py
 
 # Commands for terminal
 SourceStock.bat

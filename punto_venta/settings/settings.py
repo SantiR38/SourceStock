@@ -75,3 +75,18 @@ USE_L10N = True
 USE_TZ = True
 
 LOGIN_REDIRECT_URL = '/'
+
+try:
+    from .settings_local import *  # noqa
+except:  # noqa
+    pass
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cordoba',
+        'USER': 'root',
+        'PASSWORD': 'root',
+        'HOST': '172.17.0.1',
+        'PORT': '3306',
+    },
+}
