@@ -24,7 +24,7 @@ class ClienteTestCase(TestCase):
 class VentaTestCase(TestCase):
     def test_create_sale(self):
         sale = Venta.crear_venta_vacia(Venta.STATUS_WAITING)
-        self.assertEqual(sale.fecha, date.today())
+        self.assertEqual(sale.datetime_created, date.today())
         self.assertEqual(sale.total, 0)
         self.assertEqual(sale.descuento, 0)
         self.assertEqual(sale.descuento_adicional, 0)

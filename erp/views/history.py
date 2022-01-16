@@ -2,14 +2,14 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView
 
-from erp.models import Venta, DetalleVenta, Entrada, DetalleEntrada
+from erp.models import Venta, DetalleVenta, Purchase, DetalleEntrada
 
 
 class DetalleDeCompra(DetailView):
     template_name = "erp/detalle_de_operacion.html"
 
     def get_object(self):
-        return get_object_or_404(Entrada, id=self.kwargs.get("id"))
+        return get_object_or_404(Purchase, id=self.kwargs.get("id"))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -17,15 +17,15 @@ class DetalleDeCompra(DetailView):
         context['subtitulo'] = "Compra realizada"
         context['persona'] = "Proveedor"
         context['elementos_vendidos'] = DetalleEntrada.objects.filter(
-            id_entrada=self.kwargs.get("id"))
+            purchase_id=self.kwargs.get("id"))
 
         return context
     
     def post(self, request, *args, **kwargs):
         id_ = self.kwargs.get("id")
         DetalleEntrada.give_product_back()
-        DetalleEntrada.objects.filter(id_entrada=id_).delete()
-        Entrada.objects.get(id=id_).delete()
+        DetalleEntrada.objects.filter(purchase_id=id_).delete()
+        Purchase.objects.get(id=id_).delete()
 
         return HttpResponseRedirect('/historial_compras/')
 

@@ -33,7 +33,7 @@
 
                     <tr class="intercalado">
                       <td><a href="/detalle_de_venta/{{i.id}}">{{i.id}}</a></td>
-                      <td> {{i.fecha}} </td>
+                      <td> {{i.datetime_created}} </td>
                       <td> 
                         {% if i.cliente != None %}
                         {{i.cliente.name}} {{i.cliente.apellido}}
@@ -60,10 +60,10 @@
 
                     <tr class="intercalado">
                       <td><a href="/detalle_de_compra/{{i.id}}">{{i.id}}</a></td>
-                      <td> {{i.fecha}} </td>
+                      <td> {{i.datetime_created}} </td>
                       <td> 
-                        {% if i.proveedor != None %}
-                        {{i.proveedor.name}}
+                        {% if i.provider != None %}
+                        {{i.provider.name}}
                         {% else %}
                         -
                         {% endif %}

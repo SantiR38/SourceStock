@@ -49,7 +49,7 @@ def aniadir_al_carrito(request, code_param):
     ##
     costo_peso_argentino = new_article.cost * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.cost
     precio_peso_argentino = new_article.price * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.price
-    DetalleVenta.objects.create(costo_unitario=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
+    DetalleVenta.objects.create(unit_cost=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
                                 precio_unitario=precio_peso_argentino,
                                 discount_percentage=new_article.discount_percentage,
                                 precio_por_cantidad= precio_peso_argentino,

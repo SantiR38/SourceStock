@@ -27,7 +27,7 @@
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           <li class="nav-item has-treeview menu-open">
-            <a href="#" class="nav-link {% if request.path == '/entrada' or request.path == '/' or request.path == '/control_inventario' or request.path == '/control_clientes' or request.path == '/proveedor' or request.path == '/control_proveedores' or request.path == '/venta_catalogo/' %}active{% endif %}">
+            <a href="#" class="nav-link {% if request.path == '/entrada' or request.path == '/' or request.path == '/control_inventario' or request.path == '/control_clientes' or request.path == '/provider' or request.path == '/control_proveedores' or request.path == '/venta_catalogo/' %}active{% endif %}">
                                         
               <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
@@ -66,7 +66,7 @@
               </li>
 
               <li class="nav-item">
-                <a href="{% url 'control_proveedores' %}" class="nav-link {% if request.path == '/control_proveedores' or request.path == '/proveedor' %}active{% endif %}">
+                <a href="{% url 'control_proveedores' %}" class="nav-link {% if request.path == '/control_proveedores' or request.path == '/provider' %}active{% endif %}">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Proveedores</p>
                 </a>

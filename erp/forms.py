@@ -52,9 +52,9 @@ class FormEntrada(forms.Form):
     cost = forms.DecimalField(max_digits=10, decimal_places=2,
         label="Costo con IVA", label_suffix="**:", required=False)
     quantity = forms.IntegerField(label_suffix="*:")
-    proveedor = forms.ChoiceField(choices=lista_proveedores, label="Proveedor",
+    provider = forms.ChoiceField(choices=lista_proveedores, label="Provider",
         label_suffix="*:")
-    fecha = forms.DateTimeField(
+    datetime_created = forms.DateTimeField(
         widget=forms.widgets.DateInput(attrs={'type': 'date'}),
         label_suffix="*:", initial=date.today())
 

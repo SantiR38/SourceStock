@@ -1,5 +1,5 @@
 from django.contrib import admin
-from erp.models import Article, Entrada, DetalleEntrada, Venta, DetalleVenta, Loss, LossDetail, Client
+from erp.models import Article, Purchase, DetalleEntrada, Venta, DetalleVenta, Loss, LossDetail, Client
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -9,11 +9,11 @@ class ArticleAdmin(admin.ModelAdmin):
 
 
 class DetalleEntradaAdmin(admin.ModelAdmin):
-    list_display = ("id_entrada", "product_id", "costo_unitario", "quantity")
+    list_display = ("purchase_id", "product_id", "unit_cost", "quantity")
 
 
 admin.site.register(Article, ArticleAdmin)
-admin.site.register(Entrada)
+admin.site.register(Purchase)
 admin.site.register(DetalleEntrada, DetalleEntradaAdmin)
 admin.site.register(Venta)
 admin.site.register(DetalleVenta)

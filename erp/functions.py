@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from punto_venta.env_variables import enterprise
 
 # Models
-from erp.models import Venta, DetalleVenta, Client, Proveedor, Entrada, DetalleEntrada, Article
+from erp.models import Venta, DetalleVenta, Client, Provider, Purchase, DetalleEntrada, Article
 
 # SourceStock - Api
 from api.models import PrecioDolar
@@ -64,23 +64,23 @@ def compra_activa():
 
     # Esta función devuelve dos parámetros:
     #   1. Una lista del detalle de compra para mostrar en la vista entrada
-    #   2. Datos de la compra general (proveedor y total).
+    #   2. Datos de la compra general (provider y total).
 
     lista = []
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Compra a su id
-        nueva_compra = Entrada.objects.get(status=Entrada.STATUS_WAITING)
-    except Entrada.DoesNotExist:
-        nueva_compra = Entrada.objects.create(fecha=date.today(),
+        nueva_compra = Purchase.objects.get(status=Purchase.STATUS_WAITING)
+    except Purchase.DoesNotExist:
+        nueva_compra = Purchase.objects.create(
             total=0,
-            status=Entrada.STATUS_WAITING)
+            status=Purchase.STATUS_WAITING)
     else:
-        lista = DetalleEntrada.objects.filter(id_entrada = nueva_compra)
+        lista = DetalleEntrada.objects.filter(purchase_id = nueva_compra)
         nueva_compra.total = 0
         for i in lista:
             if i.is_in_dolar:
-                nueva_compra.total += (i.costo_unitario * i.quantity * PrecioDolar.cotizacion_venta())
+                nueva_compra.total += (i.unit_cost * i.quantity * PrecioDolar.cotizacion_venta())
             else:
-                nueva_compra.total += (i.costo_unitario * i.quantity)
+                nueva_compra.total += (i.unit_cost * i.quantity)
         nueva_compra.save()
     return [lista, nueva_compra]
 
@@ -103,13 +103,13 @@ def buscar_cliente(param):
 
 def buscar_proveedor(name):
 
-    # Se utiliza esta función para regustrar un proveedor dentro de una entrada.
+    # Se utiliza esta función para regustrar un provider dentro de una entrada.
 
     try:
-        proveedor = Proveedor.objects.get(name=name)
+        provider = Provider.objects.get(name=name)
     except ObjectDoesNotExist as DoesNotExist:
-        proveedor = None
-    return proveedor
+        provider = None
+    return provider
 
 def dni_cliente():
 
@@ -123,10 +123,10 @@ def dni_cliente():
 
 def nombre_proveedor():
 
-    # Esta función introduce el name del proveedor en el formulario de la vista entrada.
+    # Esta función introduce el name del provider en el formulario de la vista entrada.
 
-    if compra_activa()[1].proveedor != None:
-        a = compra_activa()[1].proveedor.name
+    if compra_activa()[1].provider != None:
+        a = compra_activa()[1].provider.name
     else:
         a = None
     return a
@@ -162,7 +162,7 @@ def emitir_recibo(id_venta):
     p.setFont("Helvetica", 10)
     p.drawString(328, 770, "Documento no válido como factura")
     p.drawString(328, 740, "Fecha de emisión:")
-    p.drawString(420, 740, str(venta.fecha))
+    p.drawString(420, 740, str(venta.datetime_created))
     p.drawString(328, 710, enterprise['iva_situation'])
     p.drawString(462, 710, f"CUIT: {enterprise['cuit']}")
     if 'cuit2' in enterprise:
@@ -265,13 +265,13 @@ def emitir_recibo(id_venta):
     buffer.seek(0)
     return buffer
 
-def emitir_detalle_entrada(id_entrada):
+def emitir_detalle_entrada(purchase_id):
 
     # Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
     # Utiliza la librería reportlab
 
-    entrada = Entrada.objects.get(id=id_entrada)
-    detalle_entrada = DetalleEntrada.objects.filter(id_entrada=entrada)
+    entrada = Purchase.objects.get(id=purchase_id)
+    detalle_entrada = DetalleEntrada.objects.filter(purchase_id=entrada)
 
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
@@ -289,7 +289,7 @@ def emitir_detalle_entrada(id_entrada):
     
     p.setFont("Helvetica", 10)
     p.drawString(38, 715, "Fecha de emisión:")
-    p.drawString(130, 715, str(entrada.fecha))
+    p.drawString(130, 715, str(entrada.datetime_created))
 
     p.drawString(38, 693, f"Dir: {enterprise['address']}")
     p.drawString(297.5, 693, f"Tel: {enterprise['phone']}")
@@ -302,11 +302,11 @@ def emitir_detalle_entrada(id_entrada):
     p.drawString(297.5, 653, "CUIT: ")
     
     p.setFont("Helvetica", 10)
-    if entrada.proveedor != None:
-        p.drawString(95, 673, entrada.proveedor.name)
-        p.drawString(95, 653, entrada.proveedor.direction)
-        p.drawString(355, 673, entrada.proveedor.tax_condition)
-        p.drawString(355, 653, entrada.proveedor.cuit)
+    if entrada.provider != None:
+        p.drawString(95, 673, entrada.provider.name)
+        p.drawString(95, 653, entrada.provider.direction)
+        p.drawString(355, 673, entrada.provider.tax_condition)
+        p.drawString(355, 653, entrada.provider.cuit)
     else:
         p.drawString(355, 673, "Consumidor Final")
     
@@ -335,9 +335,9 @@ def emitir_detalle_entrada(id_entrada):
         p.drawString(50, alto, str(i.quantity))
         p.drawString(150, alto, i.product_id.description)
         p.drawString(380, alto, "$")
-        p.drawString(390, alto, str(i.costo_unitario))
+        p.drawString(390, alto, str(i.unit_cost))
         p.drawString(460, alto, "$")
-        p.drawString(470, alto, str(i.quantity*i.costo_unitario))
+        p.drawString(470, alto, str(i.quantity*i.unit_cost))
         alto -= 30
 
     # Filas total
@@ -360,9 +360,9 @@ def emitir_detalle_entrada(id_entrada):
 
 def lista_proveedores():
 
-    # Lista la totalidad de los proveedores para mostrar en la vista Entrada
+    # Lista la totalidad de los proveedores para mostrar en la vista Purchase
 
-    query = Proveedor.objects.all().order_by('name')
+    query = Provider.objects.all().order_by('name')
     lista = [(" ", " ")]
     if query.exists():
         for i in query:

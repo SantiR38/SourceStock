@@ -51,7 +51,7 @@ Compra
         </div>
         <div class="card-body">
           <div style=" width: 100%;">
-            <h5>Proveedor: {{proveedor}}</h5>
+            <h5>Proveedor: {{provider}}</h5>
             <br />
             <table>
 
@@ -65,7 +65,7 @@ Compra
             {% for i in articulo_a_comprar %}
               <tr>
                 <td>{{ i.product_id }}</td>
-                <td>${{ i.costo_unitario }}</td>
+                <td>${{ i.unit_cost }}</td>
                 <td>{{ i.quantity }} </td>
                 <!-- <td><a href="cancelar_unidad/{{i.id}}"><img src="{% static '/dist/img/cancel.svg' %}" alt="Cancelar" /></a></td> -->
               </tr>

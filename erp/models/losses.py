@@ -10,6 +10,6 @@ class Loss(SSBaseModel):
 
 class LossDetail(SSBaseModel):
     loss_id = models.ForeignKey(Loss, on_delete=models.CASCADE)
-    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
     product_id = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=1)

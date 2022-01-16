@@ -23,14 +23,14 @@
     * Error cuando la base de datos esta vacía
 2. **Favicon agregado**
 3. **Nuevas tablas en base de datos**:
-    * Entrada: Registra cada compra o entrada de mercadería, Utilizada como foreign key de DetalleEntrada. 
-    * DetalleEntrada: Registra cada uno de los articulos de una Entrada.
+    * Purchase: Registra cada compra o entrada de mercadería, Utilizada como foreign key de DetalleEntrada. 
+    * DetalleEntrada: Registra cada uno de los articulos de una Purchase.
     * Venta: Registra cada venta de mercadería, Utilizada como foreign key de DetalleVenta. 
     * DetalleVenta: Registra cada uno de los articulos de una Venta.
     * Perdida (aun no utilizada)
     * DetallePerdida (aun no utilizada)
 4. **Nuevas views**:
-    * Entrada
+    * Purchase
     * Venta
     * Transacción Exitosa
     * Venta Exitosa
@@ -77,7 +77,7 @@
 
 1. Campo Apellido cliente ya no es obligatorio. Campo name ahora se titula "Nombre o Empresa".
 2. Agregado archivo requirements.txt
-3. Modelo, formulario y vista "Proveedor" implementados al software.
+3. Modelo, formulario y vista "Provider" implementados al software.
 4. Corregido Script de actualización para añadir los 3 valores de ArtState.
 5. Ahora el cliente se puede buscar por name en la vista Venta.
 6. Artículos de control de inventario ahora están ordenados alfabéticamente.
@@ -115,7 +115,7 @@
 
 ## Versión 1.9
 1. Classmethod implementado a model Venta. Mostrar las ultimas 50 ventas en el historial.
-2. Classmethod implementado a model Entrada. Mostrar las ultimas 50 entradas en el historial.
+2. Classmethod implementado a model Purchase. Mostrar las ultimas 50 entradas en el historial.
 4. Paginación de a 15 elementos.
 5. Detalle de compra y venta agregado.
 6. Las páginas tienen su name correcto en el title del head.

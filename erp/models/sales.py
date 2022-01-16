@@ -6,7 +6,6 @@ from erp.models import SSBaseModel
 
 
 class Venta(SSBaseModel):
-    fecha = models.DateField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
     descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     descuento_adicional = models.DecimalField(max_digits=10, decimal_places=2, null=True)
@@ -16,7 +15,6 @@ class Venta(SSBaseModel):
     @classmethod
     def crear_venta_vacia(cls, status):
         venta = cls.objects.create(
-            fecha=date.today(),
             total=0,
             status=status,
             descuento=0,
@@ -33,12 +31,12 @@ class Venta(SSBaseModel):
         Muestra las últimas 50 ventas realizadas
         """
         return cls.objects.filter(status=cls.STATUS_FINISHED) \
-            .order_by('-fecha', '-id')[:50]
+            .order_by('-datetime_created', '-id')[:50]
 
 
 class DetalleVenta(SSBaseModel):
     id_venta = models.ForeignKey('Venta', on_delete=models.CASCADE)
-    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # Si bien tanto este dato como el del price estan en el objeto Article,
+    unit_cost = models.DecimalField(max_digits=10, decimal_places=2)  # Si bien tanto este dato como el del price estan en el objeto Article,
     precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # es mejor guardar el producto al price que se vendió para mejor contabilidad
     precio_por_cantidad = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     discount_percentage = models.DecimalField(max_digits=10, decimal_places=2, null=True)

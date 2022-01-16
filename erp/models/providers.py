@@ -4,7 +4,7 @@ from django.db import models
 from erp.models import SSBaseModel
 
 
-class Proveedor(SSBaseModel):
+class Provider(SSBaseModel):
     name = models.CharField(max_length=100)
     tax_condition = models.CharField(max_length=25)
     cuit = models.CharField(max_length=15, null=True)
