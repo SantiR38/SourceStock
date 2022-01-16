@@ -10,7 +10,7 @@ from api.models import PrecioDolar
 from erp.forms import (FormVenta, FormNuevoArticulo, FormEntrada, FormCliente,
     FormBusqueda, FormFiltroFecha, FormProveedor)
 from erp.models import (Article, Entrada, DetalleEntrada, Venta,
-    DetalleVenta, Cliente, Proveedor)
+    DetalleVenta, Client, Proveedor)
 from erp.functions import (profit_percentage, venta_activa, compra_activa,
     buscar_cliente, comprar_articulo, buscar_proveedor, dni_cliente,
     emitir_recibo, nombre_proveedor, emitir_detalle_entrada)
@@ -30,7 +30,7 @@ def entrada(request):
         "proveedor": ""
     }
     if compra_activa()[1].proveedor is not None:
-        ctx['proveedor'] = compra_activa()[1].proveedor.nombre
+        ctx['proveedor'] = compra_activa()[1].proveedor.name
 
     if request.method == "POST":
         view_form = FormEntrada(request.POST)
@@ -81,7 +81,7 @@ def entrada(request):
             view_form = FormEntrada({'cantidad': 1, 'proveedor': nombre_proveedor()})
 
             if compra_activa()[1].proveedor is not None:
-                ctx['proveedor'] = compra_activa()[1].proveedor.nombre
+                ctx['proveedor'] = compra_activa()[1].proveedor.name
             return HttpResponse(template.render(ctx, request))
     else:
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a comprar es 1.
@@ -313,7 +313,7 @@ def venta(request):
         "total_con_descuento": venta_activa()[1].total_con_descuento
     }
     if venta_activa()[1].cliente is not None:
-        ctx['cliente'] = venta_activa()[1].cliente.nombre
+        ctx['cliente'] = venta_activa()[1].cliente.name
 
     if request.method == "POST":
         view_form = FormVenta(request.POST)
@@ -342,7 +342,7 @@ def venta(request):
                         nueva_venta.cliente = buscar_cliente(cleaned_form['cliente'])
                     except:
                         nueva_venta.cliente = None
-                        ctx['cliente'] = "Hay más de un cliente con el mismo nombre, probar con DNI."
+                        ctx['cliente'] = "Hay más de un cliente con el mismo name, probar con DNI."
 
                 nueva_venta.save()
 
@@ -392,7 +392,7 @@ def venta(request):
             view_form = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = view_form
             if nueva_venta.cliente is not None:
-                ctx['cliente'] = nueva_venta.cliente.nombre
+                ctx['cliente'] = nueva_venta.cliente.name
 
             return HttpResponse(template.render(ctx, request))
     else:
@@ -495,16 +495,16 @@ def cliente(request):
             cleaned_form = view_form.cleaned_data  # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
             try: # Si el cliente existe en la base de datos
-                new_client = Cliente.objects.get(dni=cleaned_form['dni'])
+                new_client = Client.objects.get(dni=cleaned_form['dni'])
                 ctx['message'] = "El cliente ya existe"
 
             except ObjectDoesNotExist as DoesNotExist: # Si el cliente no existe en la base de datos, crearlo
-                new_client = Cliente.objects.create(nombre=cleaned_form['nombre'],
-                                                    condicion_iva=cleaned_form['condicion_iva'],
+                new_client = Client.objects.create(name=cleaned_form['name'],
+                                                    tax_condition=cleaned_form['tax_condition'],
                                                     dni=cleaned_form['dni'],
                                                     cuit=cleaned_form['cuit'],
-                                                    direccion=cleaned_form['direccion'],
-                                                    telefono=cleaned_form['telefono'],
+                                                    direction=cleaned_form['direction'],
+                                                    phone_number=cleaned_form['phone_number'],
                                                     email=cleaned_form['email'])
 
                 return redirect('control_clientes')
@@ -519,7 +519,7 @@ def control_clientes(request):
     view_form = FormBusqueda()
     ctx = {
         "titulo": "Lista de clientes",
-        "articulos": Cliente.objects.filter(id__lte=50).order_by('nombre'),
+        "articulos": Client.objects.filter(id__lte=50).order_by('name'),
         "agregar_persona": "+ Agregar Cliente",
         "link_agregar": "/cliente",
         "link_modificar": "/modificar_cliente/",
@@ -530,7 +530,7 @@ def control_clientes(request):
         view_form = FormBusqueda(request.POST)
         if view_form.is_valid():
             cleaned_form = view_form.cleaned_data
-            resultado = Cliente.objects.filter(dni=int(cleaned_form['buscar'])) # Código
+            resultado = Client.objects.filter(dni=int(cleaned_form['buscar'])) # Código
             ctx["articulos"] = resultado
     else:
         view_form = FormBusqueda()
@@ -541,22 +541,22 @@ def control_clientes(request):
 def modificar_cliente(request, id_param):
     template = loader.get_template('agregar_modificar.html')
     try:
-        new_cliente = Cliente.objects.get(id=id_param)
+        new_cliente = Client.objects.get(id=id_param)
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
     else:
         form_details = {
-            'nombre': new_cliente.nombre,
-            'condicion_iva': new_cliente.condicion_iva,
+            'name': new_cliente.name,
+            'tax_condition': new_cliente.tax_condition,
             'dni': new_cliente.dni,
             'cuit': new_cliente.cuit,
-            'direccion': new_cliente.direccion,
-            'telefono': new_cliente.telefono,
+            'direction': new_cliente.direction,
+            'phone_number': new_cliente.phone_number,
             'email': new_cliente.email
         }
         view_form = FormCliente(form_details)
         ctx = {
-            "articulos": Cliente.objects.filter(id__lte=50),
+            "articulos": Client.objects.filter(id__lte=50),
             "form": view_form,
             "message": "",
             "titulo": "Modificar cliente"
@@ -567,12 +567,12 @@ def modificar_cliente(request, id_param):
             if view_form.is_valid():
                 cleaned_form = view_form.cleaned_data  # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
-                new_cliente.nombre = cleaned_form["nombre"]
-                new_cliente.condicion_iva = cleaned_form["condicion_iva"]
+                new_cliente.name = cleaned_form["name"]
+                new_cliente.tax_condition = cleaned_form["tax_condition"]
                 new_cliente.dni = cleaned_form["dni"]
                 new_cliente.cuit = cleaned_form["cuit"]
-                new_cliente.direccion = cleaned_form["direccion"]
-                new_cliente.telefono = cleaned_form["telefono"]
+                new_cliente.direction = cleaned_form["direction"]
+                new_cliente.phone_number = cleaned_form["phone_number"]
                 new_cliente.email = cleaned_form["email"]
 
                 new_cliente.save()
@@ -601,15 +601,15 @@ def proveedor(request):
             cleaned_form = view_form.cleaned_data  # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
             try: # Si el Proveedor existe en la base de datos
-                new_proveedor = Proveedor.objects.get(nombre=cleaned_form['nombre'])
+                new_proveedor = Proveedor.objects.get(name=cleaned_form['name'])
                 ctx['message'] = "El proveedor ya existe"
 
             except ObjectDoesNotExist as DoesNotExist: # Si el Proveedor no existe en la base de datos, crearlo
-                new_proveedor = Proveedor.objects.create(nombre=cleaned_form['nombre'],
-                                                         condicion_iva=cleaned_form['condicion_iva'],
+                new_proveedor = Proveedor.objects.create(name=cleaned_form['name'],
+                                                         tax_condition=cleaned_form['tax_condition'],
                                                          cuit=cleaned_form['cuit'],
-                                                         direccion=cleaned_form['direccion'],
-                                                         telefono=cleaned_form['telefono'],
+                                                         direction=cleaned_form['direction'],
+                                                         phone_number=cleaned_form['phone_number'],
                                                          email=cleaned_form['email'])
 
                 ctx['message'] = 'El proveedor fue agregado correctamente.'
@@ -627,11 +627,11 @@ def modificar_proveedor(request, id_param):
         return redirect('not_found')
     else:
         form_details = {
-            'nombre': new_proveedor.nombre,
-            'condicion_iva': new_proveedor.condicion_iva,
+            'name': new_proveedor.name,
+            'tax_condition': new_proveedor.tax_condition,
             'cuit': new_proveedor.cuit,
-            'direccion': new_proveedor.direccion,
-            'telefono': new_proveedor.telefono,
+            'direction': new_proveedor.direction,
+            'phone_number': new_proveedor.phone_number,
             'email': new_proveedor.email
         }
         view_form = FormProveedor(form_details)
@@ -648,11 +648,11 @@ def modificar_proveedor(request, id_param):
                 # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
                 cleaned_form = view_form.cleaned_data
 
-                new_proveedor.nombre = cleaned_form["nombre"]
-                new_proveedor.condicion_iva = cleaned_form["condicion_iva"]
+                new_proveedor.name = cleaned_form["name"]
+                new_proveedor.tax_condition = cleaned_form["tax_condition"]
                 new_proveedor.cuit = cleaned_form["cuit"]
-                new_proveedor.direccion = cleaned_form["direccion"]
-                new_proveedor.telefono = cleaned_form["telefono"]
+                new_proveedor.direction = cleaned_form["direction"]
+                new_proveedor.phone_number = cleaned_form["phone_number"]
                 new_proveedor.email = cleaned_form["email"]
 
                 new_proveedor.save()
@@ -666,7 +666,7 @@ def control_proveedores(request):
     template = loader.get_template('control_personas.html')
     ctx = {
         "titulo": "Proveedores",
-        "articulos": Proveedor.objects.filter(id__lte=50).order_by('nombre'),
+        "articulos": Proveedor.objects.filter(id__lte=50).order_by('name'),
         "agregar_persona": "+ Agregar Proveedor",
         "link_agregar": "/proveedor",
         "link_modificar": "/modificar_proveedor/"

@@ -11,7 +11,7 @@ class Venta(SSBaseModel):
     descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     descuento_adicional = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     total_con_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    cliente = models.ForeignKey('Cliente', on_delete=models.SET_NULL, null=True)
+    cliente = models.ForeignKey('Client', on_delete=models.SET_NULL, null=True)
 
     @classmethod
     def crear_venta_vacia(cls, status):

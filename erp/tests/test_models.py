@@ -1,17 +1,17 @@
 from datetime import date
 from django.test import TestCase
 
-from erp.models import Cliente, Venta
+from erp.models import Client, Venta
 
 
 class ClienteTestCase(TestCase):
     def setUp(self):
-        Cliente.objects.create(nombre="Santi Rodriguez",
-            condicion_iva="Monotributista",
+        Client.objects.create(name="Santi Rodriguez",
+            tax_condition="Monotributista",
             dni=39249727,
             cuit="20-39249727-8",
-            direccion="Mariquita S. de Thompson 1580",
-            telefono="3585163434",
+            direction="Mariquita S. de Thompson 1580",
+            phone_number="3585163434",
             email="santirodriguez38@gmail.com")
 
     def test_false_is_false(self):

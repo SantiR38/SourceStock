@@ -36,7 +36,7 @@
                       <td> {{i.fecha}} </td>
                       <td> 
                         {% if i.cliente != None %}
-                        {{i.cliente.nombre}} {{i.cliente.apellido}}
+                        {{i.cliente.name}} {{i.cliente.apellido}}
                         {% else %}
                         -
                         {% endif %}
@@ -63,7 +63,7 @@
                       <td> {{i.fecha}} </td>
                       <td> 
                         {% if i.proveedor != None %}
-                        {{i.proveedor.nombre}}
+                        {{i.proveedor.name}}
                         {% else %}
                         -
                         {% endif %}

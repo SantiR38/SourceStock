@@ -70,12 +70,12 @@ class FormEntrada(forms.Form):
 
 
 class FormCliente(forms.Form):
-    nombre = forms.CharField(max_length=50,label= "Nombre o Empresa", label_suffix= "*:")
-    condicion_iva = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
+    name = forms.CharField(max_length=50,label= "Nombre o Empresa", label_suffix= "*:")
+    tax_condition = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
     dni = forms.IntegerField(label= "DNI", required=False)
     cuit = forms.CharField(required=False)
-    direccion = forms.CharField(max_length=50, required=False)
-    telefono = forms.CharField(required=False)
+    direction = forms.CharField(max_length=50, required=False)
+    phone_number = forms.CharField(required=False)
     email = forms.EmailField(required=False)
 
 
@@ -89,9 +89,9 @@ class FormFiltroFecha(forms.Form):
 
 
 class FormProveedor(forms.Form):
-    nombre = forms.CharField(max_length=100, label= "Nombre Empresa", label_suffix= "*:")
-    condicion_iva = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
+    name = forms.CharField(max_length=100, label= "Nombre Empresa", label_suffix= "*:")
+    tax_condition = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
     cuit = forms.CharField(required=False)
-    direccion = forms.CharField(max_length=50, required=False)
-    telefono = forms.CharField(required=False)
+    direction = forms.CharField(max_length=50, required=False)
+    phone_number = forms.CharField(required=False)
     email = forms.EmailField(required=False)

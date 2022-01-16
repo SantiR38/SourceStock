@@ -55,14 +55,14 @@
                 
 
                   <tr class="intercalado">
-                    <td><a href="{{link_modificar}}{{i.id}}">{{i.nombre}} {% if titulo == "Clientes" %}{{i.apellido}}{% endif %}</a></td>
-                    <td> {{i.condicion_iva}} </td>
+                    <td><a href="{{link_modificar}}{{i.id}}">{{i.name}} {% if titulo == "Clientes" %}{{i.apellido}}{% endif %}</a></td>
+                    <td> {{i.tax_condition}} </td>
                     {% if titulo == "Clientes" %}
                       <td> {{i.dni}} </td>
                     {% endif %}
                     <td> {{i.cuit}} </td>
-                    <td> {{i.direccion}} </td>
-                    <td> {{i.telefono}} </td>
+                    <td> {{i.direction}} </td>
+                    <td> {{i.phone_number}} </td>
                     <td> {{i.email}} </td>
                   </tr>
 

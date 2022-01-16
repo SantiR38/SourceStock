@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from punto_venta.env_variables import enterprise
 
 # Models
-from erp.models import Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada, Article
+from erp.models import Venta, DetalleVenta, Client, Proveedor, Entrada, DetalleEntrada, Article
 
 # SourceStock - Api
 from api.models import PrecioDolar
@@ -90,12 +90,12 @@ def buscar_cliente(param):
 
     if type(param) == int:
         try:
-            cliente = Cliente.objects.get(dni=param)
+            cliente = Client.objects.get(dni=param)
         except ObjectDoesNotExist as DoesNotExist:
             cliente = None
     elif type(param) == str:
         try:
-            cliente = Cliente.objects.get(nombre=param)
+            cliente = Client.objects.get(name=param)
         except ObjectDoesNotExist as DoesNotExist:
             cliente = None
     
@@ -106,7 +106,7 @@ def buscar_proveedor(name):
     # Se utiliza esta función para regustrar un proveedor dentro de una entrada.
 
     try:
-        proveedor = Proveedor.objects.get(nombre=name)
+        proveedor = Proveedor.objects.get(name=name)
     except ObjectDoesNotExist as DoesNotExist:
         proveedor = None
     return proveedor
@@ -123,10 +123,10 @@ def dni_cliente():
 
 def nombre_proveedor():
 
-    # Esta función introduce el nombre del proveedor en el formulario de la vista entrada.
+    # Esta función introduce el name del proveedor en el formulario de la vista entrada.
 
     if compra_activa()[1].proveedor != None:
-        a = compra_activa()[1].proveedor.nombre
+        a = compra_activa()[1].proveedor.name
     else:
         a = None
     return a
@@ -185,9 +185,9 @@ def emitir_recibo(id_venta):
 
     p.setFont("Helvetica", 10)
     if venta.cliente != None:
-        p.drawString(95, 673, venta.cliente.nombre)
-        p.drawString(95, 653, venta.cliente.direccion)
-        p.drawString(355, 673, venta.cliente.condicion_iva)
+        p.drawString(95, 673, venta.cliente.name)
+        p.drawString(95, 653, venta.cliente.direction)
+        p.drawString(355, 673, venta.cliente.tax_condition)
         p.drawString(355, 653, venta.cliente.cuit)
     else:
         p.drawString(355, 673, "Consumidor Final")
@@ -303,9 +303,9 @@ def emitir_detalle_entrada(id_entrada):
     
     p.setFont("Helvetica", 10)
     if entrada.proveedor != None:
-        p.drawString(95, 673, entrada.proveedor.nombre)
-        p.drawString(95, 653, entrada.proveedor.direccion)
-        p.drawString(355, 673, entrada.proveedor.condicion_iva)
+        p.drawString(95, 673, entrada.proveedor.name)
+        p.drawString(95, 653, entrada.proveedor.direction)
+        p.drawString(355, 673, entrada.proveedor.tax_condition)
         p.drawString(355, 653, entrada.proveedor.cuit)
     else:
         p.drawString(355, 673, "Consumidor Final")
@@ -362,22 +362,22 @@ def lista_proveedores():
 
     # Lista la totalidad de los proveedores para mostrar en la vista Entrada
 
-    query = Proveedor.objects.all().order_by('nombre')
+    query = Proveedor.objects.all().order_by('name')
     lista = [(" ", " ")]
     if query.exists():
         for i in query:
-            lista.append((i.nombre, i.nombre))
+            lista.append((i.name, i.name))
     return lista
 
 def lista_clientes():
 
     # Lista la totalidad de los clientes para mostrar en la vista Venta
 
-    query = Cliente.objects.all().order_by('nombre')
+    query = Client.objects.all().order_by('name')
     lista = [(" ", " ")]
     if query.exists():
         for i in query:
-            lista.append((i.nombre, i.nombre))
+            lista.append((i.name, i.name))
     return lista
 
 

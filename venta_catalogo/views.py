@@ -6,7 +6,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 
-from erp.models import Article, Venta, DetalleVenta, Cliente
+from erp.models import Article, Venta, DetalleVenta, Client
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
 from erp.functions import venta_activa, emitir_recibo, venta_activa_dict
@@ -69,8 +69,8 @@ def confirmar_venta(request):
         "articulo_a_vender": venta_activa_dict(),
         "esta_venta": venta_activa()[1],
         "titulo": "Confirmar venta",
-        "persona": Cliente.objects.all(),
-        "titulo_persona": "Cliente",
+        "persona": Client.objects.all(),
+        "person_title": "Cliente",
         "form": miFormulario
     }
 
@@ -90,7 +90,7 @@ def elegir_cliente(request, code_param):
 
     nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
 
-    nueva_venta.cliente = Cliente.objects.get(id=code_param)
+    nueva_venta.cliente = Client.objects.get(id=code_param)
     nueva_venta.save()
 
     return redirect('confirmar_venta')
@@ -106,7 +106,7 @@ def descuento_adicional(request):
         "articulo_a_vender": venta_activa()[0],
         "esta_venta": venta_activa()[1],
         "titulo": "Añadir descuento adicional",
-        "titulo_persona": "Cliente",
+        "person_title": "Cliente",
 
     }
     if request.method == "POST":

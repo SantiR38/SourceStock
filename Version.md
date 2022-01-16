@@ -60,9 +60,9 @@
 ## Versión 1.5
 
 1. **FormCliente:** Se creó el formulario cliente para la futura emisión de recibos y facturas.
-2. **Modelo Cliente:** Los datos de cada cliente se guardan en la base de datos.
+2. **Modelo Client:** Los datos de cada cliente se guardan en la base de datos.
 3. El detalle de venta se muestra apenas se carga la vista venta.
-4. Modelo Cliente implementado en vista venta.
+4. Modelo Client implementado en vista venta.
 5. Costo y price sin iva agregados.
 6. Opción de eliminar elemento a vender (vista 'cancelar_unidad').
 7. Generación de un comprobante de venta.
@@ -75,11 +75,11 @@
 
 ## Versión 1.7
 
-1. Campo Apellido cliente ya no es obligatorio. Campo nombre ahora se titula "Nombre o Empresa".
+1. Campo Apellido cliente ya no es obligatorio. Campo name ahora se titula "Nombre o Empresa".
 2. Agregado archivo requirements.txt
 3. Modelo, formulario y vista "Proveedor" implementados al software.
 4. Corregido Script de actualización para añadir los 3 valores de ArtState.
-5. Ahora el cliente se puede buscar por nombre en la vista Venta.
+5. Ahora el cliente se puede buscar por name en la vista Venta.
 6. Artículos de control de inventario ahora están ordenados alfabéticamente.
 7. **Nueva vista:** Control de clientes.
 8. **Nueva vista:** Control de proveedores.
@@ -91,7 +91,7 @@
 14. Precio con descuento agregado.
 15. **Bug Fixed:** Ya no se permite vender cantidades por encima del stock disponible.
 15. **Bug Fixed:** Cuando se cancela una compra o venta, ya no quedan remanentes indeseados.
-16. **Bug Fixed:** Se eliminó el campo apellido del model Cliente.
+16. **Bug Fixed:** Se eliminó el campo apellido del model Client.
 
 ## Versión 1.8
 1. Los errores 404 son dirigidos a un template de la aplicacion erp.
@@ -118,8 +118,8 @@
 2. Classmethod implementado a model Entrada. Mostrar las ultimas 50 entradas en el historial.
 4. Paginación de a 15 elementos.
 5. Detalle de compra y venta agregado.
-6. Las páginas tienen su nombre correcto en el title del head.
-7. Los archivos pdf se descargan con nombre y fecha de emisión.
+6. Las páginas tienen su name correcto en el title del head.
+7. Los archivos pdf se descargan con name y fecha de emisión.
 8. Implementación de cotización en dolar.
 9. Mejoras en documentación.
 10. Creadas variables de entorno para la informacion de la empresa. Ignorada en git.

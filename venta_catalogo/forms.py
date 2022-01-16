@@ -7,7 +7,7 @@ class FormFiltrarArticulos(forms.Form):
     brand = forms.CharField(max_length=150, required=False)
 
 class FormBuscarCliente(forms.Form):
-    nombre = forms.CharField(max_length=50, required=False)
+    name = forms.CharField(max_length=50, required=False)
     dni = forms.IntegerField(required=False)
 
 class FormDescuentoAdicional(forms.Form):

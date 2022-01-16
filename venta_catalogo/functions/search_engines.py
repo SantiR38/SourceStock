@@ -1,4 +1,4 @@
-from erp.models import Article, Cliente
+from erp.models import Article, Client
 
 def search_articles(infForm):
     if infForm['code'] != None:
@@ -15,9 +15,9 @@ def search_articles(infForm):
 
 def search_clients(infForm):
     if infForm['dni'] != None:
-        query = Cliente.objects.filter(nombre__icontains=infForm['nombre'],
+        query = Client.objects.filter(nombre__icontains=infForm['name'],
                                         dni__icontains=infForm['dni'])
     else:
-        query = Cliente.objects.filter(nombre__icontains=infForm['nombre'])
+        query = Client.objects.filter(nombre__icontains=infForm['name'])
     
     return query

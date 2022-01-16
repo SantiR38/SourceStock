@@ -54,13 +54,13 @@
                   <td><b> Subtotal </b></td>
                   <td><b> Descuento </b></td>
                   <td><b> Total con descuento </b></td>
-                  <td><b> {{ titulo_persona }} </b> </td>
+                  <td><b> {{ person_title }} </b> </td>
 
                 <tr class="intercalado">
                   <td> ${{esta_venta.total}} </td>
                   <td> ${{esta_venta.descuento}} </td>
                   <td> ${{esta_venta.total_con_descuento}} </td>
-                  <td> {{ esta_venta.cliente.nombre }} </td>
+                  <td> {{ esta_venta.cliente.name }} </td>
                 </tr>
               </table>
 
@@ -108,14 +108,14 @@
 
 
               <tr class="intercalado">
-                <td>{{i.nombre}}</td>
-                <td> {{i.condicion_iva}} </td>
+                <td>{{i.name}}</td>
+                <td> {{i.tax_condition}} </td>
                 {% if titulo == "Confirmar venta" %}
                 <td> {{i.dni}} </td>
                 {% endif %}
                 <td> {{i.cuit}} </td>
-                <td> {{i.direccion}} </td>
-                <td> {{i.telefono}} </td>
+                <td> {{i.direction}} </td>
+                <td> {{i.phone_number}} </td>
                 <td> {{i.email}} </td>
                 <td> <a href="elegir_cliente/{{i.id}}">✅</a> </td>
               </tr>

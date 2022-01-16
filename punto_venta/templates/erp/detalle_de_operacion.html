@@ -30,9 +30,9 @@
               <tr class="intercalado">
                 <td>{{object.fecha}}</td>
                 <td>{% if titulo == "Detalle de compra" %}
-                  {{object.proveedor.nombre}}
+                  {{object.proveedor.name}}
                   {% else %}
-                  {{object.cliente.nombre}}
+                  {{object.cliente.name}}
                   {% endif %}
                 </td>
               </tr>
