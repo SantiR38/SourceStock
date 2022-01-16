@@ -1,7 +1,7 @@
 from datetime import date
 from django.test import TestCase
 
-from erp.models import Client, Venta
+from erp.models import Client, Sale
 
 
 class ClienteTestCase(TestCase):
@@ -23,9 +23,9 @@ class ClienteTestCase(TestCase):
 
 class VentaTestCase(TestCase):
     def test_create_sale(self):
-        sale = Venta.crear_venta_vacia(Venta.STATUS_WAITING)
+        sale = Sale.crear_venta_vacia(Sale.STATUS_WAITING)
         self.assertEqual(sale.datetime_created, date.today())
         self.assertEqual(sale.total, 0)
-        self.assertEqual(sale.descuento, 0)
-        self.assertEqual(sale.descuento_adicional, 0)
-        self.assertEqual(sale.total_con_descuento, None)
+        self.assertEqual(sale.discount, 0)
+        self.assertEqual(sale.extra_discount, 0)
+        self.assertEqual(sale.total_discounted, None)

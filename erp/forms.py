@@ -17,7 +17,7 @@ class FormBusqueda(forms.Form):
 class FormVenta(forms.Form): # Sirve para la actualización inventario en general
     code = forms.IntegerField(label_suffix= "*:")
     quantity = forms.IntegerField(label_suffix= "*:")
-    cliente = forms.ChoiceField(choices=lista_clientes, label= "Cliente", required=False, label_suffix= "**:")
+    client = forms.ChoiceField(choices=lista_clientes, label= "Cliente", required=False, label_suffix= "**:")
     dni_cliente = forms.IntegerField(required=False, label="DNI Cliente", label_suffix= "**:")
 
 

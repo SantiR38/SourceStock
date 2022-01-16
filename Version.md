@@ -25,15 +25,15 @@
 3. **Nuevas tablas en base de datos**:
     * Purchase: Registra cada compra o entrada de mercadería, Utilizada como foreign key de DetalleEntrada. 
     * DetalleEntrada: Registra cada uno de los articulos de una Purchase.
-    * Venta: Registra cada venta de mercadería, Utilizada como foreign key de DetalleVenta. 
-    * DetalleVenta: Registra cada uno de los articulos de una Venta.
+    * Sale: Registra cada venta de mercadería, Utilizada como foreign key de SaleDetail. 
+    * SaleDetail: Registra cada uno de los articulos de una Venta.
     * Perdida (aun no utilizada)
     * DetallePerdida (aun no utilizada)
 4. **Nuevas views**:
     * Purchase
-    * Venta
+    * Sale
     * Transacción Exitosa
-    * Venta Exitosa
+    * Sale Exitosa
     * Cancelar
 5. **Funcionalidades**: Ahora tanto la compra como la venta crean una lista a la derecha donde se van enumerando los productos que son parte de la transacción. La misma se puede confirmar o cancelar antes de afectar a la tabla principal 'Article'.
 
@@ -79,7 +79,7 @@
 2. Agregado archivo requirements.txt
 3. Modelo, formulario y vista "Provider" implementados al software.
 4. Corregido Script de actualización para añadir los 3 valores de ArtState.
-5. Ahora el cliente se puede buscar por name en la vista Venta.
+5. Ahora el cliente se puede buscar por name en la vista Sale.
 6. Artículos de control de inventario ahora están ordenados alfabéticamente.
 7. **Nueva vista:** Control de clientes.
 8. **Nueva vista:** Control de proveedores.
@@ -103,7 +103,7 @@
     * Cambio de color a small boxes (gris claro).
 5. **Nueva Vista:** Aniadir_carrito.
 6. Filtro de busqueda en vista venta_por_catalogo.
-7. Mediante un metodo del model Venta, se simplifico el codigo para crear el objeto.
+7. Mediante un metodo del model Sale, se simplifico el codigo para crear el objeto.
 8. **Nueva Vista:** confirmar_venta.
 9. **Nueva Vista:** elegir_cliente.
 10. Campo model agregado a tabla Article.
@@ -114,7 +114,7 @@
 15. **Nueva Vista**: Emitir presupuesto. Se descarga como archivo adjunto.
 
 ## Versión 1.9
-1. Classmethod implementado a model Venta. Mostrar las ultimas 50 ventas en el historial.
+1. Classmethod implementado a model Sale. Mostrar las ultimas 50 ventas en el historial.
 2. Classmethod implementado a model Purchase. Mostrar las ultimas 50 entradas en el historial.
 4. Paginación de a 15 elementos.
 5. Detalle de compra y venta agregado.
@@ -131,5 +131,5 @@
 ## Versión 1.10
 1. Estados de las instancias automáticamente migrados.
 2. Precio con descuento mostrado en venta_catálogo.
-3. Artículo detallado en pestaña `Venta` aun si no hay suficiente stock.
+3. Artículo detallado en pestaña `Sale` aun si no hay suficiente stock.
 4. Comandos de terminal ignorados.

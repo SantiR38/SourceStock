@@ -51,9 +51,9 @@ Esta venta
                 <tr class="intercalado">
                   <td>{{i.product_id.codigo}}</td>
                   <td> {{i.product_id.description}} </td>
-                  <td> ${{i.precio_unitario}} </td>
+                  <td> ${{i.unit_price}} </td>
                   <td> {{i.discount_percentage}}% </td>
-                  <td> ${{i.descuento }} </td>
+                  <td> ${{i.discount }} </td>
                   <td> {{i.product_id.brand}} </td>
                   <td> {{i.product_id.model}} </td>
                   <td> {{i.quantity}} </td>
@@ -74,8 +74,8 @@ Esta venta
 
               <tr class="intercalado">
                 <td> ${{totales.total}} </td>
-                <td> ${{totales.descuento}} </td>
-                <td> ${{totales.total_con_descuento}} </td>
+                <td> ${{totales.discount}} </td>
+                <td> ${{totales.total_discounted}} </td>
                 <td> <a href="confirmar_venta"><button>Confirmar</button></a> </td>
               </tr>
             </table>

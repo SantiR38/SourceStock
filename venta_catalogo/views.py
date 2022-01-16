@@ -6,7 +6,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 
-from erp.models import Article, Venta, DetalleVenta, Client
+from erp.models import Article, Sale, SaleDetail, Client
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
 from erp.functions import venta_activa, emitir_recibo, venta_activa_dict
@@ -40,7 +40,7 @@ def venta_por_catalogo(request):
 @login_required
 def aniadir_al_carrito(request, code_param):
 
-    nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
+    nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
 
     new_article = Article.objects.get(code=code_param)
 
@@ -49,13 +49,13 @@ def aniadir_al_carrito(request, code_param):
     ##
     costo_peso_argentino = new_article.cost * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.cost
     precio_peso_argentino = new_article.price * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.price
-    DetalleVenta.objects.create(unit_cost=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
-                                precio_unitario=precio_peso_argentino,
+    SaleDetail.objects.create(unit_cost=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
+                                unit_price=precio_peso_argentino,
                                 discount_percentage=new_article.discount_percentage,
-                                precio_por_cantidad= precio_peso_argentino,
-                                descuento=precio_peso_argentino * new_article.discount_percentage / 100,
+                                price_by_quantity= precio_peso_argentino,
+                                discount=precio_peso_argentino * new_article.discount_percentage / 100,
                                 quantity=1,
-                                id_venta=nueva_venta,
+                                sale_id=nueva_venta,
                                 product_id=new_article)
 
     return redirect('venta_por_catalogo')
@@ -74,7 +74,7 @@ def confirmar_venta(request):
         "form": miFormulario
     }
 
-    nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
+    nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
 
     if request.method == "POST":
         miFormulario = FormBuscarCliente(request.POST)
@@ -88,16 +88,16 @@ def confirmar_venta(request):
 @login_required
 def elegir_cliente(request, code_param):
 
-    nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
+    nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
 
-    nueva_venta.cliente = Client.objects.get(id=code_param)
+    nueva_venta.client = Client.objects.get(id=code_param)
     nueva_venta.save()
 
     return redirect('confirmar_venta')
 
 @login_required
-def descuento_adicional(request):
-    template = loader.get_template('venta_catalogo/descuento_adicional.html')
+def extra_discount(request):
+    template = loader.get_template('venta_catalogo/extra_discount.html')
     miFormulario = FormDescuentoAdicional()
     nueva_venta = venta_activa()[1]
 
@@ -113,16 +113,16 @@ def descuento_adicional(request):
         miFormulario = FormDescuentoAdicional(request.POST)
         if miFormulario.is_valid():
             infForm = miFormulario.cleaned_data
-            nueva_venta.descuento_adicional = nueva_venta.total * infForm['descuento'] / 100
-            nueva_venta.total_con_descuento -= nueva_venta.descuento_adicional
+            nueva_venta.extra_discount = nueva_venta.total * infForm['discount'] / 100
+            nueva_venta.total_discounted -= nueva_venta.extra_discount
             nueva_venta.save()
             return redirect('venta_exitosa')
 
     return HttpResponse(template.render(ctx, request))
 
 @login_required
-def presupuesto(request, id_venta):
+def presupuesto(request, sale_id):
     try:
-        return FileResponse(emitir_recibo(id_venta), as_attachment=True, filename=f'presupuesto_{date.today()}.pdf')
+        return FileResponse(emitir_recibo(sale_id), as_attachment=True, filename=f'presupuesto_{date.today()}.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')

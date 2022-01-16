@@ -1,5 +1,5 @@
 from django.contrib import admin
-from erp.models import Article, Purchase, DetalleEntrada, Venta, DetalleVenta, Loss, LossDetail, Client
+from erp.models import Article, Purchase, DetalleEntrada, Sale, SaleDetail, Loss, LossDetail, Client
 
 
 class ArticleAdmin(admin.ModelAdmin):
@@ -15,8 +15,8 @@ class DetalleEntradaAdmin(admin.ModelAdmin):
 admin.site.register(Article, ArticleAdmin)
 admin.site.register(Purchase)
 admin.site.register(DetalleEntrada, DetalleEntradaAdmin)
-admin.site.register(Venta)
-admin.site.register(DetalleVenta)
+admin.site.register(Sale)
+admin.site.register(SaleDetail)
 admin.site.register(Loss)
 admin.site.register(LossDetail)
 admin.site.register(Client)

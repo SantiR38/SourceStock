@@ -9,8 +9,8 @@ from django.contrib.auth.decorators import login_required
 from api.models import PrecioDolar
 from erp.forms import (FormVenta, FormNuevoArticulo, FormEntrada, FormCliente,
     FormBusqueda, FormFiltroFecha, FormProveedor)
-from erp.models import (Article, Purchase, DetalleEntrada, Venta,
-    DetalleVenta, Client, Provider)
+from erp.models import (Article, Purchase, DetalleEntrada, Sale,
+    SaleDetail, Client, Provider)
 from erp.functions import (profit_percentage, venta_activa, compra_activa,
     buscar_cliente, comprar_articulo, buscar_proveedor, dni_cliente,
     emitir_recibo, nombre_proveedor, emitir_detalle_entrada)
@@ -170,12 +170,12 @@ def cancelar(request):
     """
     Cancel transacciont view.
     ---
-    Delete all the instances `Purchase` and `Venta` with STATUS_WAITING`.
+    Delete all the instances `Purchase` and `Sale` with STATUS_WAITING`.
     Useful only for sales and purchases.
     """
     template = loader.get_template('message.html')
     Purchase.objects.filter(status=Purchase.STATUS_WAITING).delete()
-    Venta.objects.filter(status=Purchase.STATUS_WAITING).delete()
+    Sale.objects.filter(status=Purchase.STATUS_WAITING).delete()
 
     ctx = {'message': 'Se ha cancelado la transacción.',
         'titulo': 'Transacción cancelada',
@@ -308,12 +308,12 @@ def venta(request):
         "form": view_form,
         "titulo": "Venta",
         "total": venta_activa()[1].total,
-        "cliente": "",
-        "descuento": venta_activa()[1].descuento,
-        "total_con_descuento": venta_activa()[1].total_con_descuento
+        "client": "",
+        "discount": venta_activa()[1].discount,
+        "total_discounted": venta_activa()[1].total_discounted
     }
-    if venta_activa()[1].cliente is not None:
-        ctx['cliente'] = venta_activa()[1].cliente.name
+    if venta_activa()[1].client is not None:
+        ctx['client'] = venta_activa()[1].client.name
 
     if request.method == "POST":
         view_form = FormVenta(request.POST)
@@ -321,28 +321,28 @@ def venta(request):
             cleaned_form = view_form.cleaned_data  # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
             ##
-            # Venta
+            # Sale
             ##
 
             try:  # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
-                nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
+                nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
 
-            except Venta.DoesNotExist:
-                nueva_venta = Venta.objects.create(
+            except Sale.DoesNotExist:
+                nueva_venta = Sale.objects.create(
                     total=0,
-                    status=Venta.STATUS_WAITING,
-                    descuento=0,
-                    cliente=buscar_cliente(cleaned_form['dni_cliente']))
+                    status=Sale.STATUS_WAITING,
+                    discount=0,
+                    client=buscar_cliente(cleaned_form['dni_cliente']))
             else:
                 if cleaned_form['dni_cliente'] is not None:
-                    nueva_venta.cliente = buscar_cliente(cleaned_form['dni_cliente'])
+                    nueva_venta.client = buscar_cliente(cleaned_form['dni_cliente'])
 
-                elif cleaned_form['cliente'] is not None:
+                elif cleaned_form['client'] is not None:
                     try:
-                        nueva_venta.cliente = buscar_cliente(cleaned_form['cliente'])
+                        nueva_venta.client = buscar_cliente(cleaned_form['client'])
                     except:
-                        nueva_venta.cliente = None
-                        ctx['cliente'] = "Hay más de un cliente con el mismo name, probar con DNI."
+                        nueva_venta.client = None
+                        ctx['client'] = "Hay más de un client con el mismo name, probar con DNI."
 
                 nueva_venta.save()
 
@@ -360,13 +360,13 @@ def venta(request):
                 costo_peso_argentino = new_article.cost * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.cost
                 precio_peso_argentino = new_article.price * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.price
                 if new_article.stock >= cleaned_form['quantity']:
-                    DetalleVenta.objects.create(unit_cost=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
-                                                precio_unitario=precio_peso_argentino,
+                    SaleDetail.objects.create(unit_cost=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
+                                                unit_price=precio_peso_argentino,
                                                 discount_percentage=new_article.discount_percentage,
-                                                precio_por_cantidad=precio_peso_argentino * cleaned_form['quantity'],
-                                                descuento=precio_peso_argentino * new_article.discount_percentage / 100,
+                                                price_by_quantity=precio_peso_argentino * cleaned_form['quantity'],
+                                                discount=precio_peso_argentino * new_article.discount_percentage / 100,
                                                 quantity=cleaned_form['quantity'],
-                                                id_venta=Venta.objects.get(status=Venta.STATUS_WAITING),
+                                                sale_id=Sale.objects.get(status=Sale.STATUS_WAITING),
                                                 product_id=Article.objects.get(code=cleaned_form['code']))
                 else:
                     ctx['inexistente'] = 'No hay suficiente stock del producto.'
@@ -375,24 +375,24 @@ def venta(request):
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la venta seguirá guardada.'
 
             # Se suman los precios unitarios al price total de la venta
-            lista = DetalleVenta.objects.filter(id_venta=nueva_venta)
+            lista = SaleDetail.objects.filter(sale_id=nueva_venta)
             nueva_venta.total = 0
-            nueva_venta.descuento = 0
+            nueva_venta.discount = 0
             for i in lista:
-                nueva_venta.total += (i.precio_unitario * i.quantity)
-                if i.descuento is not None:
-                    nueva_venta.descuento += (i.descuento * i.quantity)
-            nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+                nueva_venta.total += (i.unit_price * i.quantity)
+                if i.discount is not None:
+                    nueva_venta.discount += (i.discount * i.quantity)
+            nueva_venta.total_discounted = nueva_venta.total - nueva_venta.discount
 
             nueva_venta.save()
             ctx['total'] = nueva_venta.total
-            ctx['descuento'] = nueva_venta.descuento
-            ctx['total_con_descuento'] = nueva_venta.total_con_descuento
+            ctx['discount'] = nueva_venta.discount
+            ctx['total_discounted'] = nueva_venta.total_discounted
             ctx['articulo_a_vender'] = lista
             view_form = FormVenta({'quantity': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = view_form
-            if nueva_venta.cliente is not None:
-                ctx['cliente'] = nueva_venta.cliente.name
+            if nueva_venta.client is not None:
+                ctx['client'] = nueva_venta.client.name
 
             return HttpResponse(template.render(ctx, request))
     else:
@@ -405,9 +405,9 @@ def venta(request):
 def historial_ventas(request):
     template = loader.get_template('historial_ventas.html')
     view_form = FormFiltroFecha()
-    if Venta.get_inactive().exists():
+    if Sale.get_inactive().exists():
         ctx = {
-            "transaccion": Venta.get_inactive(),
+            "transaccion": Sale.get_inactive(),
             "form": view_form,
             "titulo": "Historial de ventas"
         }
@@ -416,7 +416,7 @@ def historial_ventas(request):
             view_form = FormFiltroFecha(request.POST)
             if view_form.is_valid():
                 cleaned_form = view_form.cleaned_data
-                ctx["transaccion"] = Venta.objects.filter(fecha__range=[cleaned_form['fecha_inicial'], cleaned_form['fecha_final']]).order_by('-datetime_created', '-id')
+                ctx["transaccion"] = Sale.objects.filter(fecha__range=[cleaned_form['fecha_inicial'], cleaned_form['fecha_final']]).order_by('-datetime_created', '-id')
         else:
             view_form = FormFiltroFecha()
         # !filtro fecha
@@ -427,9 +427,9 @@ def historial_ventas(request):
         return redirect('venta_exitosa')
 
 @login_required
-def recibo(request, id_venta):
+def recibo(request, sale_id):
     try:
-        return FileResponse(emitir_recibo(id_venta), as_attachment=False, filename=f'recibo_{Venta.objects.get(id=id_venta).datetime_created}.pdf')
+        return FileResponse(emitir_recibo(sale_id), as_attachment=False, filename=f'recibo_{Sale.objects.get(id=sale_id).datetime_created}.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')
 
@@ -442,22 +442,22 @@ def venta_exitosa(request):
            'hay_recibo': False}
 
     try:
-        nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
+        nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
 
-        producto_leido = DetalleVenta.objects.filter(id_venta=nueva_venta)  # Se crea un QuerySet para sacar datos de cada producto comprado
+        producto_leido = SaleDetail.objects.filter(sale_id=nueva_venta)  # Se crea un QuerySet para sacar datos de cada producto comprado
 
         if producto_leido.exists():
             for i in producto_leido: # Se actualiza  el stock de cada objeto Article
                 i.product_id.stock -= i.quantity
                 i.product_id.save()
 
-            nueva_venta.status = Venta.STATUS_FINISHED
+            nueva_venta.status = Sale.STATUS_FINISHED
             nueva_venta.save()
             ctx['hay_recibo'] = True
         else:
             return redirect('not_found')
-        ctx['id_venta'] = nueva_venta.id
-    except Venta.DoesNotExist:
+        ctx['sale_id'] = nueva_venta.id
+    except Sale.DoesNotExist:
         return redirect('not_found')
 
 
@@ -466,7 +466,7 @@ def venta_exitosa(request):
 @login_required
 def cancelar_unidad(request, code_articulo):
     try:
-        articulo_staging = DetalleVenta.objects.get(id=code_articulo)
+        articulo_staging = SaleDetail.objects.get(id=code_articulo)
     except ObjectDoesNotExist as DoesNotExist:
         pass
     else:
@@ -478,7 +478,7 @@ def cancelar_unidad(request, code_articulo):
 
 #Funciones para administrar los clientes
 @login_required
-def cliente(request):
+def client(request):
     template = loader.get_template('agregar_modificar.html')
     view_form = FormCliente()
     lista = []
@@ -494,11 +494,11 @@ def cliente(request):
         if view_form.is_valid():
             cleaned_form = view_form.cleaned_data  # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
-            try: # Si el cliente existe en la base de datos
+            try: # Si el client existe en la base de datos
                 new_client = Client.objects.get(dni=cleaned_form['dni'])
                 ctx['message'] = "El cliente ya existe"
 
-            except ObjectDoesNotExist as DoesNotExist: # Si el cliente no existe en la base de datos, crearlo
+            except ObjectDoesNotExist as DoesNotExist: # Si el client no existe en la base de datos, crearlo
                 new_client = Client.objects.create(name=cleaned_form['name'],
                                                     tax_condition=cleaned_form['tax_condition'],
                                                     dni=cleaned_form['dni'],
@@ -521,7 +521,7 @@ def control_clientes(request):
         "titulo": "Lista de clientes",
         "articulos": Client.objects.filter(id__lte=50).order_by('name'),
         "agregar_persona": "+ Agregar Cliente",
-        "link_agregar": "/cliente",
+        "link_agregar": "/client",
         "link_modificar": "/modificar_cliente/",
         "form": view_form
     }

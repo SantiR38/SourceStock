@@ -36,7 +36,7 @@
                 <tr class="intercalado">
                   <td>{{i.product_id.codigo}}</td>
                   <td> {{i.product_id.description}} </td>
-                  <td> ${{i.precio_unitario}} </td>
+                  <td> ${{i.unit_price}} </td>
                   <td> {{i.discount_percentage}}% </td>
                   <td> ${{i.discounted_price }} </td>
                   <td> {{i.product_id.brand}} </td>
@@ -58,16 +58,16 @@
 
                 <tr class="intercalado">
                   <td> ${{esta_venta.total}} </td>
-                  <td> ${{esta_venta.descuento}} </td>
-                  <td> ${{esta_venta.total_con_descuento}} </td>
-                  <td> {{ esta_venta.cliente.name }} </td>
+                  <td> ${{esta_venta.discount}} </td>
+                  <td> ${{esta_venta.total_discounted}} </td>
+                  <td> {{ esta_venta.client.name }} </td>
                 </tr>
               </table>
 
               <br />
               <span>
                 <a href="/venta_exitosa"><button>Confirmar</button></a>
-                <a href="descuento_adicional"><button>Añadir descuento</button></a>
+                <a href="extra_discount"><button>Añadir descuento</button></a>
                 <a href="presupuesto/{{esta_venta.id}}"><button>Emitir Presupuesto</button></a>
               </span>
 

@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from punto_venta.env_variables import enterprise
 
 # Models
-from erp.models import Venta, DetalleVenta, Client, Provider, Purchase, DetalleEntrada, Article
+from erp.models import Sale, SaleDetail, Client, Provider, Purchase, DetalleEntrada, Article
 
 # SourceStock - Api
 from api.models import PrecioDolar
@@ -31,23 +31,23 @@ def venta_activa():
     # En la vista venta, muestra la venta en curso apenas se carga la página.
     # Esta función devuelve dos parámetros:
     #   1. Una lista del detalle de venta para mostrar en la vista venta
-    #   2. Datos de la venta general (cliente y total).
+    #   2. Datos de la venta general (client y total).
 
     try:  # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
-        nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
-    except Venta.DoesNotExist:
-        nueva_venta = Venta.crear_venta_vacia(Venta.STATUS_WAITING)
+        nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
+    except Sale.DoesNotExist:
+        nueva_venta = Sale.crear_venta_vacia(Sale.STATUS_WAITING)
         return [[], nueva_venta]
 
-    lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
+    lista = SaleDetail.objects.filter(sale_id = nueva_venta)
     nueva_venta.total = 0
-    nueva_venta.descuento = 0
+    nueva_venta.discount = 0
     for i in lista:
-        nueva_venta.total += (i.precio_unitario * i.quantity)
+        nueva_venta.total += (i.unit_price * i.quantity)
 
-        if i.descuento != None:
-            nueva_venta.descuento += (i.descuento * i.quantity)
-    nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+        if i.discount != None:
+            nueva_venta.discount += (i.discount * i.quantity)
+    nueva_venta.total_discounted = nueva_venta.total - nueva_venta.discount
     
     nueva_venta.save()
     return [lista, nueva_venta]
@@ -56,7 +56,7 @@ def venta_activa_dict():
     venta = venta_activa()[0].values()
     for i in range(len(venta)):
         article = Article.objects.filter(id=venta[i]["id_producto_id"]).values()[0]
-        venta[i]["discounted_price"] = venta[i]["precio_unitario"] - venta[i]["descuento"]
+        venta[i]["discounted_price"] = venta[i]["unit_price"] - venta[i]["discount"]
         venta[i]["product_id"] = article
     return venta
 
@@ -86,20 +86,20 @@ def compra_activa():
 
 def buscar_cliente(param):
 
-    # Se utiliza esta función para registrar un cliente dentro de una venta.
+    # Se utiliza esta función para registrar un client dentro de una venta.
 
     if type(param) == int:
         try:
-            cliente = Client.objects.get(dni=param)
+            client = Client.objects.get(dni=param)
         except ObjectDoesNotExist as DoesNotExist:
-            cliente = None
+            client = None
     elif type(param) == str:
         try:
-            cliente = Client.objects.get(name=param)
+            client = Client.objects.get(name=param)
         except ObjectDoesNotExist as DoesNotExist:
-            cliente = None
+            client = None
     
-    return cliente
+    return client
 
 def buscar_proveedor(name):
 
@@ -113,10 +113,10 @@ def buscar_proveedor(name):
 
 def dni_cliente():
 
-    # Esta función introduce el dni del cliente en el formulario de la vista venta.
+    # Esta función introduce el dni del client en el formulario de la vista venta.
 
-    if venta_activa()[1].cliente != None:
-        a = venta_activa()[1].cliente.dni
+    if venta_activa()[1].client != None:
+        a = venta_activa()[1].client.dni
     else:
         a = None
     return a
@@ -140,14 +140,14 @@ def final_price(costo_s_iva, porc_ganancia):
     final_price = porc_ganancia(costo_final, porc_ganancia)
     return final_price
 
-def emitir_recibo(id_venta):
+def emitir_recibo(sale_id):
 
     # Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
     # Utiliza la librería reportlab
 
-    venta = Venta.objects.get(id=id_venta)
-    detalle_venta = DetalleVenta.objects.filter(id_venta=venta)
-    recibo_presupuesto = "Presupuesto" if venta.status == Venta.STATUS_WAITING else "Recibo"
+    venta = Sale.objects.get(id=sale_id)
+    detalle_venta = SaleDetail.objects.filter(sale_id=venta)
+    recibo_presupuesto = "Presupuesto" if venta.status == Sale.STATUS_WAITING else "Recibo"
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
@@ -184,11 +184,11 @@ def emitir_recibo(id_venta):
     p.drawString(297.5, 653, "CUIT: ")
 
     p.setFont("Helvetica", 10)
-    if venta.cliente != None:
-        p.drawString(95, 673, venta.cliente.name)
-        p.drawString(95, 653, venta.cliente.direction)
-        p.drawString(355, 673, venta.cliente.tax_condition)
-        p.drawString(355, 653, venta.cliente.cuit)
+    if venta.client != None:
+        p.drawString(95, 673, venta.client.name)
+        p.drawString(95, 653, venta.client.direction)
+        p.drawString(355, 673, venta.client.tax_condition)
+        p.drawString(355, 653, venta.client.cuit)
     else:
         p.drawString(355, 673, "Consumidor Final")
 
@@ -226,9 +226,9 @@ def emitir_recibo(id_venta):
         p.drawString(50, alto, str(i.quantity))
         p.drawString(150, alto, i.product_id.description)
         p.drawString(380, alto, "$")
-        p.drawString(390, alto, str(i.precio_unitario))
+        p.drawString(390, alto, str(i.unit_price))
         p.drawString(480, alto, "$")
-        p.drawString(490, alto, str(i.quantity*i.precio_unitario))
+        p.drawString(490, alto, str(i.quantity*i.unit_price))
         alto -= 30
 
 
@@ -242,18 +242,18 @@ def emitir_recibo(id_venta):
     alto -= 35
     p.drawString(390, alto, "Descuento")
     p.drawString(480, alto, "$-")
-    p.drawString(490, alto, str(venta.descuento))
+    p.drawString(490, alto, str(venta.discount))
 
     alto -= 35
     p.drawString(390, alto, "Dcto. adicional")
     p.drawString(480, alto, "$-")
-    p.drawString(490, alto, str(venta.descuento_adicional))
+    p.drawString(490, alto, str(venta.extra_discount))
 
     alto -= 35
     p.setFont("Helvetica-Bold", 11)
     p.drawString(390, alto, "Total")
     p.drawString(480, alto, "$")
-    p.drawString(490, alto, str(venta.total_con_descuento))
+    p.drawString(490, alto, str(venta.total_discounted))
 
 
     # Close the PDF object cleanly, and we're done.
@@ -371,7 +371,7 @@ def lista_proveedores():
 
 def lista_clientes():
 
-    # Lista la totalidad de los clientes para mostrar en la vista Venta
+    # Lista la totalidad de los clientes para mostrar en la vista Sale
 
     query = Client.objects.all().order_by('name')
     lista = [(" ", " ")]

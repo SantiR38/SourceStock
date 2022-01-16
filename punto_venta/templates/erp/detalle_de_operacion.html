@@ -32,7 +32,7 @@
                 <td>{% if titulo == "Detalle de compra" %}
                   {{object.provider.name}}
                   {% else %}
-                  {{object.cliente.name}}
+                  {{object.client.name}}
                   {% endif %}
                 </td>
               </tr>
@@ -62,8 +62,8 @@
                 <td>{% if i.is_in_dolar %}U$D{% else %}${% endif %}{{i.unit_cost}}</td>
                 <td>{% if i.is_in_dolar %}U$D{% else %}${% endif %}{{i.cost_by_quantity}}</td>
                 {% else %}
-                <td>${{i.precio_unitario}}</td>
-                <td>${{i.precio_por_cantidad}}</td>
+                <td>${{i.unit_price}}</td>
+                <td>${{i.price_by_quantity}}</td>
                 {% endif %}
 
               </tr>
@@ -81,19 +81,19 @@
                 <td><b>Descuento</b></td>
                 <td></td>
                 <td></td>
-                <td><b>{{object.descuento}}</b></td>
+                <td><b>{{object.discount}}</b></td>
               </tr>
               <tr class="intercalado">
                 <td><b>Descuento Adicional</b></td>
                 <td></td>
                 <td></td>
-                <td><b>{{object.descuento_adicional}}</b></td>
+                <td><b>{{object.extra_discount}}</b></td>
               </tr>
               <tr class="intercalado">
                 <td><b>Total con descuento</b></td>
                 <td></td>
                 <td></td>
-                <td><b>{{object.total_con_descuento}}</b></td>
+                <td><b>{{object.total_discounted}}</b></td>
               </tr>
               {% endif %}
 

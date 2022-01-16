@@ -75,7 +75,7 @@ Venta
         </div>
         <div class="card-body">
           <div style=" width: 100%;">
-            <h5>Cliente: {{cliente}}</h5>
+            <h5>Cliente: {{client}}</h5>
             <br />
             <table>
               <tr>
@@ -88,7 +88,7 @@ Venta
             {% for i in articulo_a_vender %}
               <tr>
                 <td>{{ i.product_id }}</td>
-                <td>${{ i.precio_unitario }}</td>
+                <td>${{ i.unit_price }}</td>
                 <td>{{ i.quantity }} </td>
                 <td><a href="cancelar_unidad/{{i.id}}"><img src="{% static '/dist/img/cancel.svg' %}" alt="Cancelar" /></a></td>
               </tr>
@@ -99,8 +99,8 @@ Venta
 
             <p style= "color:#A91400"><strong>{{inexistente}}</strong></p>
             <p><strong>Total: ${{ total }}</strong></p>
-            <p><strong>Dto: ${{ descuento }}</strong></p>
-            <p><strong>Total c/Dto: ${{ total_con_descuento }}</strong></p>
+            <p><strong>Dto: ${{ discount }}</strong></p>
+            <p><strong>Total c/Dto: ${{ total_discounted }}</strong></p>
             <span>
               <a href="/venta_exitosa"><button>Confirmar compra</button></a>
               <a href="/cancelar"><button>Cancelar</button></a>

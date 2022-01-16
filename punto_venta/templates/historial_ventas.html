@@ -35,13 +35,13 @@
                       <td><a href="/detalle_de_venta/{{i.id}}">{{i.id}}</a></td>
                       <td> {{i.datetime_created}} </td>
                       <td> 
-                        {% if i.cliente != None %}
-                        {{i.cliente.name}} {{i.cliente.apellido}}
+                        {% if i.client != None %}
+                        {{i.client.name}} {{i.client.apellido}}
                         {% else %}
                         -
                         {% endif %}
                       </td>
-                      <td> ${{i.total_con_descuento}} </td>
+                      <td> ${{i.total_discounted}} </td>
                     </tr>
 
                   {% endfor %}
