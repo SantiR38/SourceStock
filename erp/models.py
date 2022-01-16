@@ -27,7 +27,6 @@ class SSBaseModel(models.Model):
 
 
 class Article(models.Model):
-    codigo = models.BigIntegerField(unique=True)
     descripcion = models.CharField(max_length=100, null=True)
     costo_sin_iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     costo = models.DecimalField(max_digits=10, decimal_places=2)
@@ -67,7 +66,7 @@ class Article(models.Model):
             precio_descontado = cls.get_porcentaje_ganancia(precio, -porcentaje_descuento)
 
         context = {
-            "codigo": infForm['codigo'],
+            "code": infForm['code'],
             "descripcion": infForm['descripcion'],
             "costo_sin_iva": costo_sin_iva,
             "costo": costo,
@@ -88,14 +87,14 @@ class Article(models.Model):
 
     @classmethod
     def create_new(cls, infForm):
-        article = cls.objects.filter(codigo=infForm['codigo'])
+        article = cls.objects.filter(code=infForm['code'])
         if article.exists():
             mensaje = "El código ya está siendo utilizado por otro producto."
         else:
             if infForm['costo'] is not None and infForm['costo_sin_iva'] is not None:
                 mensaje = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
             elif infForm['costo'] is not None or infForm['costo_sin_iva'] is not None:
-                cls.objects.create(codigo=cls.get_context(infForm)['codigo'],
+                cls.objects.create(code=cls.get_context(infForm)['code'],
                                         descripcion=cls.get_context(infForm)['descripcion'],
                                         costo_sin_iva=cls.get_context(infForm)['costo_sin_iva'],
                                         costo=cls.get_context(infForm)['costo'],

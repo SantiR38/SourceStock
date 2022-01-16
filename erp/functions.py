@@ -399,7 +399,7 @@ def comprar_articulo(infForm):
         costo_sin_iva = costo / Decimal(1.21)
 
     contexto = {
-        "codigo": infForm['codigo'],
+        "code": infForm['code'],
         "costo_sin_iva": costo_sin_iva,
         "costo": costo,
         "cantidad": infForm['cantidad'],

@@ -38,12 +38,12 @@ def venta_por_catalogo(request):
     return HttpResponse(template.render(ctx, request))
 
 @login_required
-def aniadir_al_carrito(request, codigo_param):
+def aniadir_al_carrito(request, code_param):
 
     estado = ArtState.objects.get(nombre="Active")
     nueva_venta = Venta.objects.get(id_state=estado)
 
-    new_article = Article.objects.get(codigo=codigo_param)
+    new_article = Article.objects.get(code=code_param)
 
     ##
     # Detalle de venta
@@ -89,12 +89,12 @@ def confirmar_venta(request):
     return HttpResponse(template.render(ctx, request))
 
 @login_required
-def elegir_cliente(request, codigo_param):
+def elegir_cliente(request, code_param):
 
     estado = ArtState.objects.get(nombre="Active")
     nueva_venta = Venta.objects.get(id_state=estado)
 
-    nueva_venta.cliente = Cliente.objects.get(id=codigo_param)
+    nueva_venta.cliente = Cliente.objects.get(id=code_param)
     nueva_venta.save()
 
     return redirect('confirmar_venta')

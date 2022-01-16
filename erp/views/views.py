@@ -48,7 +48,7 @@ def entrada(request):
             new_sale.save()
 
             new_article = Article.objects.filter(
-                codigo=cleaned_form['codigo']).first()
+                code=cleaned_form['code']).first()
             if new_article is None:
                 ctx['inexistente'] = ('Artículo inexistente, debe agregarlo en'
                     'la sección "Control de inventario/Agregar artículo". El '
@@ -222,7 +222,7 @@ def control_inventario(request):
         if view_form.is_valid():
             cleaned_form = view_form.cleaned_data
             ctx["articulos"] = Article.objects.filter(
-                codigo=int(cleaned_form['buscar']))  # Código de barras
+                code=int(cleaned_form['buscar']))  # Código de barras
     else:
         view_form = FormBusqueda()
 
@@ -230,15 +230,15 @@ def control_inventario(request):
 
 
 @login_required
-def articulo(request, codigo_articulo):
+def articulo(request, code_articulo):
     """Modify  an existing article."""
     template = loader.get_template('agregar_modificar.html')
-    new_article = Article.objects.filter(codigo=codigo_articulo).first()
+    new_article = Article.objects.filter(code=code_articulo).first()
     if new_article is None:
         return redirect('not_found')
 
     form_details = {
-        'codigo': new_article.codigo,
+        'code': new_article.code,
         'descripcion': new_article.descripcion,
         'en_dolar': new_article.en_dolar,
         'costo': new_article.costo,
@@ -269,7 +269,7 @@ def articulo(request, codigo_articulo):
 
             elif cleaned_form['costo'] is not None or cleaned_form['costo_sin_iva'] is not None:
 
-                new_article.codigo = cleaned_form['codigo']
+                new_article.code = cleaned_form['code']
                 if cleaned_form['descripcion'] != "":
                     new_article.descripcion = cleaned_form['descripcion']
                 new_article.en_dolar = cleaned_form['en_dolar']
@@ -355,7 +355,7 @@ def venta(request):
             ##
 
             try: # Si el producto existe en la base de datos
-                new_article = Article.objects.get(codigo=cleaned_form['codigo']) # Llamamos al objeto desde la db que tenga el mismo codigo que en
+                new_article = Article.objects.get(code=cleaned_form['code']) # Llamamos al objeto desde la db que tenga el mismo code que en
                                                                             # el formulario y lo metemos como QuerySet en una variable.
                 ctx["article_detail"] = new_article
                 ##
@@ -371,7 +371,7 @@ def venta(request):
                                                 descuento=precio_peso_argentino * new_article.porcentaje_descuento / 100,
                                                 cantidad=cleaned_form['cantidad'],
                                                 id_venta=Venta.objects.get(id_state=article_status),
-                                                id_producto=Article.objects.get(codigo=cleaned_form['codigo']))
+                                                id_producto=Article.objects.get(code=cleaned_form['code']))
                 else:
                     ctx['inexistente'] = 'No hay suficiente stock del producto.'
 
@@ -469,9 +469,9 @@ def venta_exitosa(request):
     return HttpResponse(template.render(ctx, request))
 
 @login_required
-def cancelar_unidad(request, codigo_articulo):
+def cancelar_unidad(request, code_articulo):
     try:
-        articulo_staging = DetalleVenta.objects.get(id=codigo_articulo)
+        articulo_staging = DetalleVenta.objects.get(id=code_articulo)
     except ObjectDoesNotExist as DoesNotExist:
         pass
     else:

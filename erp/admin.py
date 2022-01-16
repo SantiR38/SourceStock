@@ -4,8 +4,8 @@ from erp.models import Article, Entrada, DetalleEntrada, Venta, DetalleVenta, Pe
 # Register your models here.
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ("codigo", "descripcion", "costo", "porcentaje_ganancia", "precio", "seccion", "stock")
-    search_fields = ("codigo", "descripcion")
+    list_display = ("code", "descripcion", "costo", "porcentaje_ganancia", "precio", "seccion", "stock")
+    search_fields = ("code", "descripcion")
     list_filter = ("seccion",) # Comma is important, because this is a tupple. Otherwise gives us an Exception.
 
 class DetalleEntradaAdmin(admin.ModelAdmin):
