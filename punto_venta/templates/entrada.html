@@ -64,9 +64,9 @@ Compra
 
             {% for i in articulo_a_comprar %}
               <tr>
-                <td>{{ i.id_producto }}</td>
+                <td>{{ i.product_id }}</td>
                 <td>${{ i.costo_unitario }}</td>
-                <td>{{ i.cantidad }} </td>
+                <td>{{ i.quantity }} </td>
                 <!-- <td><a href="cancelar_unidad/{{i.id}}"><img src="{% static '/dist/img/cancel.svg' %}" alt="Cancelar" /></a></td> -->
               </tr>
             {% endfor %}

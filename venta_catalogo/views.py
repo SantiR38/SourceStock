@@ -54,9 +54,9 @@ def aniadir_al_carrito(request, code_param):
                                 discount_percentage=new_article.discount_percentage,
                                 precio_por_cantidad= precio_peso_argentino,
                                 descuento=precio_peso_argentino * new_article.discount_percentage / 100,
-                                cantidad=1,
+                                quantity=1,
                                 id_venta=nueva_venta,
-                                id_producto=new_article)
+                                product_id=new_article)
 
     return redirect('venta_por_catalogo')
 

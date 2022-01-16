@@ -43,10 +43,10 @@ def venta_activa():
     nueva_venta.total = 0
     nueva_venta.descuento = 0
     for i in lista:
-        nueva_venta.total += (i.precio_unitario * i.cantidad)
+        nueva_venta.total += (i.precio_unitario * i.quantity)
 
         if i.descuento != None:
-            nueva_venta.descuento += (i.descuento * i.cantidad)
+            nueva_venta.descuento += (i.descuento * i.quantity)
     nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
     
     nueva_venta.save()
@@ -57,7 +57,7 @@ def venta_activa_dict():
     for i in range(len(venta)):
         article = Article.objects.filter(id=venta[i]["id_producto_id"]).values()[0]
         venta[i]["discounted_price"] = venta[i]["precio_unitario"] - venta[i]["descuento"]
-        venta[i]["id_producto"] = article
+        venta[i]["product_id"] = article
     return venta
 
 def compra_activa():
@@ -78,9 +78,9 @@ def compra_activa():
         nueva_compra.total = 0
         for i in lista:
             if i.is_in_dolar:
-                nueva_compra.total += (i.costo_unitario * i.cantidad * PrecioDolar.cotizacion_venta())
+                nueva_compra.total += (i.costo_unitario * i.quantity * PrecioDolar.cotizacion_venta())
             else:
-                nueva_compra.total += (i.costo_unitario * i.cantidad)
+                nueva_compra.total += (i.costo_unitario * i.quantity)
         nueva_compra.save()
     return [lista, nueva_compra]
 
@@ -223,12 +223,12 @@ def emitir_recibo(id_venta):
     p.setFont("Helvetica", 11)
 
     for i in detalle_venta:
-        p.drawString(50, alto, str(i.cantidad))
-        p.drawString(150, alto, i.id_producto.description)
+        p.drawString(50, alto, str(i.quantity))
+        p.drawString(150, alto, i.product_id.description)
         p.drawString(380, alto, "$")
         p.drawString(390, alto, str(i.precio_unitario))
         p.drawString(480, alto, "$")
-        p.drawString(490, alto, str(i.cantidad*i.precio_unitario))
+        p.drawString(490, alto, str(i.quantity*i.precio_unitario))
         alto -= 30
 
 
@@ -332,12 +332,12 @@ def emitir_detalle_entrada(id_entrada):
     p.setFont("Helvetica", 11)
 
     for i in detalle_entrada:
-        p.drawString(50, alto, str(i.cantidad))
-        p.drawString(150, alto, i.id_producto.description)
+        p.drawString(50, alto, str(i.quantity))
+        p.drawString(150, alto, i.product_id.description)
         p.drawString(380, alto, "$")
         p.drawString(390, alto, str(i.costo_unitario))
         p.drawString(460, alto, "$")
-        p.drawString(470, alto, str(i.cantidad*i.costo_unitario))
+        p.drawString(470, alto, str(i.quantity*i.costo_unitario))
         alto -= 30
 
     # Filas total
@@ -396,7 +396,7 @@ def comprar_articulo(infForm):
         "code": infForm['code'],
         "cost_no_taxes": cost_no_taxes,
         "cost": cost,
-        "cantidad": infForm['cantidad'],
+        "quantity": infForm['quantity'],
         "is_in_dolar": infForm['is_in_dolar']
     }
 

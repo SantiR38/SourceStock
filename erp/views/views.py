@@ -20,7 +20,7 @@ from erp.functions import (profit_percentage, venta_activa, compra_activa,
 def entrada(request):
     template = loader.get_template('entrada.html')
     view_form = FormEntrada(
-        {'cantidad': 1, 'proveedor': nombre_proveedor()})
+        {'quantity': 1, 'proveedor': nombre_proveedor()})
     ctx = {
         "articulo_a_comprar": compra_activa()[0],
         "form": view_form,
@@ -60,32 +60,32 @@ def entrada(request):
                 if cleaned_form.get('inexistente') is None:
                     DetalleEntrada.objects.create(cost_no_taxes=comprar_articulo(cleaned_form)['cost_no_taxes'],
                         costo_unitario=comprar_articulo(cleaned_form)['cost'],
-                        costo_por_cantidad=comprar_articulo(cleaned_form)['cost'] * comprar_articulo(cleaned_form)['cantidad'],
-                        cantidad=comprar_articulo(cleaned_form)['cantidad'],
+                        costo_por_cantidad=comprar_articulo(cleaned_form)['cost'] * comprar_articulo(cleaned_form)['quantity'],
+                        quantity=comprar_articulo(cleaned_form)['quantity'],
                         id_entrada=new_sale,
                         is_in_dolar=comprar_articulo(cleaned_form)['is_in_dolar'],
-                        id_producto=new_article)
+                        product_id=new_article)
                     ctx['inexistente'] = ''
 
             queryset = DetalleEntrada.objects.filter(id_entrada=new_sale)
             new_sale.total = 0
             for i in queryset:
                 if i.is_in_dolar:
-                    new_sale.total += (i.costo_unitario * i.cantidad * PrecioDolar.cotizacion_venta())
+                    new_sale.total += (i.costo_unitario * i.quantity * PrecioDolar.cotizacion_venta())
                 else:
-                    new_sale.total += (i.costo_unitario * i.cantidad)  # Se suman los precios unitarios al price total de la compra
+                    new_sale.total += (i.costo_unitario * i.quantity)  # Se suman los precios unitarios al price total de la compra
             new_sale.save()
             ctx['total'] = new_sale.total
             ctx['articulo_a_comprar'] = queryset
 
-            view_form = FormEntrada({'cantidad': 1, 'proveedor': nombre_proveedor()})
+            view_form = FormEntrada({'quantity': 1, 'proveedor': nombre_proveedor()})
 
             if compra_activa()[1].proveedor is not None:
                 ctx['proveedor'] = compra_activa()[1].proveedor.name
             return HttpResponse(template.render(ctx, request))
     else:
-        # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a comprar es 1.
-        view_form = FormEntrada({'cantidad': 1, 'proveedor': nombre_proveedor()})
+        # Es es formulario que se muestra antes de enviar la info. La quantity por defecto de articulos a comprar es 1.
+        view_form = FormEntrada({'quantity': 1, 'proveedor': nombre_proveedor()})
 
     return HttpResponse(template.render(ctx, request))
 
@@ -102,20 +102,20 @@ def transaccion_exitosa(request):
         return redirect('not_found')
 
     producto_leido = DetalleEntrada.objects.filter(
-        id_entrada=nueva_venta).select_related('id_producto')
+        id_entrada=nueva_venta).select_related('product_id')
 
     try:
         for j in producto_leido:  # Esto es simplemente para que cancele la compra completa y no se actualicen el stock y price solo de algunos productos
-            j.id_producto.profit_percentage * 1  # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
+            j.product_id.profit_percentage * 1  # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
         for i in producto_leido:  # Se actualiza el cost y el stock de cada objeto Article
-            i.id_producto.is_in_dolar = i.is_in_dolar
-            i.id_producto.cost_no_taxes = i.cost_no_taxes
-            i.id_producto.cost = i.costo_unitario
-            i.id_producto.price_no_taxes = profit_percentage(i.cost_no_taxes, i.id_producto.profit_percentage)
-            i.id_producto.price = profit_percentage(i.costo_unitario, i.id_producto.profit_percentage)
-            i.id_producto.discounted_price = profit_percentage(i.id_producto.price, -i.id_producto.discount_percentage)
-            i.id_producto.stock += i.cantidad
-            i.id_producto.save()
+            i.product_id.is_in_dolar = i.is_in_dolar
+            i.product_id.cost_no_taxes = i.cost_no_taxes
+            i.product_id.cost = i.costo_unitario
+            i.product_id.price_no_taxes = profit_percentage(i.cost_no_taxes, i.product_id.profit_percentage)
+            i.product_id.price = profit_percentage(i.costo_unitario, i.product_id.profit_percentage)
+            i.product_id.discounted_price = profit_percentage(i.product_id.price, -i.product_id.discount_percentage)
+            i.product_id.stock += i.quantity
+            i.product_id.save()
 
         nueva_venta.status = Entrada.STATUS_FINISHED
         nueva_venta.save()  # Hace que esa entrada pase a estar inactiva
@@ -301,7 +301,7 @@ def articulo(request, code_articulo):
 @login_required
 def venta(request):
     template = loader.get_template('venta.html')
-    view_form = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
+    view_form = FormVenta({'quantity': 1, 'dni_cliente': dni_cliente()})
     lista = []
     ctx = {
         "articulo_a_vender": venta_activa()[0],
@@ -359,15 +359,15 @@ def venta(request):
                 ##
                 costo_peso_argentino = new_article.cost * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.cost
                 precio_peso_argentino = new_article.price * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.price
-                if new_article.stock >= cleaned_form['cantidad']:
+                if new_article.stock >= cleaned_form['quantity']:
                     DetalleVenta.objects.create(costo_unitario=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
                                                 precio_unitario=precio_peso_argentino,
                                                 discount_percentage=new_article.discount_percentage,
-                                                precio_por_cantidad=precio_peso_argentino * cleaned_form['cantidad'],
+                                                precio_por_cantidad=precio_peso_argentino * cleaned_form['quantity'],
                                                 descuento=precio_peso_argentino * new_article.discount_percentage / 100,
-                                                cantidad=cleaned_form['cantidad'],
+                                                quantity=cleaned_form['quantity'],
                                                 id_venta=Venta.objects.get(status=Venta.STATUS_WAITING),
-                                                id_producto=Article.objects.get(code=cleaned_form['code']))
+                                                product_id=Article.objects.get(code=cleaned_form['code']))
                 else:
                     ctx['inexistente'] = 'No hay suficiente stock del producto.'
 
@@ -379,9 +379,9 @@ def venta(request):
             nueva_venta.total = 0
             nueva_venta.descuento = 0
             for i in lista:
-                nueva_venta.total += (i.precio_unitario * i.cantidad)
+                nueva_venta.total += (i.precio_unitario * i.quantity)
                 if i.descuento is not None:
-                    nueva_venta.descuento += (i.descuento * i.cantidad)
+                    nueva_venta.descuento += (i.descuento * i.quantity)
             nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
 
             nueva_venta.save()
@@ -389,7 +389,7 @@ def venta(request):
             ctx['descuento'] = nueva_venta.descuento
             ctx['total_con_descuento'] = nueva_venta.total_con_descuento
             ctx['articulo_a_vender'] = lista
-            view_form = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
+            view_form = FormVenta({'quantity': 1, 'dni_cliente': dni_cliente()})
             ctx['form'] = view_form
             if nueva_venta.cliente is not None:
                 ctx['cliente'] = nueva_venta.cliente.name
@@ -397,7 +397,7 @@ def venta(request):
             return HttpResponse(template.render(ctx, request))
     else:
         # Es es formulario que se muestra antes de enviar la info. La cantidad por defecto de articulos a vender es 1.
-        view_form = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
+        view_form = FormVenta({'quantity': 1, 'dni_cliente': dni_cliente()})
 
     return HttpResponse(template.render(ctx, request))
 
@@ -448,8 +448,8 @@ def venta_exitosa(request):
 
         if producto_leido.exists():
             for i in producto_leido: # Se actualiza  el stock de cada objeto Article
-                i.id_producto.stock -= i.cantidad
-                i.id_producto.save()
+                i.product_id.stock -= i.quantity
+                i.product_id.save()
 
             nueva_venta.status = Venta.STATUS_FINISHED
             nueva_venta.save()

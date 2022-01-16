@@ -16,7 +16,7 @@ class FormBusqueda(forms.Form):
 
 class FormVenta(forms.Form): # Sirve para la actualización inventario en general
     code = forms.IntegerField(label_suffix= "*:")
-    cantidad = forms.IntegerField(label_suffix= "*:")
+    quantity = forms.IntegerField(label_suffix= "*:")
     cliente = forms.ChoiceField(choices=lista_clientes, label= "Cliente", required=False, label_suffix= "**:")
     dni_cliente = forms.IntegerField(required=False, label="DNI Cliente", label_suffix= "**:")
 
@@ -51,7 +51,7 @@ class FormEntrada(forms.Form):
         label="Costo sin IVA", label_suffix="**:", required=False)
     cost = forms.DecimalField(max_digits=10, decimal_places=2,
         label="Costo con IVA", label_suffix="**:", required=False)
-    cantidad = forms.IntegerField(label_suffix="*:")
+    quantity = forms.IntegerField(label_suffix="*:")
     proveedor = forms.ChoiceField(choices=lista_proveedores, label="Proveedor",
         label_suffix="*:")
     fecha = forms.DateTimeField(

@@ -2,7 +2,7 @@
 
 ## Versión 1.0.1
 
-1. **View compra_simple:** Corrección de bug de la versión anterior que no permitía agregar artículos solo con el campo cógido y cantidad. Ahora, para hacer una compra detallada, hay una página específica llamada 'agregar o modificar productos'.
+1. **View compra_simple:** Corrección de bug de la versión anterior que no permitía agregar artículos solo con los campos `code` y `quantity`. Ahora, para hacer una compra detallada, hay una página específica llamada 'agregar o modificar productos'.
 2. **Problemas con campo código:** Se cambió el campo codigo de IntegerField() a BigIntegerField() para que acepte numeros de mayor tamaño.
 3. **Enlaces de inicio a admin:** Se enlazan las páginas mediante pestañas, sin tener que modificar la url a mano.
 4. **Costo y price decimales:** Estos campos aceptaban solo valores enteros, pero ahora aceptan numeros de hasta 2 decimales.
