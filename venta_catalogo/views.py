@@ -22,7 +22,7 @@ def venta_por_catalogo(request):
         "articulo_a_vender": venta_activa()[0],
         "totales": venta_activa()[1],
         "titulo": "Venta por catálogo",
-        "articulos": Article.objects.filter(id__lte=50).order_by('descripcion'),
+        "articulos": Article.objects.filter(id__lte=50).order_by('description'),
         "form": miFormulario
     }
 
@@ -47,13 +47,13 @@ def aniadir_al_carrito(request, code_param):
     ##
     # Detalle de venta
     ##
-    costo_peso_argentino = new_article.costo * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.costo
-    precio_peso_argentino = new_article.precio * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.precio
+    costo_peso_argentino = new_article.cost * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.cost
+    precio_peso_argentino = new_article.price * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.price
     DetalleVenta.objects.create(costo_unitario=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
                                 precio_unitario=precio_peso_argentino,
-                                porcentaje_descuento=new_article.porcentaje_descuento,
+                                discount_percentage=new_article.discount_percentage,
                                 precio_por_cantidad= precio_peso_argentino,
-                                descuento=precio_peso_argentino * new_article.porcentaje_descuento / 100,
+                                descuento=precio_peso_argentino * new_article.discount_percentage / 100,
                                 cantidad=1,
                                 id_venta=nueva_venta,
                                 id_producto=new_article)

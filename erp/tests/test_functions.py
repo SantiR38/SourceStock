@@ -1,5 +1,5 @@
 from django.test import TestCase
-from erp.functions import porcentaje_ganancia
+from erp.functions import profit_percentage
 
 class TestFunciones(TestCase):
 
@@ -13,6 +13,6 @@ class TestFunciones(TestCase):
         pass
 
     def test_porcentaje_ganancia(self):
-        print('Method: porcentaje_ganancia con dos parámetros')
-        self.assertEqual(porcentaje_ganancia(100, 21), 121)
-        self.assertEqual(porcentaje_ganancia(200, 21), 242)
+        print('Method: profit_percentage con dos parámetros')
+        self.assertEqual(profit_percentage(100, 21), 121)
+        self.assertEqual(profit_percentage(200, 21), 242)

@@ -23,33 +23,33 @@ class FormVenta(forms.Form): # Sirve para la actualización inventario en genera
 
 class FormNuevoArticulo(forms.Form):
     code = forms.IntegerField(label_suffix= "*:")
-    descripcion = forms.CharField(required=False)
-    en_dolar = forms.BooleanField(label="Cotiza en dolar", required=False)
-    costo_sin_iva = forms.DecimalField(max_digits=10,
+    description = forms.CharField(required=False)
+    is_in_dolar = forms.BooleanField(label="Cotiza en dolar", required=False)
+    cost_no_taxes = forms.DecimalField(max_digits=10,
                                        decimal_places=2,
                                        label_suffix= "*:",
                                        label="Costo sin IVA",
                                        required=False)
-    costo = forms.DecimalField(max_digits=10,
+    cost = forms.DecimalField(max_digits=10,
                                decimal_places=2,
                                label_suffix= "*:",
                                label="Costo con IVA",
                                required=False)
-    porcentaje_ganancia = forms.DecimalField(max_digits=10, decimal_places=2, label_suffix= "*:")
-    porcentaje_descuento = forms.DecimalField(max_digits=10, decimal_places=2, initial=0, label_suffix= "*:")
-    seccion = forms.CharField(required=False)
-    marca = forms.CharField(required=False)
-    modelo = forms.CharField(required=False)
+    profit_percentage = forms.DecimalField(max_digits=10, decimal_places=2, label_suffix= "*:")
+    discount_percentage = forms.DecimalField(max_digits=10, decimal_places=2, initial=0, label_suffix= "*:")
+    section = forms.CharField(required=False)
+    brand = forms.CharField(required=False)
+    model = forms.CharField(required=False)
     stock = forms.IntegerField(label_suffix="*:")
-    alarma_stock = forms.IntegerField(required=False, label="Stock mínimo permitido", initial=1,)
+    min_stock_allowed = forms.IntegerField(required=False, label="Stock mínimo permitido", initial=1,)
 
 
 class FormEntrada(forms.Form):
     code = forms.IntegerField(label_suffix="*:")
-    en_dolar = forms.BooleanField(label="Cotiza en dolar", required=False)
-    costo_sin_iva = forms.DecimalField(max_digits=10, decimal_places=2,
+    is_in_dolar = forms.BooleanField(label="Cotiza en dolar", required=False)
+    cost_no_taxes = forms.DecimalField(max_digits=10, decimal_places=2,
         label="Costo sin IVA", label_suffix="**:", required=False)
-    costo = forms.DecimalField(max_digits=10, decimal_places=2,
+    cost = forms.DecimalField(max_digits=10, decimal_places=2,
         label="Costo con IVA", label_suffix="**:", required=False)
     cantidad = forms.IntegerField(label_suffix="*:")
     proveedor = forms.ChoiceField(choices=lista_proveedores, label="Proveedor",
@@ -60,10 +60,10 @@ class FormEntrada(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        if all(cleaned_data['costo'], cleaned_data['costo_sin_iva']):
-            cleaned_data['inexistente'] = "PROBLEMA: Los campos costo final y " \
-                "costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
-        if not any(cleaned_data['costo'], cleaned_data['costo_sin_iva']):
+        if all(cleaned_data['cost'], cleaned_data['cost_no_taxes']):
+            cleaned_data['inexistente'] = "PROBLEMA: Los campos cost final y " \
+                "cost neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
+        if not any(cleaned_data['cost'], cleaned_data['cost_no_taxes']):
             cleaned_data['inexistente'] = "Debes rellenar uno de los dos costos."
         
         return cleaned_data

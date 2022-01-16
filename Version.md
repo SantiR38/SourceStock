@@ -5,7 +5,7 @@
 1. **View compra_simple:** Corrección de bug de la versión anterior que no permitía agregar artículos solo con el campo cógido y cantidad. Ahora, para hacer una compra detallada, hay una página específica llamada 'agregar o modificar productos'.
 2. **Problemas con campo código:** Se cambió el campo codigo de IntegerField() a BigIntegerField() para que acepte numeros de mayor tamaño.
 3. **Enlaces de inicio a admin:** Se enlazan las páginas mediante pestañas, sin tener que modificar la url a mano.
-4. **Costo y precio decimales:** Estos campos aceptaban solo valores enteros, pero ahora aceptan numeros de hasta 2 decimales.
+4. **Costo y price decimales:** Estos campos aceptaban solo valores enteros, pero ahora aceptan numeros de hasta 2 decimales.
 5. **'Active' condicional:** Corrección de bug estético que no resaltaba la pestaña que estaba activa en el sidebar.
 6. **Panel de Administracion:** Pequeños cambios en el '/admin'.
 7. **Version.md:** Creación de archivo para registrar los cambios realizados en cada versión.
@@ -39,7 +39,7 @@
 
 ## Versión 1.3.1
 
-1. **Bug fixed:** Se quitó el porcentaje_ganancia de la tabla DetalleEntrada y se lo colocó en la tabla Article. Se eliminó ese campo de la vista entrada y del formulario entrada, para que ahora esten en agregar_modificar.
+1. **Bug fixed:** Se quitó el profit_percentage de la tabla DetalleEntrada y se lo colocó en la tabla Article. Se eliminó ese campo de la vista entrada y del formulario entrada, para que ahora esten en agregar_modificar.
 2. **Sidebar:** Las pestañas hijas ahora son mas pequeñas y tienen un margen mayor para distinguirlas de las pestañas contenedoras.
 3. **Documentación:** 
     * Se cambió la escritura del Readme de HTML a Markdown.
@@ -48,7 +48,7 @@
 
 ## Versión 1.3.2
 
-1. **Bug fixed:** En la sección 'Agregar o modificar' habia un KeyError, debido a que no se adaptó el formulario ni la funcionalidad de la vista a la nueva estructura del modelo Article.
+1. **Bug fixed:** En la sección 'Agregar o modificar' habia un KeyError, debido a que no se adaptó el formulario ni la funcionalidad de la vista a la nueva estructura del model Article.
 
 ## Versión 1.4
 
@@ -63,7 +63,7 @@
 2. **Modelo Cliente:** Los datos de cada cliente se guardan en la base de datos.
 3. El detalle de venta se muestra apenas se carga la vista venta.
 4. Modelo Cliente implementado en vista venta.
-5. Costo y precio sin iva agregados.
+5. Costo y price sin iva agregados.
 6. Opción de eliminar elemento a vender (vista 'cancelar_unidad').
 7. Generación de un comprobante de venta.
 8. Vista nueva con historial de ventas.
@@ -91,11 +91,11 @@
 14. Precio con descuento agregado.
 15. **Bug Fixed:** Ya no se permite vender cantidades por encima del stock disponible.
 15. **Bug Fixed:** Cuando se cancela una compra o venta, ya no quedan remanentes indeseados.
-16. **Bug Fixed:** Se eliminó el campo apellido del modelo Cliente.
+16. **Bug Fixed:** Se eliminó el campo apellido del model Cliente.
 
 ## Versión 1.8
 1. Los errores 404 son dirigidos a un template de la aplicacion erp.
-2. Corregido bug de precio con descuento.
+2. Corregido bug de price con descuento.
 3. **Nueva App:** venta_catalogo.
 4. **Mejoras estéticas:**
     * Tamaño general de letra reducido.
@@ -103,10 +103,10 @@
     * Cambio de color a small boxes (gris claro).
 5. **Nueva Vista:** Aniadir_carrito.
 6. Filtro de busqueda en vista venta_por_catalogo.
-7. Mediante un metodo del modelo Venta, se simplifico el codigo para crear el objeto.
+7. Mediante un metodo del model Venta, se simplifico el codigo para crear el objeto.
 8. **Nueva Vista:** confirmar_venta.
 9. **Nueva Vista:** elegir_cliente.
-10. Campo modelo agregado a tabla Article.
+10. Campo model agregado a tabla Article.
 11. Inventario de clientes y articulos limitados en la primera vista a 50 objetos.
 12. Alarma de stock incluida en venta por catálogo.
 13. Historial de compra y venta agregado al navbar.
@@ -114,8 +114,8 @@
 15. **Nueva Vista**: Emitir presupuesto. Se descarga como archivo adjunto.
 
 ## Versión 1.9
-1. Classmethod implementado a modelo Venta. Mostrar las ultimas 50 ventas en el historial.
-2. Classmethod implementado a modelo Entrada. Mostrar las ultimas 50 entradas en el historial.
+1. Classmethod implementado a model Venta. Mostrar las ultimas 50 ventas en el historial.
+2. Classmethod implementado a model Entrada. Mostrar las ultimas 50 entradas en el historial.
 4. Paginación de a 15 elementos.
 5. Detalle de compra y venta agregado.
 6. Las páginas tienen su nombre correcto en el title del head.

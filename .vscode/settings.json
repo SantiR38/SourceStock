@@ -3,5 +3,17 @@
     // ignore line too long
     "python.linting.flake8Args": [
         "--ignore=E501, E128"
+    ],
+    "python.linting.pylintArgs": [
+        "--load-plugins",
+        "pylint_django",
+        "--load-plugins",
+        "pylint_django.checkers.migrations",
+        "--disable=C0114, C0115, W0222",
+        "--disable=imported-auth-user",
+        "--disable=invalid-name",
+        "--disable=line-too-long",
+        "--disable=django-not-configured",
+        "--django-settings-module=punto_venta.settings.settings"
     ]
 }

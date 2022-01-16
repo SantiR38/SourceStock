@@ -21,10 +21,10 @@ from api.models import PrecioDolar
 
 # ------ SERVICES ------ #
 
-def porcentaje_ganancia(costo, porcentaje):
+def profit_percentage(cost, porcentaje):
     # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
-    precio_final = costo + (costo * porcentaje / 100)
-    return precio_final
+    final_price = cost + (cost * porcentaje / 100)
+    return final_price
 
 def venta_activa():
 
@@ -56,7 +56,7 @@ def venta_activa_dict():
     venta = venta_activa()[0].values()
     for i in range(len(venta)):
         article = Article.objects.filter(id=venta[i]["id_producto_id"]).values()[0]
-        venta[i]["precio_descontado"] = venta[i]["precio_unitario"] - venta[i]["descuento"]
+        venta[i]["discounted_price"] = venta[i]["precio_unitario"] - venta[i]["descuento"]
         venta[i]["id_producto"] = article
     return venta
 
@@ -77,7 +77,7 @@ def compra_activa():
         lista = DetalleEntrada.objects.filter(id_entrada = nueva_compra)
         nueva_compra.total = 0
         for i in lista:
-            if i.en_dolar:
+            if i.is_in_dolar:
                 nueva_compra.total += (i.costo_unitario * i.cantidad * PrecioDolar.cotizacion_venta())
             else:
                 nueva_compra.total += (i.costo_unitario * i.cantidad)
@@ -132,13 +132,13 @@ def nombre_proveedor():
     return a
 
 
-def precio_final(costo_s_iva, porc_ganancia):
+def final_price(costo_s_iva, porc_ganancia):
     
-    # Devuelve el precio final de un producto al cual se le registró solo el costo sin iva.
+    # Devuelve el price final de un producto al cual se le registró solo el cost sin iva.
 
-    costo_final = porcentaje_ganancia(costo_s_iva, 21)
-    precio_final = porc_ganancia(costo_final, porc_ganancia)
-    return precio_final
+    costo_final = profit_percentage(costo_s_iva, 21)
+    final_price = porc_ganancia(costo_final, porc_ganancia)
+    return final_price
 
 def emitir_recibo(id_venta):
 
@@ -224,7 +224,7 @@ def emitir_recibo(id_venta):
 
     for i in detalle_venta:
         p.drawString(50, alto, str(i.cantidad))
-        p.drawString(150, alto, i.id_producto.descripcion)
+        p.drawString(150, alto, i.id_producto.description)
         p.drawString(380, alto, "$")
         p.drawString(390, alto, str(i.precio_unitario))
         p.drawString(480, alto, "$")
@@ -333,7 +333,7 @@ def emitir_detalle_entrada(id_entrada):
 
     for i in detalle_entrada:
         p.drawString(50, alto, str(i.cantidad))
-        p.drawString(150, alto, i.id_producto.descripcion)
+        p.drawString(150, alto, i.id_producto.description)
         p.drawString(380, alto, "$")
         p.drawString(390, alto, str(i.costo_unitario))
         p.drawString(460, alto, "$")
@@ -384,20 +384,20 @@ def lista_clientes():
 def comprar_articulo(infForm):
     # Funciona solo para modificar objetos de tipo DetalleEntrada.
     
-    costo_sin_iva = infForm['costo_sin_iva']
-    costo = infForm['costo']
+    cost_no_taxes = infForm['cost_no_taxes']
+    cost = infForm['cost']
 
-    if costo_sin_iva != None:
-        costo = porcentaje_ganancia(costo_sin_iva, 21)
-    elif costo != None:
-        costo_sin_iva = costo / Decimal(1.21)
+    if cost_no_taxes != None:
+        cost = profit_percentage(cost_no_taxes, 21)
+    elif cost != None:
+        cost_no_taxes = cost / Decimal(1.21)
 
     contexto = {
         "code": infForm['code'],
-        "costo_sin_iva": costo_sin_iva,
-        "costo": costo,
+        "cost_no_taxes": cost_no_taxes,
+        "cost": cost,
         "cantidad": infForm['cantidad'],
-        "en_dolar": infForm['en_dolar']
+        "is_in_dolar": infForm['is_in_dolar']
     }
 
     return contexto

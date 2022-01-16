@@ -57,10 +57,10 @@
 
               <tr class="intercalado">
                 <td>{{i.cantidad}}</td>
-                <td>{{i.id_producto.descripcion}}</td>
+                <td>{{i.id_producto.description}}</td>
                 {% if titulo == "Detalle de compra" %}
-                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
-                <td>{% if i.en_dolar %}U$D{% else %}${% endif %}{{i.costo_por_cantidad}}</td>
+                <td>{% if i.is_in_dolar %}U$D{% else %}${% endif %}{{i.costo_unitario}}</td>
+                <td>{% if i.is_in_dolar %}U$D{% else %}${% endif %}{{i.costo_por_cantidad}}</td>
                 {% else %}
                 <td>${{i.precio_unitario}}</td>
                 <td>${{i.precio_por_cantidad}}</td>

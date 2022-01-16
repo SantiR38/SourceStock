@@ -38,10 +38,10 @@ class Venta(SSBaseModel):
 
 class DetalleVenta(SSBaseModel):
     id_venta = models.ForeignKey('Venta', on_delete=models.CASCADE)
-    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # Si bien tanto este dato como el del precio estan en el objeto Article,
-    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # es mejor guardar el producto al precio que se vendió para mejor contabilidad
+    costo_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # Si bien tanto este dato como el del price estan en el objeto Article,
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)  # es mejor guardar el producto al price que se vendió para mejor contabilidad
     precio_por_cantidad = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    porcentaje_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    discount_percentage = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     id_producto = models.ForeignKey('Article', on_delete=models.SET_NULL, null=True)
     cantidad = models.IntegerField()

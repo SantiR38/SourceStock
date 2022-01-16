@@ -3,9 +3,9 @@ from erp.models import Article, Entrada, DetalleEntrada, Venta, DetalleVenta, Lo
 
 
 class ArticleAdmin(admin.ModelAdmin):
-    list_display = ("code", "descripcion", "costo", "porcentaje_ganancia", "precio", "seccion", "stock")
-    search_fields = ("code", "descripcion")
-    list_filter = ("seccion",)
+    list_display = ("code", "description", "cost", "profit_percentage", "price", "section", "stock")
+    search_fields = ("code", "description")
+    list_filter = ("section",)
 
 
 class DetalleEntradaAdmin(admin.ModelAdmin):

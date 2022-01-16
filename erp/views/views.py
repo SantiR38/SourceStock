@@ -11,7 +11,7 @@ from erp.forms import (FormVenta, FormNuevoArticulo, FormEntrada, FormCliente,
     FormBusqueda, FormFiltroFecha, FormProveedor)
 from erp.models import (Article, Entrada, DetalleEntrada, Venta,
     DetalleVenta, Cliente, Proveedor)
-from erp.functions import (porcentaje_ganancia, venta_activa, compra_activa,
+from erp.functions import (profit_percentage, venta_activa, compra_activa,
     buscar_cliente, comprar_articulo, buscar_proveedor, dni_cliente,
     emitir_recibo, nombre_proveedor, emitir_detalle_entrada)
 
@@ -52,28 +52,28 @@ def entrada(request):
                 ctx['inexistente'] = ('Artículo inexistente, debe agregarlo en'
                     'la sección "Control de inventario/Agregar artículo". El '
                     'resto de la compra seguirá guardada.')
-            elif new_article.porcentaje_ganancia is None:
+            elif new_article.profit_percentage is None:
                 ctx["porcentaje_inexistente"] = ("Este producto no tiene "
                     "porcentaje de ganancia. Agrégalo en la sección "
                     "'Agregar o modificar' antes de continuar.")
             else:
                 if cleaned_form.get('inexistente') is None:
-                    DetalleEntrada.objects.create(costo_sin_iva=comprar_articulo(cleaned_form)['costo_sin_iva'],
-                        costo_unitario=comprar_articulo(cleaned_form)['costo'],
-                        costo_por_cantidad=comprar_articulo(cleaned_form)['costo'] * comprar_articulo(cleaned_form)['cantidad'],
+                    DetalleEntrada.objects.create(cost_no_taxes=comprar_articulo(cleaned_form)['cost_no_taxes'],
+                        costo_unitario=comprar_articulo(cleaned_form)['cost'],
+                        costo_por_cantidad=comprar_articulo(cleaned_form)['cost'] * comprar_articulo(cleaned_form)['cantidad'],
                         cantidad=comprar_articulo(cleaned_form)['cantidad'],
                         id_entrada=new_sale,
-                        en_dolar=comprar_articulo(cleaned_form)['en_dolar'],
+                        is_in_dolar=comprar_articulo(cleaned_form)['is_in_dolar'],
                         id_producto=new_article)
                     ctx['inexistente'] = ''
 
             queryset = DetalleEntrada.objects.filter(id_entrada=new_sale)
             new_sale.total = 0
             for i in queryset:
-                if i.en_dolar:
+                if i.is_in_dolar:
                     new_sale.total += (i.costo_unitario * i.cantidad * PrecioDolar.cotizacion_venta())
                 else:
-                    new_sale.total += (i.costo_unitario * i.cantidad)  # Se suman los precios unitarios al precio total de la compra
+                    new_sale.total += (i.costo_unitario * i.cantidad)  # Se suman los precios unitarios al price total de la compra
             new_sale.save()
             ctx['total'] = new_sale.total
             ctx['articulo_a_comprar'] = queryset
@@ -92,8 +92,8 @@ def entrada(request):
 
 @login_required
 def transaccion_exitosa(request):
-    template = loader.get_template('mensaje.html')
-    ctx = {'mensaje': 'Su transacción fue un éxito.',
+    template = loader.get_template('message.html')
+    ctx = {'message': 'Su transacción fue un éxito.',
            'titulo': 'Transacción exitosa',
            'redireccion': 'Volviendo a la página de ventas...'}
 
@@ -105,22 +105,22 @@ def transaccion_exitosa(request):
         id_entrada=nueva_venta).select_related('id_producto')
 
     try:
-        for j in producto_leido:  # Esto es simplemente para que cancele la compra completa y no se actualicen el stock y precio solo de algunos productos
-            j.id_producto.porcentaje_ganancia * 1  # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
-        for i in producto_leido:  # Se actualiza el costo y el stock de cada objeto Article
-            i.id_producto.en_dolar = i.en_dolar
-            i.id_producto.costo_sin_iva = i.costo_sin_iva
-            i.id_producto.costo = i.costo_unitario
-            i.id_producto.precio_sin_iva = porcentaje_ganancia(i.costo_sin_iva, i.id_producto.porcentaje_ganancia)
-            i.id_producto.precio = porcentaje_ganancia(i.costo_unitario, i.id_producto.porcentaje_ganancia)
-            i.id_producto.precio_descontado = porcentaje_ganancia(i.id_producto.precio, -i.id_producto.porcentaje_descuento)
+        for j in producto_leido:  # Esto es simplemente para que cancele la compra completa y no se actualicen el stock y price solo de algunos productos
+            j.id_producto.profit_percentage * 1  # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
+        for i in producto_leido:  # Se actualiza el cost y el stock de cada objeto Article
+            i.id_producto.is_in_dolar = i.is_in_dolar
+            i.id_producto.cost_no_taxes = i.cost_no_taxes
+            i.id_producto.cost = i.costo_unitario
+            i.id_producto.price_no_taxes = profit_percentage(i.cost_no_taxes, i.id_producto.profit_percentage)
+            i.id_producto.price = profit_percentage(i.costo_unitario, i.id_producto.profit_percentage)
+            i.id_producto.discounted_price = profit_percentage(i.id_producto.price, -i.id_producto.discount_percentage)
             i.id_producto.stock += i.cantidad
             i.id_producto.save()
 
         nueva_venta.status = Entrada.STATUS_FINISHED
         nueva_venta.save()  # Hace que esa entrada pase a estar inactiva
     except TypeError:
-        ctx['mensaje'] = ('Error. Uno o varios artículos no poseen porcentaje '
+        ctx['message'] = ('Error. Uno o varios artículos no poseen porcentaje '
             'de ganancia. Agregalos en "Agregar o Modificar" Luego registra '
             'nuevamente la compra.')
         nueva_venta = Entrada.objects.get(status=Entrada.STATUS_WAITING)
@@ -173,11 +173,11 @@ def cancelar(request):
     Delete all the instances `Entrada` and `Venta` with STATUS_WAITING`.
     Useful only for sales and purchases.
     """
-    template = loader.get_template('mensaje.html')
+    template = loader.get_template('message.html')
     Entrada.objects.filter(status=Entrada.STATUS_WAITING).delete()
     Venta.objects.filter(status=Entrada.STATUS_WAITING).delete()
 
-    ctx = {'mensaje': 'Se ha cancelado la transacción.',
+    ctx = {'message': 'Se ha cancelado la transacción.',
         'titulo': 'Transacción cancelada',
         'redireccion': 'Volviendo a la página de ventas...'}
 
@@ -197,7 +197,7 @@ def agregar_articulo(request):
     if request.method == "POST":
         view_form = FormNuevoArticulo(request.POST)
         if view_form.is_valid():
-            ctx['mensaje'] = Article.create_new(view_form.cleaned_data)
+            ctx['message'] = Article.create_new(view_form.cleaned_data)
             view_form = FormNuevoArticulo()
     else:
         view_form = FormNuevoArticulo()
@@ -209,7 +209,7 @@ def control_inventario(request):
     template = loader.get_template('control_inventario.html')
     view_form = FormBusqueda()
     ctx = {
-        "articulos": Article.objects.filter(id__lte=50).order_by('descripcion'),
+        "articulos": Article.objects.filter(id__lte=50).order_by('description'),
         "form": view_form,
         "titulo": "Control de inventario"
     }
@@ -236,16 +236,16 @@ def articulo(request, code_articulo):
 
     form_details = {
         'code': new_article.code,
-        'descripcion': new_article.descripcion,
-        'en_dolar': new_article.en_dolar,
-        'costo': new_article.costo,
-        'porcentaje_ganancia': new_article.porcentaje_ganancia,
-        'porcentaje_descuento': new_article.porcentaje_descuento,
-        'seccion': new_article.seccion,
-        'marca': new_article.marca,
-        'modelo': new_article.modelo,
+        'description': new_article.description,
+        'is_in_dolar': new_article.is_in_dolar,
+        'cost': new_article.cost,
+        'profit_percentage': new_article.profit_percentage,
+        'discount_percentage': new_article.discount_percentage,
+        'section': new_article.section,
+        'brand': new_article.brand,
+        'model': new_article.model,
         'stock': new_article.stock,
-        'alarma_stock': new_article.alarma_stock
+        'min_stock_allowed': new_article.min_stock_allowed
     }
     view_form = FormNuevoArticulo(form_details)
     ctx = {
@@ -259,36 +259,36 @@ def articulo(request, code_articulo):
         if view_form.is_valid():
             cleaned_form = view_form.cleaned_data
 
-            if all(cleaned_form['costo'], cleaned_form['costo_sin_iva']):
-                ctx['mensaje'] = ("PROBLEMA: Los campos costo final y costo "
+            if all(cleaned_form['cost'], cleaned_form['cost_no_taxes']):
+                ctx['message'] = ("PROBLEMA: Los campos cost final y cost "
                     "neto + IVA estan completados. Debes llenar solo uno de "
                     "estos dos campos.")
 
-            elif cleaned_form['costo'] is not None or cleaned_form['costo_sin_iva'] is not None:
+            elif cleaned_form['cost'] is not None or cleaned_form['cost_no_taxes'] is not None:
 
                 new_article.code = cleaned_form['code']
-                if cleaned_form['descripcion'] != "":
-                    new_article.descripcion = cleaned_form['descripcion']
-                new_article.en_dolar = cleaned_form['en_dolar']
-                new_article.costo_sin_iva = cleaned_form['costo_sin_iva']
-                new_article.costo = Article.get_context(cleaned_form)['costo']
-                new_article.porcentaje_ganancia = cleaned_form['porcentaje_ganancia']
-                new_article.precio_sin_iva = Article.get_context(cleaned_form)['precio_sin_iva']
-                new_article.precio = Article.get_context(cleaned_form)['precio']
-                new_article.porcentaje_descuento = Article.get_context(cleaned_form)['porcentaje_descuento']
-                new_article.precio_descontado = Article.get_context(cleaned_form)['precio_descontado']
-                if cleaned_form['seccion'] != "":
-                    new_article.seccion = cleaned_form['seccion']
-                new_article.marca = cleaned_form['marca']
-                new_article.modelo = cleaned_form['modelo']
+                if cleaned_form['description'] != "":
+                    new_article.description = cleaned_form['description']
+                new_article.is_in_dolar = cleaned_form['is_in_dolar']
+                new_article.cost_no_taxes = cleaned_form['cost_no_taxes']
+                new_article.cost = Article.get_context(cleaned_form)['cost']
+                new_article.profit_percentage = cleaned_form['profit_percentage']
+                new_article.price_no_taxes = Article.get_context(cleaned_form)['price_no_taxes']
+                new_article.price = Article.get_context(cleaned_form)['price']
+                new_article.discount_percentage = Article.get_context(cleaned_form)['discount_percentage']
+                new_article.discounted_price = Article.get_context(cleaned_form)['discounted_price']
+                if cleaned_form['section'] != "":
+                    new_article.section = cleaned_form['section']
+                new_article.brand = cleaned_form['brand']
+                new_article.model = cleaned_form['model']
                 new_article.stock = cleaned_form['stock']
-                new_article.alarma_stock = cleaned_form['alarma_stock']
+                new_article.min_stock_allowed = cleaned_form['min_stock_allowed']
                 new_article.save()  # Guardamos los cambios en la base de datos
 
                 return redirect('control_inventario')
 
             else:
-                ctx['mensaje'] = "PROBLEMA: Debes rellenar uno de los dos costos."
+                ctx['message'] = "PROBLEMA: Debes rellenar uno de los dos costos."
                 view_form = FormNuevoArticulo(form_details)
 
     else:
@@ -324,7 +324,7 @@ def venta(request):
             # Venta
             ##
 
-            try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
+            try:  # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
                 nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
 
             except Venta.DoesNotExist: # Si no hay ninguno activo, crearlo.
@@ -357,14 +357,14 @@ def venta(request):
                 ##
                 # Detalle de venta
                 ##
-                costo_peso_argentino = new_article.costo * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.costo
-                precio_peso_argentino = new_article.precio * PrecioDolar.cotizacion_venta() if new_article.en_dolar else new_article.precio
+                costo_peso_argentino = new_article.cost * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.cost
+                precio_peso_argentino = new_article.price * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.price
                 if new_article.stock >= cleaned_form['cantidad']:
                     DetalleVenta.objects.create(costo_unitario=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
                                                 precio_unitario=precio_peso_argentino,
-                                                porcentaje_descuento=new_article.porcentaje_descuento,
+                                                discount_percentage=new_article.discount_percentage,
                                                 precio_por_cantidad=precio_peso_argentino * cleaned_form['cantidad'],
-                                                descuento=precio_peso_argentino * new_article.porcentaje_descuento / 100,
+                                                descuento=precio_peso_argentino * new_article.discount_percentage / 100,
                                                 cantidad=cleaned_form['cantidad'],
                                                 id_venta=Venta.objects.get(status=Venta.STATUS_WAITING),
                                                 id_producto=Article.objects.get(code=cleaned_form['code']))
@@ -374,7 +374,7 @@ def venta(request):
             except ObjectDoesNotExist as DoesNotExist: # Si el producto no existe en la base de datos
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la venta seguirá guardada.'
 
-            # Se suman los precios unitarios al precio total de la venta
+            # Se suman los precios unitarios al price total de la venta
             lista = DetalleVenta.objects.filter(id_venta=nueva_venta)
             nueva_venta.total = 0
             nueva_venta.descuento = 0
@@ -436,8 +436,8 @@ def recibo(request, id_venta):
 
 @login_required
 def venta_exitosa(request):
-    template = loader.get_template('mensaje.html')
-    ctx = {'mensaje': 'Su transacción fue un éxito.',
+    template = loader.get_template('message.html')
+    ctx = {'message': 'Su transacción fue un éxito.',
            'titulo': 'Venta exitosa',
            'hay_recibo': False}
 
@@ -485,7 +485,7 @@ def cliente(request):
     ctx = {
         "articulo_a_vender": lista,
         "form": view_form,
-        "mensaje": "",
+        "message": "",
         "titulo": "Añadir cliente"
     }
 
@@ -496,7 +496,7 @@ def cliente(request):
 
             try: # Si el cliente existe en la base de datos
                 new_client = Cliente.objects.get(dni=cleaned_form['dni'])
-                ctx['mensaje'] = "El cliente ya existe"
+                ctx['message'] = "El cliente ya existe"
 
             except ObjectDoesNotExist as DoesNotExist: # Si el cliente no existe en la base de datos, crearlo
                 new_client = Cliente.objects.create(nombre=cleaned_form['nombre'],
@@ -558,7 +558,7 @@ def modificar_cliente(request, id_param):
         ctx = {
             "articulos": Cliente.objects.filter(id__lte=50),
             "form": view_form,
-            "mensaje": "",
+            "message": "",
             "titulo": "Modificar cliente"
         }
 
@@ -591,7 +591,7 @@ def proveedor(request):
     ctx = {
         "articulo_a_vender": lista,
         "form": view_form,
-        "mensaje": "",
+        "message": "",
         "titulo": "Añadir proveedor"
     }
 
@@ -602,7 +602,7 @@ def proveedor(request):
 
             try: # Si el Proveedor existe en la base de datos
                 new_proveedor = Proveedor.objects.get(nombre=cleaned_form['nombre'])
-                ctx['mensaje'] = "El proveedor ya existe"
+                ctx['message'] = "El proveedor ya existe"
 
             except ObjectDoesNotExist as DoesNotExist: # Si el Proveedor no existe en la base de datos, crearlo
                 new_proveedor = Proveedor.objects.create(nombre=cleaned_form['nombre'],
@@ -612,7 +612,7 @@ def proveedor(request):
                                                          telefono=cleaned_form['telefono'],
                                                          email=cleaned_form['email'])
 
-                ctx['mensaje'] = 'El proveedor fue agregado correctamente.'
+                ctx['message'] = 'El proveedor fue agregado correctamente.'
 
             view_form = FormProveedor()
 
@@ -638,7 +638,7 @@ def modificar_proveedor(request, id_param):
         ctx = {
             "articulos": Proveedor.objects.filter(id__lte=50),
             "form": view_form,
-            "mensaje": "",
+            "message": "",
             "titulo": "Modificar proveedor"
         }
 

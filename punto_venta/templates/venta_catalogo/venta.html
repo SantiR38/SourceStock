@@ -50,12 +50,12 @@ Esta venta
 
                 <tr class="intercalado">
                   <td>{{i.id_producto.codigo}}</td>
-                  <td> {{i.id_producto.descripcion}} </td>
+                  <td> {{i.id_producto.description}} </td>
                   <td> ${{i.precio_unitario}} </td>
-                  <td> {{i.porcentaje_descuento}}% </td>
+                  <td> {{i.discount_percentage}}% </td>
                   <td> ${{i.descuento }} </td>
-                  <td> {{i.id_producto.marca}} </td>
-                  <td> {{i.id_producto.modelo}} </td>
+                  <td> {{i.id_producto.brand}} </td>
+                  <td> {{i.id_producto.model}} </td>
                   <td> {{i.cantidad}} </td>
                   <td> <a href="/cancelar_unidad/{{i.id}}">⛔</a> </td>
                 </tr>
@@ -111,19 +111,19 @@ Esta venta
               {% for i in articulos %}
 
 
-              <tr class="intercalado" style="{% if i.en_dolar %} color: darkgreen; {% endif %}">
+              <tr class="intercalado" style="{% if i.is_in_dolar %} color: darkgreen; {% endif %}">
                 <td><a href="/articulo/{{i.codigo}}">{{i.codigo}}</a></td>
-                <td> {{i.descripcion}} </td>
-                <td> {% if i.en_dolar %}U$D{% else %}${% endif %} {{i.precio}} </td>
-                <td> {{i.porcentaje_descuento}}% </td>
-                <td> {% if i.en_dolar %}U$D{% else %}${% endif %} {{i.precio_descontado}} </td>
-                <td> {{i.seccion}} </td>
-                <td> {{i.marca}} </td>
-                <td> {{i.modelo}} </td>
+                <td> {{i.description}} </td>
+                <td> {% if i.is_in_dolar %}U$D{% else %}${% endif %} {{i.price}} </td>
+                <td> {{i.discount_percentage}}% </td>
+                <td> {% if i.is_in_dolar %}U$D{% else %}${% endif %} {{i.discounted_price}} </td>
+                <td> {{i.section}} </td>
+                <td> {{i.brand}} </td>
+                <td> {{i.model}} </td>
                 <td> {{i.stock}} </td>
                 <td style="text-align: right;">
                   {% if i.stock > 0 %}
-                  {% if i.stock <= i.alarma_stock %}<span
+                  {% if i.stock <= i.min_stock_allowed %}<span
                     title="Su stock es igual o inferior al mínimo permitido">❗</span>{% endif %}
                     <a href="aniadir_al_carrito/{{i.codigo}}">✅</a>
                   {% else %}

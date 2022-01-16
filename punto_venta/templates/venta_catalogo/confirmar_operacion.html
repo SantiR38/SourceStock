@@ -35,12 +35,12 @@
 
                 <tr class="intercalado">
                   <td>{{i.id_producto.codigo}}</td>
-                  <td> {{i.id_producto.descripcion}} </td>
+                  <td> {{i.id_producto.description}} </td>
                   <td> ${{i.precio_unitario}} </td>
-                  <td> {{i.porcentaje_descuento}}% </td>
-                  <td> ${{i.precio_descontado }} </td>
-                  <td> {{i.id_producto.marca}} </td>
-                  <td> {{i.id_producto.modelo}} </td>
+                  <td> {{i.discount_percentage}}% </td>
+                  <td> ${{i.discounted_price }} </td>
+                  <td> {{i.id_producto.brand}} </td>
+                  <td> {{i.id_producto.model}} </td>
                   <td> {{i.cantidad}} </td>
                   <td> <a href="/cancelar_unidad/{{i.id}}">⛔</a> </td>
                 </tr>

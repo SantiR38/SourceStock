@@ -2,14 +2,14 @@ from erp.models import Article, Cliente
 
 def search_articles(infForm):
     if infForm['code'] != None:
-        query = Article.objects.filter(seccion__icontains=infForm['seccion'],
-                                        descripcion__icontains=infForm['descripcion'],
-                                        marca__icontains=infForm['marca'],
+        query = Article.objects.filter(seccion__icontains=infForm['section'],
+                                        description__icontains=infForm['description'],
+                                        marca__icontains=infForm['brand'],
                                         code__icontains=infForm['code'])
     else:
-        query = Article.objects.filter(seccion__icontains=infForm['seccion'],
-                                        descripcion__icontains=infForm['descripcion'],
-                                        marca__icontains=infForm['marca'])
+        query = Article.objects.filter(seccion__icontains=infForm['section'],
+                                        description__icontains=infForm['description'],
+                                        marca__icontains=infForm['brand'])
 
     return query
 

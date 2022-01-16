@@ -6,60 +6,60 @@ from erp.models import SSBaseModel
 
 
 class Article(SSBaseModel):
-    descripcion = models.CharField(max_length=100, null=True)
-    costo_sin_iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    costo = models.DecimalField(max_digits=10, decimal_places=2)
-    porcentaje_ganancia = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    precio_sin_iva = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    precio = models.DecimalField(max_digits=10, decimal_places=2)
-    porcentaje_descuento = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    precio_descontado = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    seccion = models.CharField(max_length=100, blank=True)
-    marca = models.CharField(max_length=100, blank=True)
-    modelo = models.CharField(max_length=100, blank=True)
+    description = models.CharField(max_length=100, null=True)
+    cost_no_taxes = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    cost = models.DecimalField(max_digits=10, decimal_places=2)
+    profit_percentage = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    price_no_taxes = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    discount_percentage = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    discounted_price = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    section = models.CharField(max_length=100, blank=True)
+    brand = models.CharField(max_length=100, blank=True)
+    model = models.CharField(max_length=100, blank=True)
     stock = models.IntegerField(verbose_name="Cantidad")
-    alarma_stock = models.IntegerField(verbose_name="Stock minimo permitido", null=True)
-    en_dolar = models.BooleanField(default=False, null=True,
+    min_stock_allowed = models.IntegerField(verbose_name="Stock minimo permitido", null=True)
+    is_in_dolar = models.BooleanField(default=False, null=True,
         help_text="Determines if the product cotization is in dolar.")
 
     @classmethod
-    def get_porcentaje_ganancia(self, costo, porcentaje):
+    def get_porcentaje_ganancia(self, cost, porcentaje):
         # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
-        precio_final = costo + (costo * porcentaje / 100)
-        return precio_final
+        final_price = cost + (cost * porcentaje / 100)
+        return final_price
 
     @classmethod
     def get_context(cls, infForm):
-        costo_sin_iva = infForm['costo_sin_iva']
-        costo = infForm['costo']
-        porcentaje_descuento = infForm['porcentaje_descuento']
-        precio_descontado = None
-        if costo_sin_iva is not None:
-            costo = cls.get_porcentaje_ganancia(costo_sin_iva, 21)
-        elif costo is not None:
-            costo_sin_iva = costo / Decimal(1.21)
+        cost_no_taxes = infForm['cost_no_taxes']
+        cost = infForm['cost']
+        discount_percentage = infForm['discount_percentage']
+        discounted_price = None
+        if cost_no_taxes is not None:
+            cost = cls.get_porcentaje_ganancia(cost_no_taxes, 21)
+        elif cost is not None:
+            cost_no_taxes = cost / Decimal(1.21)
 
-        precio = cls.get_porcentaje_ganancia(costo, infForm['porcentaje_ganancia'])
+        price = cls.get_porcentaje_ganancia(cost, infForm['profit_percentage'])
 
-        if porcentaje_descuento is not None:
-            precio_descontado = cls.get_porcentaje_ganancia(precio, -porcentaje_descuento)
+        if discount_percentage is not None:
+            discounted_price = cls.get_porcentaje_ganancia(price, -discount_percentage)
 
         context = {
             "code": infForm['code'],
-            "descripcion": infForm['descripcion'],
-            "costo_sin_iva": costo_sin_iva,
-            "costo": costo,
-            "precio_sin_iva": cls.get_porcentaje_ganancia(costo_sin_iva, infForm['porcentaje_ganancia']),
-            "precio": precio,
-            "porcentaje_ganancia": infForm['porcentaje_ganancia'],
-            "porcentaje_descuento": porcentaje_descuento,
-            "precio_descontado": precio_descontado,
-            "seccion": infForm['seccion'],
-            "marca": infForm['marca'],
-            "modelo": infForm['modelo'],
+            "description": infForm['description'],
+            "cost_no_taxes": cost_no_taxes,
+            "cost": cost,
+            "price_no_taxes": cls.get_porcentaje_ganancia(cost_no_taxes, infForm['profit_percentage']),
+            "price": price,
+            "profit_percentage": infForm['profit_percentage'],
+            "discount_percentage": discount_percentage,
+            "discounted_price": discounted_price,
+            "section": infForm['section'],
+            "brand": infForm['brand'],
+            "model": infForm['model'],
             "stock": infForm['stock'],
-            "alarma_stock": infForm['alarma_stock'],
-            "en_dolar": infForm['en_dolar']
+            "min_stock_allowed": infForm['min_stock_allowed'],
+            "is_in_dolar": infForm['is_in_dolar']
         }
 
         return context
@@ -68,30 +68,30 @@ class Article(SSBaseModel):
     def create_new(cls, infForm):
         article = cls.objects.filter(code=infForm['code'])
         if article.exists():
-            mensaje = "El código ya está siendo utilizado por otro producto."
+            message = "El código ya está siendo utilizado por otro producto."
         else:
-            if infForm['costo'] is not None and infForm['costo_sin_iva'] is not None:
-                mensaje = "PROBLEMA: Los campos costo final y costo neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
-            elif infForm['costo'] is not None or infForm['costo_sin_iva'] is not None:
+            if infForm['cost'] is not None and infForm['cost_no_taxes'] is not None:
+                message = "PROBLEMA: Los campos cost final y cost neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
+            elif infForm['cost'] is not None or infForm['cost_no_taxes'] is not None:
                 cls.objects.create(code=cls.get_context(infForm)['code'],
-                    descripcion=cls.get_context(infForm)['descripcion'],
-                    costo_sin_iva=cls.get_context(infForm)['costo_sin_iva'],
-                    costo=cls.get_context(infForm)['costo'],
-                    en_dolar=cls.get_context(infForm)['en_dolar'],
-                    precio_sin_iva=cls.get_context(infForm)['precio_sin_iva'],
-                    precio=cls.get_context(infForm)['precio'],
-                    porcentaje_ganancia=cls.get_context(infForm)['porcentaje_ganancia'],
-                    porcentaje_descuento=cls.get_context(infForm)['porcentaje_descuento'],
-                    precio_descontado=cls.get_context(infForm)['precio_descontado'],
-                    seccion=cls.get_context(infForm)['seccion'],
-                    marca=cls.get_context(infForm)['marca'],
-                    modelo=cls.get_context(infForm)['modelo'],
+                    description=cls.get_context(infForm)['description'],
+                    cost_no_taxes=cls.get_context(infForm)['cost_no_taxes'],
+                    cost=cls.get_context(infForm)['cost'],
+                    is_in_dolar=cls.get_context(infForm)['is_in_dolar'],
+                    price_no_taxes=cls.get_context(infForm)['price_no_taxes'],
+                    price=cls.get_context(infForm)['price'],
+                    profit_percentage=cls.get_context(infForm)['profit_percentage'],
+                    discount_percentage=cls.get_context(infForm)['discount_percentage'],
+                    discounted_price=cls.get_context(infForm)['discounted_price'],
+                    section=cls.get_context(infForm)['section'],
+                    brand=cls.get_context(infForm)['brand'],
+                    model=cls.get_context(infForm)['model'],
                     stock=cls.get_context(infForm)['stock'],
-                    alarma_stock=cls.get_context(infForm)['alarma_stock'])
-                mensaje = "Artículo agregado exitosamente"
+                    min_stock_allowed=cls.get_context(infForm)['min_stock_allowed'])
+                message = "Artículo agregado exitosamente"
             else:
-                mensaje = "PROBLEMA: Debes rellenar uno de los dos costos."
-        return mensaje
+                message = "PROBLEMA: Debes rellenar uno de los dos costos."
+        return message
 
     def __str__(self):
-        return self.descripcion
+        return self.description
