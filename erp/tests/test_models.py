@@ -1,7 +1,7 @@
 from datetime import date
 from django.test import TestCase
 
-from erp.models import Cliente, Venta, ArtState
+from erp.models import Cliente, Venta
 
 
 class ClienteTestCase(TestCase):
@@ -12,8 +12,7 @@ class ClienteTestCase(TestCase):
             cuit="20-39249727-8",
             direccion="Mariquita S. de Thompson 1580",
             telefono="3585163434",
-            email="santirodriguez38@gmail.com"
-        )
+            email="santirodriguez38@gmail.com")
 
     def test_false_is_false(self):
         self.assertFalse(False)
@@ -23,11 +22,8 @@ class ClienteTestCase(TestCase):
 
 
 class VentaTestCase(TestCase):
-    def setUp(self):
-        ArtState.objects.create(nombre="Active")
-
     def test_create_sale(self):
-        sale = Venta.crear_venta_vacia(ArtState.objects.get(nombre="Active"))
+        sale = Venta.crear_venta_vacia(Venta.STATUS_WAITING)
         self.assertEqual(sale.fecha, date.today())
         self.assertEqual(sale.total, 0)
         self.assertEqual(sale.descuento, 0)

@@ -23,7 +23,6 @@
     * Error cuando la base de datos esta vacía
 2. **Favicon agregado**
 3. **Nuevas tablas en base de datos**:
-    * ArtState: Utilizada como foreign key para la tabla Article, Entrada, Venta y Perdida.
     * Entrada: Registra cada compra o entrada de mercadería, Utilizada como foreign key de DetalleEntrada. 
     * DetalleEntrada: Registra cada uno de los articulos de una Entrada.
     * Venta: Registra cada venta de mercadería, Utilizada como foreign key de DetalleVenta. 

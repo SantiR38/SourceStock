@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.db import models
 
+from erp.models import SSBaseModel
 from .services import get_dolar_value
 
 
@@ -10,7 +11,7 @@ DOLAR_COMPRA = Decimal(DOLAR_VALUES[0].replace(',','.'))
 DOLAR_VENTA = Decimal(DOLAR_VALUES[1].replace(',','.'))
 
 
-class PrecioDolar(models.Model):
+class PrecioDolar(SSBaseModel):
     oficial_compra = models.DecimalField(max_digits=10, decimal_places=2, null=True, default=DOLAR_COMPRA)
     oficial_venta = models.DecimalField(max_digits=10, decimal_places=2, null=True, default=DOLAR_VENTA)
 

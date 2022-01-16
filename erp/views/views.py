@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from api.models import PrecioDolar
 from erp.forms import (FormVenta, FormNuevoArticulo, FormEntrada, FormCliente,
     FormBusqueda, FormFiltroFecha, FormProveedor)
-from erp.models import (Article, ArtState, Entrada, DetalleEntrada, Venta,
+from erp.models import (Article, Entrada, DetalleEntrada, Venta,
     DetalleVenta, Cliente, Proveedor)
 from erp.functions import (porcentaje_ganancia, venta_activa, compra_activa,
     buscar_cliente, comprar_articulo, buscar_proveedor, dni_cliente,
@@ -21,7 +21,6 @@ def entrada(request):
     template = loader.get_template('entrada.html')
     view_form = FormEntrada(
         {'cantidad': 1, 'proveedor': nombre_proveedor()})
-    article_status = ArtState.objects.get(nombre="Active")
     ctx = {
         "articulo_a_comprar": compra_activa()[0],
         "form": view_form,
@@ -40,10 +39,10 @@ def entrada(request):
             cleaned_form = view_form.cleaned_data
             # Si ya hay un objeto activo, solo agregarle
             # elementos de tipo detalle_entrada a su id
-            new_sale = Entrada.objects.filter(id_state=article_status).first()
+            new_sale = Entrada.objects.filter(status=Entrada.STATUS_WAITING).first()
             if new_sale is None:
                 new_sale = Entrada.objects.create(fecha=cleaned_form['fecha'],
-                    total=0, id_state=article_status)
+                    total=0, status=Entrada.STATUS_WAITING)
             new_sale.proveedor = buscar_proveedor(cleaned_form['proveedor'])
             new_sale.save()
 
@@ -98,8 +97,7 @@ def transaccion_exitosa(request):
            'titulo': 'Transacción exitosa',
            'redireccion': 'Volviendo a la página de ventas...'}
 
-    article_status = ArtState.objects.get(nombre="Active")
-    nueva_venta = Entrada.objects.filter(id_state=article_status).first()
+    nueva_venta = Entrada.objects.filter(status=Entrada.STATUS_WAITING).first()
     if nueva_venta is None:
         return redirect('not_found')
 
@@ -119,13 +117,13 @@ def transaccion_exitosa(request):
             i.id_producto.stock += i.cantidad
             i.id_producto.save()
 
-        nueva_venta.id_state = ArtState.objects.get(nombre="Inactive")  # Pasamos la entrada a modo inactivo
+        nueva_venta.status = Entrada.STATUS_FINISHED
         nueva_venta.save()  # Hace que esa entrada pase a estar inactiva
     except TypeError:
         ctx['mensaje'] = ('Error. Uno o varios artículos no poseen porcentaje '
             'de ganancia. Agregalos en "Agregar o Modificar" Luego registra '
             'nuevamente la compra.')
-        nueva_venta = Entrada.objects.get(id_state=article_status)
+        nueva_venta = Entrada.objects.get(status=Entrada.STATUS_WAITING)
         nueva_venta.delete()  # Deletes sale_details in cascade
 
     return HttpResponse(template.render(ctx, request))
@@ -172,13 +170,12 @@ def cancelar(request):
     """
     Cancel transacciont view.
     ---
-    Delete all the instances `Entrada` and `Venta` with `ArtState="Active"`.
+    Delete all the instances `Entrada` and `Venta` with STATUS_WAITING`.
     Useful only for sales and purchases.
     """
     template = loader.get_template('mensaje.html')
-    state = ArtState.objects.get(nombre="Active")
-    Entrada.objects.filter(id_state=state).delete()
-    Venta.objects.filter(id_state=state).delete()
+    Entrada.objects.filter(status=Entrada.STATUS_WAITING).delete()
+    Venta.objects.filter(status=Entrada.STATUS_WAITING).delete()
 
     ctx = {'mensaje': 'Se ha cancelado la transacción.',
         'titulo': 'Transacción cancelada',
@@ -305,7 +302,6 @@ def articulo(request, code_articulo):
 def venta(request):
     template = loader.get_template('venta.html')
     view_form = FormVenta({'cantidad': 1, 'dni_cliente': dni_cliente()})
-    article_status = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
     lista = []
     ctx = {
         "articulo_a_vender": venta_activa()[0],
@@ -329,14 +325,14 @@ def venta(request):
             ##
 
             try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
-                nueva_venta = Venta.objects.get(id_state=article_status)
+                nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
 
-            except ObjectDoesNotExist as DoesNotExist: # Si no hay ninguno activo, crearlo.
+            except Venta.DoesNotExist: # Si no hay ninguno activo, crearlo.
                 nueva_venta = Venta.objects.create(fecha=date.today(),
-                                                   total=0,
-                                                   id_state=article_status,
-                                                   descuento=0,
-                                                   cliente=buscar_cliente(cleaned_form['dni_cliente'])) # Iniciar un objeto de tipo Venta (id(auto), fecha, id_state=1(active), total=0)
+                    total=0,
+                    status=Venta.STATUS_WAITING,
+                    descuento=0,
+                    cliente=buscar_cliente(cleaned_form['dni_cliente']))
             else:
                 if cleaned_form['dni_cliente'] is not None:
                     nueva_venta.cliente = buscar_cliente(cleaned_form['dni_cliente'])
@@ -370,7 +366,7 @@ def venta(request):
                                                 precio_por_cantidad=precio_peso_argentino * cleaned_form['cantidad'],
                                                 descuento=precio_peso_argentino * new_article.porcentaje_descuento / 100,
                                                 cantidad=cleaned_form['cantidad'],
-                                                id_venta=Venta.objects.get(id_state=article_status),
+                                                id_venta=Venta.objects.get(status=Venta.STATUS_WAITING),
                                                 id_producto=Article.objects.get(code=cleaned_form['code']))
                 else:
                     ctx['inexistente'] = 'No hay suficiente stock del producto.'
@@ -445,9 +441,8 @@ def venta_exitosa(request):
            'titulo': 'Venta exitosa',
            'hay_recibo': False}
 
-    article_status = ArtState.objects.get(nombre="Active")
     try:
-        nueva_venta = Venta.objects.get(id_state=article_status)
+        nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
 
         producto_leido = DetalleVenta.objects.filter(id_venta=nueva_venta)  # Se crea un QuerySet para sacar datos de cada producto comprado
 
@@ -456,13 +451,13 @@ def venta_exitosa(request):
                 i.id_producto.stock -= i.cantidad
                 i.id_producto.save()
 
-            nueva_venta.id_state = ArtState.objects.get(nombre="Inactive") # Pasamos la entrada a modo inactivo
-            nueva_venta.save() # Hace que esa entrada pase a estar inactiva
+            nueva_venta.status = Venta.STATUS_FINISHED
+            nueva_venta.save()
             ctx['hay_recibo'] = True
         else:
             return redirect('not_found')
         ctx['id_venta'] = nueva_venta.id
-    except ObjectDoesNotExist as DoesNotExist:
+    except Venta.DoesNotExist:
         return redirect('not_found')
 
 

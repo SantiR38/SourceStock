@@ -6,7 +6,7 @@ from django.template import Template, Context, loader
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 
-from erp.models import Article, ArtState, Venta, DetalleVenta, Cliente
+from erp.models import Article, Venta, DetalleVenta, Cliente
 from venta_catalogo.forms import FormFiltrarArticulos, FormBuscarCliente
 from venta_catalogo.forms import FormDescuentoAdicional
 from erp.functions import venta_activa, emitir_recibo, venta_activa_dict
@@ -40,8 +40,7 @@ def venta_por_catalogo(request):
 @login_required
 def aniadir_al_carrito(request, code_param):
 
-    estado = ArtState.objects.get(nombre="Active")
-    nueva_venta = Venta.objects.get(id_state=estado)
+    nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
 
     new_article = Article.objects.get(code=code_param)
 
@@ -75,9 +74,7 @@ def confirmar_venta(request):
         "form": miFormulario
     }
 
-
-    estado = ArtState.objects.get(nombre="Active")
-    nueva_venta = Venta.objects.get(id_state=estado)
+    nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
 
     if request.method == "POST":
         miFormulario = FormBuscarCliente(request.POST)
@@ -91,8 +88,7 @@ def confirmar_venta(request):
 @login_required
 def elegir_cliente(request, code_param):
 
-    estado = ArtState.objects.get(nombre="Active")
-    nueva_venta = Venta.objects.get(id_state=estado)
+    nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
 
     nueva_venta.cliente = Cliente.objects.get(id=code_param)
     nueva_venta.save()

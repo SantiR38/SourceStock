@@ -13,7 +13,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from punto_venta.env_variables import enterprise
 
 # Models
-from erp.models import ArtState, Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada, Article
+from erp.models import Venta, DetalleVenta, Cliente, Proveedor, Entrada, DetalleEntrada, Article
 
 # SourceStock - Api
 from api.models import PrecioDolar
@@ -32,28 +32,24 @@ def venta_activa():
     # Esta función devuelve dos parámetros:
     #   1. Una lista del detalle de venta para mostrar en la vista venta
     #   2. Datos de la venta general (cliente y total).
-    
-    lista = []
-    # Creamos un ArtState instance para definir una transacción Activa
-    estado = ArtState.objects.get(nombre="Active")
-    
-    try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
-        nueva_venta = Venta.objects.get(id_state=estado)
-    except ObjectDoesNotExist as DoesNotExist:
-        nueva_venta = Venta.crear_venta_vacia(estado)
 
-    else:
-        lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
-        nueva_venta.total = 0
-        nueva_venta.descuento = 0
-        for i in lista:
-            nueva_venta.total += (i.precio_unitario * i.cantidad)
+    try:  # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Venta a su id
+        nueva_venta = Venta.objects.get(status=Venta.STATUS_WAITING)
+    except Venta.DoesNotExist:
+        nueva_venta = Venta.crear_venta_vacia(Venta.STATUS_WAITING)
+        return [[], nueva_venta]
 
-            if i.descuento != None:
-                nueva_venta.descuento += (i.descuento * i.cantidad)
-        nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
-        
-        nueva_venta.save()
+    lista = DetalleVenta.objects.filter(id_venta = nueva_venta)
+    nueva_venta.total = 0
+    nueva_venta.descuento = 0
+    for i in lista:
+        nueva_venta.total += (i.precio_unitario * i.cantidad)
+
+        if i.descuento != None:
+            nueva_venta.descuento += (i.descuento * i.cantidad)
+    nueva_venta.total_con_descuento = nueva_venta.total - nueva_venta.descuento
+    
+    nueva_venta.save()
     return [lista, nueva_venta]
 
 def venta_activa_dict():
@@ -71,13 +67,12 @@ def compra_activa():
     #   2. Datos de la compra general (proveedor y total).
 
     lista = []
-    estado = ArtState.objects.get(nombre="Active") # Creamos un ArtState instance para definir una transacción Activa
     try: # Si ya hay un objeto activo, solo agregarle elementos de tipo detalle_Compra a su id
-        nueva_compra = Entrada.objects.get(id_state=estado)
-    except ObjectDoesNotExist as DoesNotExist:
+        nueva_compra = Entrada.objects.get(status=Entrada.STATUS_WAITING)
+    except Entrada.DoesNotExist:
         nueva_compra = Entrada.objects.create(fecha=date.today(),
-                                            total=0,
-                                            id_state=estado) # Iniciar un objeto de tipo Compra (id(auto), fecha, id_state=1(active), total=0)
+            total=0,
+            status=Entrada.STATUS_WAITING)
     else:
         lista = DetalleEntrada.objects.filter(id_entrada = nueva_compra)
         nueva_compra.total = 0
@@ -152,8 +147,7 @@ def emitir_recibo(id_venta):
 
     venta = Venta.objects.get(id=id_venta)
     detalle_venta = DetalleVenta.objects.filter(id_venta=venta)
-    active = ArtState.objects.get(nombre="Active")
-    recibo_presupuesto = "Presupuesto" if venta.id_state == active else "Recibo"
+    recibo_presupuesto = "Presupuesto" if venta.status == Venta.STATUS_WAITING else "Recibo"
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
 
