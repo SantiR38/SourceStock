@@ -2,17 +2,29 @@ from django.db import models
 from datetime import date
 from decimal import Decimal
 
-from django.shortcuts import redirect
+from lib.md5 import uuid_md5
 
-def porcentaje_ganancia(costo, porcentaje):
-    # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
-    precio_final = costo + (costo * porcentaje / 100)
-    return precio_final
 
-# *1: CASCADE, significa que cuando se borre un artículo de la tabla padre, el artículo de la
-#     tabla hija que tiene esa clave foranea, también se borra
+class SSBaseModel(models.Model):
+    STATUS_WAITING = 'w'
+    STATUS_CANCELED = 'c'
+    STATUS_FINISHED = 'n'
 
-# *2: SET_NULL, cuando se borra el artículo, la tabla hija pone null como clave foranea.
+    STATUS = (
+        (STATUS_WAITING, 'Waiting'),
+        (STATUS_CANCELED, 'Canceled'),
+        (STATUS_FINISHED, 'Finished'),
+    )
+
+    datetime_created = models.DateTimeField(auto_now_add=True)
+    datetime_modified = models.DateTimeField(auto_now_add=True)
+    code = models.CharField(max_length=32, unique=True, default=uuid_md5)
+    status = models.CharField(max_length=1, default=STATUS_WAITING,
+        choices=STATUS)
+
+    class Meta:
+        abstract = True
+
 
 class Article(models.Model):
     codigo = models.BigIntegerField(unique=True)
@@ -30,7 +42,13 @@ class Article(models.Model):
     stock = models.IntegerField(verbose_name="Cantidad")
     alarma_stock = models.IntegerField(verbose_name="Stock minimo permitido", null=True)
     id_state = models.ForeignKey('ArtState', on_delete=models.SET_NULL, null=True)
-    en_dolar = models.BooleanField(default=False, null=True) # Determina si la cotización del producto es en dolar.
+    en_dolar = models.BooleanField(default=False, null=True)  # Determina si la cotización del producto es en dolar.
+
+    @classmethod
+    def get_porcentaje_ganancia(self, costo, porcentaje):
+        # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
+        precio_final = costo + (costo * porcentaje / 100)
+        return precio_final
 
     @classmethod
     def get_context(cls, infForm):
@@ -39,21 +57,21 @@ class Article(models.Model):
         porcentaje_descuento = infForm['porcentaje_descuento']
         precio_descontado = None
         if costo_sin_iva is not None:
-            costo = porcentaje_ganancia(costo_sin_iva, 21)
+            costo = cls.get_porcentaje_ganancia(costo_sin_iva, 21)
         elif costo is not None:
             costo_sin_iva = costo / Decimal(1.21)
 
-        precio = porcentaje_ganancia(costo, infForm['porcentaje_ganancia'])
+        precio = cls.get_porcentaje_ganancia(costo, infForm['porcentaje_ganancia'])
 
         if porcentaje_descuento is not None:
-            precio_descontado = porcentaje_ganancia(precio, -porcentaje_descuento)
+            precio_descontado = cls.get_porcentaje_ganancia(precio, -porcentaje_descuento)
 
         context = {
             "codigo": infForm['codigo'],
             "descripcion": infForm['descripcion'],
             "costo_sin_iva": costo_sin_iva,
             "costo": costo,
-            "precio_sin_iva": porcentaje_ganancia(costo_sin_iva, infForm['porcentaje_ganancia']),
+            "precio_sin_iva": cls.get_porcentaje_ganancia(costo_sin_iva, infForm['porcentaje_ganancia']),
             "precio": precio,
             "porcentaje_ganancia": infForm['porcentaje_ganancia'],
             "porcentaje_descuento": porcentaje_descuento,
