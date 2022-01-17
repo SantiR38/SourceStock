@@ -1,7 +1,7 @@
 # noqa
 from django.db import models
 
-from erp.models import BasePersonModel
+from erp.models.base import BasePersonModel
 
 
 class Client(BasePersonModel):

@@ -1,7 +1,9 @@
 # noqa
 from django.db import models
 
-from erp.models import Article, BaseOperationModel, Client, SSBaseModel
+from erp.models.articles import Article
+from erp.models.base import BaseOperationModel, SSBaseModel
+from erp.models.persons import Client
 
 
 class Sale(BaseOperationModel):

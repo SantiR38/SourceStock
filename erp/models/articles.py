@@ -2,7 +2,7 @@
 from decimal import Decimal
 from django.db import models
 
-from erp.models import SSBaseModel
+from erp.models.base import SSBaseModel
 
 
 class Article(SSBaseModel):
