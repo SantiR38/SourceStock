@@ -1,10 +1,10 @@
 # noqa
 from django.db import models
 
-from erp.models import Article, Client, SSBaseModel
+from erp.models import Article, BaseOperationModel, Client, SSBaseModel
 
 
-class Sale(SSBaseModel):
+class Sale(BaseOperationModel):
     total = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     extra_discount = models.DecimalField(max_digits=10, decimal_places=2, null=True)

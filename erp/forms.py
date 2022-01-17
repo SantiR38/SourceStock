@@ -1,23 +1,17 @@
 from django import forms
 from datetime import date
 from erp.functions import lista_proveedores, lista_clientes
-
-CONDICIONES_IVA = [("Consumidor Final", "Consumidor Final"),
-    ("Responsable Inscripto", "Responsable Inscripto"),
-    ("Monotributista", "Monotributista"),
-    ("IVA Excento", "IVA Excento"),
-    ("No Alcanzado", "No Alcanzado"),
-]
+from erp.models import Client, Provider
 
 
 class FormBusqueda(forms.Form):
     buscar = forms.IntegerField(label="")
 
 
-class FormVenta(forms.Form): # Sirve para la actualización inventario en general
-    code = forms.IntegerField(label_suffix= "*:")
-    quantity = forms.IntegerField(label_suffix= "*:")
-    client = forms.ChoiceField(choices=lista_clientes, label= "Cliente", required=False, label_suffix= "**:")
+class FormVenta(forms.Form):  # Sirve para la actualización inventario en general
+    code = forms.IntegerField(label_suffix="*:")
+    quantity = forms.IntegerField(label_suffix="*:")
+    client = forms.ChoiceField(choices=lista_clientes, label="Cliente", required=False, label_suffix= "**:")
     dni_cliente = forms.IntegerField(required=False, label="DNI Cliente", label_suffix= "**:")
 
 
@@ -26,15 +20,15 @@ class FormNuevoArticulo(forms.Form):
     description = forms.CharField(required=False)
     is_in_dolar = forms.BooleanField(label="Cotiza en dolar", required=False)
     cost_no_taxes = forms.DecimalField(max_digits=10,
-                                       decimal_places=2,
-                                       label_suffix= "*:",
-                                       label="Costo sin IVA",
-                                       required=False)
+        decimal_places=2,
+        label_suffix= "*:",
+        label="Costo sin IVA",
+        required=False)
     cost = forms.DecimalField(max_digits=10,
-                               decimal_places=2,
-                               label_suffix= "*:",
-                               label="Costo con IVA",
-                               required=False)
+        decimal_places=2,
+        label_suffix= "*:",
+        label="Costo con IVA",
+        required=False)
     profit_percentage = forms.DecimalField(max_digits=10, decimal_places=2, label_suffix= "*:")
     discount_percentage = forms.DecimalField(max_digits=10, decimal_places=2, initial=0, label_suffix= "*:")
     section = forms.CharField(required=False)
@@ -70,8 +64,8 @@ class FormEntrada(forms.Form):
 
 
 class FormCliente(forms.Form):
-    name = forms.CharField(max_length=50,label= "Nombre o Empresa", label_suffix= "*:")
-    tax_condition = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
+    name = forms.CharField(max_length=50, label="Nombre o Empresa", label_suffix="*:")
+    tax_condition = forms.ChoiceField(choices=Client.TAXES, label="Condición IVA", label_suffix= "*:")
     dni = forms.IntegerField(label= "DNI", required=False)
     cuit = forms.CharField(required=False)
     direction = forms.CharField(max_length=50, required=False)
@@ -81,16 +75,16 @@ class FormCliente(forms.Form):
 
 class FormFiltroFecha(forms.Form):
     fecha_inicial = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
-                                label_suffix= "*:",
+                                label_suffix="*:",
                                 initial=date.today())
     fecha_final = forms.DateTimeField(widget=forms.widgets.DateInput(attrs={'type': 'date'}), 
-                                label_suffix= "*:",
+                                label_suffix="*:",
                                 initial=date.today())
 
 
 class FormProveedor(forms.Form):
     name = forms.CharField(max_length=100, label= "Nombre Empresa", label_suffix= "*:")
-    tax_condition = forms.ChoiceField(choices=CONDICIONES_IVA, label= "Condición IVA", label_suffix= "*:")
+    tax_condition = forms.ChoiceField(choices=Provider.TAXES, label="Condición IVA", label_suffix= "*:")
     cuit = forms.CharField(required=False)
     direction = forms.CharField(max_length=50, required=False)
     phone_number = forms.CharField(required=False)

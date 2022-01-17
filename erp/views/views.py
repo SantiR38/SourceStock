@@ -475,7 +475,6 @@ def cancelar_unidad(request, code_articulo):
     return HttpResponseRedirect(request.META.get('HTTP_REFERER')) # esto hace que se redirija a la url anterior.
 
 
-
 #Funciones para administrar los clientes
 @login_required
 def client(request):
@@ -492,26 +491,19 @@ def client(request):
     if request.method == "POST":
         view_form = FormCliente(request.POST)
         if view_form.is_valid():
-            cleaned_form = view_form.cleaned_data  # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
+            cleaned_form = view_form.cleaned_data
 
-            try: # Si el client existe en la base de datos
-                new_client = Client.objects.get(dni=cleaned_form['dni'])
+            try:
+                Client.objects.get(dni=cleaned_form['dni'])
                 ctx['message'] = "El cliente ya existe"
-
-            except ObjectDoesNotExist as DoesNotExist: # Si el client no existe en la base de datos, crearlo
-                new_client = Client.objects.create(name=cleaned_form['name'],
-                                                    tax_condition=cleaned_form['tax_condition'],
-                                                    dni=cleaned_form['dni'],
-                                                    cuit=cleaned_form['cuit'],
-                                                    direction=cleaned_form['direction'],
-                                                    phone_number=cleaned_form['phone_number'],
-                                                    email=cleaned_form['email'])
-
+            except Client.DoesNotExist:
+                Client.objects.create(**cleaned_form)
                 return redirect('control_clientes')
 
             view_form = FormCliente()
 
     return HttpResponse(template.render(ctx, request))
+
 
 @login_required
 def control_clientes(request):
@@ -542,7 +534,7 @@ def modificar_cliente(request, id_param):
     template = loader.get_template('agregar_modificar.html')
     try:
         new_cliente = Client.objects.get(id=id_param)
-    except ObjectDoesNotExist as DoesNotExist:
+    except Client.DoesNotExist:
         return redirect('not_found')
     else:
         form_details = {
@@ -600,17 +592,11 @@ def provider(request):
         if view_form.is_valid():
             cleaned_form = view_form.cleaned_data  # Sacamos los datos del formulario en un diccionario y lo metemos a una variable
 
-            try: # Si el Provider existe en la base de datos
-                new_proveedor = Provider.objects.get(name=cleaned_form['name'])
+            try:
+                Provider.objects.get(name=cleaned_form['name'])
                 ctx['message'] = "El provider ya existe"
-
-            except ObjectDoesNotExist as DoesNotExist: # Si el Provider no existe en la base de datos, crearlo
-                new_proveedor = Provider.objects.create(name=cleaned_form['name'],
-                                                         tax_condition=cleaned_form['tax_condition'],
-                                                         cuit=cleaned_form['cuit'],
-                                                         direction=cleaned_form['direction'],
-                                                         phone_number=cleaned_form['phone_number'],
-                                                         email=cleaned_form['email'])
+            except Provider.DoesNotExist:
+                Provider.objects.create(**cleaned_form)
 
                 ctx['message'] = 'El provider fue agregado correctamente.'
 

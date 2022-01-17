@@ -1,10 +1,10 @@
 # noqa
 from django.db import models
 
-from erp.models import Article, Provider, SSBaseModel
+from erp.models import Article, BaseOperationModel, Provider, SSBaseModel
 
 
-class Purchase(SSBaseModel):
+class Purchase(BaseOperationModel):
     total = models.DecimalField(max_digits=10, decimal_places=2)
     provider = models.ForeignKey(Provider, on_delete=models.SET_NULL, null=True)
 

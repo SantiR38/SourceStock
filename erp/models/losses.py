@@ -1,10 +1,10 @@
 # noqa
 from django.db import models
 
-from erp.models import Article, SSBaseModel
+from erp.models import Article, BaseOperationModel, SSBaseModel
 
 
-class Loss(SSBaseModel):
+class Loss(BaseOperationModel):
     total = models.DecimalField(max_digits=10, decimal_places=2)
 
 

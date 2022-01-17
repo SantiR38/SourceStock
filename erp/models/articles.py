@@ -22,76 +22,65 @@ class Article(SSBaseModel):
     is_in_dolar = models.BooleanField(default=False, null=True,
         help_text="Determines if the product cotization is in dolar.")
 
-    @classmethod
-    def get_porcentaje_ganancia(self, cost, porcentaje):
-        # Calcula el porcentaje de ganancia mediante los dos parámetros solicitados.
+    @staticmethod
+    def get_porcentaje_ganancia(cost, porcentaje):
+        """Calculates the profit percentage from the requested params."""
         final_price = cost + (cost * porcentaje / 100)
         return final_price
 
     @classmethod
-    def get_context(cls, infForm):
-        cost_no_taxes = infForm['cost_no_taxes']
-        cost = infForm['cost']
-        discount_percentage = infForm['discount_percentage']
+    def get_context(cls, data):
+        cost_no_taxes = data['cost_no_taxes']
+        cost = data['cost']
+        discount_percentage = data['discount_percentage']
         discounted_price = None
         if cost_no_taxes is not None:
             cost = cls.get_porcentaje_ganancia(cost_no_taxes, 21)
         elif cost is not None:
             cost_no_taxes = cost / Decimal(1.21)
 
-        price = cls.get_porcentaje_ganancia(cost, infForm['profit_percentage'])
+        price = cls.get_porcentaje_ganancia(cost, data['profit_percentage'])
 
         if discount_percentage is not None:
             discounted_price = cls.get_porcentaje_ganancia(price, -discount_percentage)
 
         context = {
-            "code": infForm['code'],
-            "description": infForm['description'],
+            "code": data['code'],
+            "description": data['description'],
             "cost_no_taxes": cost_no_taxes,
             "cost": cost,
-            "price_no_taxes": cls.get_porcentaje_ganancia(cost_no_taxes, infForm['profit_percentage']),
+            "price_no_taxes": cls.get_porcentaje_ganancia(cost_no_taxes, data['profit_percentage']),
             "price": price,
-            "profit_percentage": infForm['profit_percentage'],
+            "profit_percentage": data['profit_percentage'],
             "discount_percentage": discount_percentage,
             "discounted_price": discounted_price,
-            "section": infForm['section'],
-            "brand": infForm['brand'],
-            "model": infForm['model'],
-            "stock": infForm['stock'],
-            "min_stock_allowed": infForm['min_stock_allowed'],
-            "is_in_dolar": infForm['is_in_dolar']
+            "section": data['section'],
+            "brand": data['brand'],
+            "model": data['model'],
+            "stock": data['stock'],
+            "min_stock_allowed": data['min_stock_allowed'],
+            "is_in_dolar": data['is_in_dolar']
         }
 
         return context
 
     @classmethod
-    def create_new(cls, infForm):
-        article = cls.objects.filter(code=infForm['code'])
+    def create_new(cls, data):
+        article = cls.objects.filter(code=data['code'])
+
         if article.exists():
-            message = "El código ya está siendo utilizado por otro producto."
-        else:
-            if infForm['cost'] is not None and infForm['cost_no_taxes'] is not None:
-                message = "PROBLEMA: Los campos cost final y cost neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
-            elif infForm['cost'] is not None or infForm['cost_no_taxes'] is not None:
-                cls.objects.create(code=cls.get_context(infForm)['code'],
-                    description=cls.get_context(infForm)['description'],
-                    cost_no_taxes=cls.get_context(infForm)['cost_no_taxes'],
-                    cost=cls.get_context(infForm)['cost'],
-                    is_in_dolar=cls.get_context(infForm)['is_in_dolar'],
-                    price_no_taxes=cls.get_context(infForm)['price_no_taxes'],
-                    price=cls.get_context(infForm)['price'],
-                    profit_percentage=cls.get_context(infForm)['profit_percentage'],
-                    discount_percentage=cls.get_context(infForm)['discount_percentage'],
-                    discounted_price=cls.get_context(infForm)['discounted_price'],
-                    section=cls.get_context(infForm)['section'],
-                    brand=cls.get_context(infForm)['brand'],
-                    model=cls.get_context(infForm)['model'],
-                    stock=cls.get_context(infForm)['stock'],
-                    min_stock_allowed=cls.get_context(infForm)['min_stock_allowed'])
-                message = "Artículo agregado exitosamente"
-            else:
-                message = "PROBLEMA: Debes rellenar uno de los dos costos."
-        return message
+            return "El código ya está siendo utilizado por otro producto."
+
+        if all(data['cost'], data['cost_no_taxes']):
+            return ("PROBLEMA: Los campos cost final y cost neto + IVA "
+                "estan completados. Debes llenar solo uno de estos dos campos.")
+
+        if any(data['cost'], data['cost_no_taxes']):
+            context = cls.get_context(data)
+            cls.objects.create(**context)
+            return "Artículo agregado exitosamente"
+
+        return "PROBLEMA: Debes rellenar uno de los dos costos."
 
     def __str__(self):
         return self.description
