@@ -1,0 +1,5 @@
+-r requirements.txt
+
+prospector==1.6.0
+
+flake8==3.9.2
