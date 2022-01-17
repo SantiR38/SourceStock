@@ -1,4 +1,4 @@
-"""Functions as services."""
+"""Functions as services."""  # noqa
 
 # Python
 import io
@@ -265,10 +265,10 @@ def emitir_recibo(sale_id):
     buffer.seek(0)
     return buffer
 
-def emitir_detalle_entrada(purchase_id):
 
-    # Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
-    # Utiliza la librería reportlab
+def emitir_detalle_entrada(purchase_id):
+    """Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
+    Utiliza la librería reportlab"""
 
     entrada = Purchase.objects.get(id=purchase_id)
     detalle_entrada = DetalleEntrada.objects.filter(purchase_id=entrada)
@@ -283,17 +283,16 @@ def emitir_detalle_entrada(purchase_id):
     # See the ReportLab documentation for the full list of functionality.
     p.setFont("Helvetica", 26)
     p.drawString(38, 780, "Registro de compra") #(Ancho, Alto, "Texto")
-    
+
     p.setFont("Helvetica-Bold", 12)
     p.drawString(38, 740, enterprise['name'])
-    
+
     p.setFont("Helvetica", 10)
     p.drawString(38, 715, "Fecha de emisión:")
     p.drawString(130, 715, str(entrada.datetime_created))
 
     p.drawString(38, 693, f"Dir: {enterprise['address']}")
     p.drawString(297.5, 693, f"Tel: {enterprise['phone']}")
-
 
     p.setFont("Helvetica-Bold", 10)
     p.drawString(38, 673, "Proveedor: ")
@@ -316,7 +315,6 @@ def emitir_detalle_entrada(purchase_id):
     p.line(30, 820, 30, 690) #Vertical Izq
     p.line(565, 820, 565, 690) #Vertical Der
     p.line(30, 705, 565, 705) #Horizontal Grande
-
 
     #Titulos de tabla
     alto = 600
@@ -348,7 +346,6 @@ def emitir_detalle_entrada(purchase_id):
     p.drawString(460, alto, "$")
     p.drawString(470, alto, str(entrada.total))
 
-
     # Close the PDF object cleanly, and we're done.
     p.showPage()
     p.save()
@@ -358,10 +355,9 @@ def emitir_detalle_entrada(purchase_id):
     buffer.seek(0)
     return buffer
 
+
 def lista_proveedores():
-
-    # Lista la totalidad de los proveedores para mostrar en la vista Purchase
-
+    """Lista la totalidad de los proveedores para mostrar en la vista Purchase."""
     query = Provider.objects.all().order_by('name')
     lista = [(" ", " ")]
     if query.exists():
@@ -369,10 +365,9 @@ def lista_proveedores():
             lista.append((i.name, i.name))
     return lista
 
+
 def lista_clientes():
-
-    # Lista la totalidad de los clientes para mostrar en la vista Sale
-
+    """Lista la totalidad de los clientes para mostrar en la vista Sale."""
     query = Client.objects.all().order_by('name')
     lista = [(" ", " ")]
     if query.exists():
@@ -382,8 +377,7 @@ def lista_clientes():
 
 
 def comprar_articulo(infForm):
-    # Funciona solo para modificar objetos de tipo DetalleEntrada.
-    
+    """Funciona solo para modificar objetos de tipo DetalleEntrada."""
     cost_no_taxes = infForm['cost_no_taxes']
     cost = infForm['cost']
 
@@ -401,4 +395,3 @@ def comprar_articulo(infForm):
     }
 
     return contexto
-    
