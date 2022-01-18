@@ -148,7 +148,7 @@ def historial_compras(request):
             cleaned_form = view_form.cleaned_data
             ctx["transaccion"] = Purchase.objects.filter(
                 fecha__range=[cleaned_form['fecha_inicial'], cleaned_form['fecha_final']]
-            ).order_by('-datetime_created', '-id')
+            ).order_by('-datetime_created', '-id').select_related('provider')
     else:
         view_form = FormFiltroFecha()
 
@@ -420,7 +420,7 @@ def historial_ventas(request):
                 ctx["transaccion"] = Sale.objects.filter(
                     fecha__range=[cleaned_form['fecha_inicial'],
                         cleaned_form['fecha_final']]) \
-                    .order_by('-datetime_created', '-id')
+                    .order_by('-datetime_created', '-id').select_related('client')
         else:
             view_form = FormFiltroFecha()
 
@@ -443,13 +443,13 @@ def recibo(request, sale):
 def venta_exitosa(request):
     template = loader.get_template('message.html')
     ctx = {'message': 'Su transacción fue un éxito.',
-           'titulo': 'Venta exitosa',
-           'hay_recibo': False}
+        'titulo': 'Venta exitosa',
+        'hay_recibo': False}
 
     try:
         nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
 
-        producto_leido = SaleDetail.objects.filter(sale=nueva_venta)  # Se crea un QuerySet para sacar datos de cada producto comprado
+        producto_leido = SaleDetail.objects.filter(sale=nueva_venta).select_related('article')  # Se crea un QuerySet para sacar datos de cada producto comprado
 
         if producto_leido.exists():
             for i in producto_leido:  # Se actualiza  el stock de cada objeto Article

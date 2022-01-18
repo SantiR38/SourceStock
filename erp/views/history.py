@@ -17,13 +17,13 @@ class DetalleDeCompra(DetailView):
         context['subtitulo'] = "Compra realizada"
         context['persona'] = "Proveedor"
         context['elementos_vendidos'] = DetalleEntrada.objects.filter(
-            purchase=self.kwargs.get("id"))
+            purchase=self.kwargs.get("id")).select_related('article')
 
         return context
     
     def post(self, request, *args, **kwargs):
         id_ = self.kwargs.get("id")
-        DetalleEntrada.give_product_back()
+        DetalleEntrada.give_product_back(id_)
         DetalleEntrada.objects.filter(purchase=id_).delete()
         Purchase.objects.get(id=id_).delete()
 
@@ -33,7 +33,7 @@ class DetalleDeCompra(DetailView):
 class DetalleDeVenta(DetailView):
     template_name = "erp/detalle_de_operacion.html"
 
-    def get_object(self):
+    def get_object(self, queryset=None):
         return get_object_or_404(Sale, id=self.kwargs.get("id"))
 
     def get_context_data(self, **kwargs):
@@ -45,7 +45,7 @@ class DetalleDeVenta(DetailView):
             sale=self.kwargs.get("id"))
 
         return context
-    
+
     def post(self, request, *args, **kwargs):
         id_ = self.kwargs.get("id")
         SaleDetail.take_product_back(id_)
