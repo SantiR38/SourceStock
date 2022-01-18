@@ -1,6 +1,7 @@
+# noqa
 from django.urls import path
 from .views import views
-from .views.history import DetalleDeCompra, DetalleDeVenta
+from erp.views import DetalleDeCompra, DetalleDeVenta
 
 
 urlpatterns = [

@@ -1,5 +1,4 @@
-from datetime import date
-
+# noqa
 from django.shortcuts import redirect
 from django.http import HttpResponse, FileResponse, HttpResponseRedirect
 from django.template import loader
@@ -127,6 +126,7 @@ def transaccion_exitosa(request):
         nueva_venta.delete()  # Deletes sale_details in cascade
 
     return HttpResponse(template.render(ctx, request))
+
 
 @login_required
 def historial_compras(request):
@@ -350,9 +350,9 @@ def venta(request):
             # Articulo
             ##
 
-            try: # Si el producto existe en la base de datos
-                new_article = Article.objects.get(code=cleaned_form['code']) # Llamamos al objeto desde la db que tenga el mismo code que en
-                                                                            # el formulario y lo metemos como QuerySet en una variable.
+            try:  # Si el producto existe en la base de datos
+                new_article = Article.objects.get(code=cleaned_form['code'])  # Llamamos al objeto desde la db que tenga el mismo code que en ↓
+                # el formulario y lo metemos como QuerySet en una variable.
                 ctx["article_detail"] = new_article
                 ##
                 # Detalle de venta
@@ -360,14 +360,14 @@ def venta(request):
                 costo_peso_argentino = new_article.cost * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.cost
                 precio_peso_argentino = new_article.price * PrecioDolar.cotizacion_venta() if new_article.is_in_dolar else new_article.price
                 if new_article.stock >= cleaned_form['quantity']:
-                    SaleDetail.objects.create(unit_cost=costo_peso_argentino, # Iniciar un objeto de tipo detalle_venta
-                                                unit_price=precio_peso_argentino,
-                                                discount_percentage=new_article.discount_percentage,
-                                                price_by_quantity=precio_peso_argentino * cleaned_form['quantity'],
-                                                discount=precio_peso_argentino * new_article.discount_percentage / 100,
-                                                quantity=cleaned_form['quantity'],
-                                                sale_id=Sale.objects.get(status=Sale.STATUS_WAITING),
-                                                product_id=Article.objects.get(code=cleaned_form['code']))
+                    SaleDetail.objects.create(unit_cost=costo_peso_argentino,  # Iniciar un objeto de tipo detalle_venta
+                        unit_price=precio_peso_argentino,
+                        discount_percentage=new_article.discount_percentage,
+                        price_by_quantity=precio_peso_argentino * cleaned_form['quantity'],
+                        discount=precio_peso_argentino * new_article.discount_percentage / 100,
+                        quantity=cleaned_form['quantity'],
+                        sale_id=Sale.objects.get(status=Sale.STATUS_WAITING),
+                        product_id=Article.objects.get(code=cleaned_form['code']))
                 else:
                     ctx['inexistente'] = 'No hay suficiente stock del producto.'
 
@@ -401,6 +401,7 @@ def venta(request):
 
     return HttpResponse(template.render(ctx, request))
 
+
 @login_required
 def historial_ventas(request):
     template = loader.get_template('historial_ventas.html')
@@ -416,21 +417,25 @@ def historial_ventas(request):
             view_form = FormFiltroFecha(request.POST)
             if view_form.is_valid():
                 cleaned_form = view_form.cleaned_data
-                ctx["transaccion"] = Sale.objects.filter(fecha__range=[cleaned_form['fecha_inicial'], cleaned_form['fecha_final']]).order_by('-datetime_created', '-id')
+                ctx["transaccion"] = Sale.objects.filter(
+                    fecha__range=[cleaned_form['fecha_inicial'],
+                        cleaned_form['fecha_final']]) \
+                    .order_by('-datetime_created', '-id')
         else:
             view_form = FormFiltroFecha()
-        # !filtro fecha
 
         return HttpResponse(template.render(ctx, request))
 
-    else:
-        return redirect('venta_exitosa')
+    return redirect('venta_exitosa')
+
 
 @login_required
 def recibo(request, sale_id):
     try:
-        return FileResponse(emitir_recibo(sale_id), as_attachment=False, filename=f'recibo_{Sale.objects.get(id=sale_id).datetime_created}.pdf')
-    except ObjectDoesNotExist as DoesNotExist:
+        sale_date = Sale.objects.get(id=sale_id).datetime_created
+        return FileResponse(emitir_recibo(sale_id), as_attachment=False,
+            filename=f'recibo_{sale_date}.pdf')
+    except Sale.DoesNotExist:
         return redirect('not_found')
 
 
@@ -447,7 +452,7 @@ def venta_exitosa(request):
         producto_leido = SaleDetail.objects.filter(sale_id=nueva_venta)  # Se crea un QuerySet para sacar datos de cada producto comprado
 
         if producto_leido.exists():
-            for i in producto_leido: # Se actualiza  el stock de cada objeto Article
+            for i in producto_leido:  # Se actualiza  el stock de cada objeto Article
                 i.product_id.stock -= i.quantity
                 i.product_id.save()
 
@@ -460,22 +465,22 @@ def venta_exitosa(request):
     except Sale.DoesNotExist:
         return redirect('not_found')
 
-
     return HttpResponse(template.render(ctx, request))
+
 
 @login_required
 def cancelar_unidad(request, code_articulo):
     try:
         articulo_staging = SaleDetail.objects.get(id=code_articulo)
-    except ObjectDoesNotExist as DoesNotExist:
+    except SaleDetail.DoesNotExist:
         pass
     else:
         articulo_staging.delete()
 
-    return HttpResponseRedirect(request.META.get('HTTP_REFERER')) # esto hace que se redirija a la url anterior.
+    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))  # esto hace que se redirija a la url anterior.
 
 
-#Funciones para administrar los clientes
+# Funciones para administrar los clientes
 @login_required
 def client(request):
     template = loader.get_template('agregar_modificar.html')
@@ -522,12 +527,13 @@ def control_clientes(request):
         view_form = FormBusqueda(request.POST)
         if view_form.is_valid():
             cleaned_form = view_form.cleaned_data
-            resultado = Client.objects.filter(dni=int(cleaned_form['buscar'])) # Código
+            resultado = Client.objects.filter(dni=int(cleaned_form['buscar']))  # Código
             ctx["articulos"] = resultado
     else:
         view_form = FormBusqueda()
 
     return HttpResponse(template.render(ctx, request))
+
 
 @login_required
 def modificar_cliente(request, id_param):
@@ -574,7 +580,7 @@ def modificar_cliente(request, id_param):
         return HttpResponse(template.render(ctx, request))
 
 
-#Funciones para administrar los proveedores
+# Funciones para administrar los proveedores
 @login_required
 def provider(request):
     template = loader.get_template('agregar_modificar.html')
@@ -604,12 +610,13 @@ def provider(request):
 
     return HttpResponse(template.render(ctx, request))
 
+
 @login_required
 def modificar_proveedor(request, id_param):
     template = loader.get_template('agregar_modificar.html')
     try:
         new_proveedor = Provider.objects.get(id=id_param)
-    except ObjectDoesNotExist as DoesNotExist:
+    except Provider.DoesNotExist:
         return redirect('not_found')
     else:
         form_details = {
@@ -647,6 +654,7 @@ def modificar_proveedor(request, id_param):
 
         return HttpResponse(template.render(ctx, request))
 
+
 @login_required
 def control_proveedores(request):
     template = loader.get_template('control_personas.html')
@@ -659,6 +667,7 @@ def control_proveedores(request):
     }
 
     return HttpResponse(template.render(ctx, request))
+
 
 @login_required
 def not_found(request):
