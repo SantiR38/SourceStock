@@ -7,5 +7,5 @@ urlpatterns = [
     path('elegir_cliente/<int:code_param>', views.elegir_cliente, name='elegir_cliente'),
     path('confirmar_venta', views.confirmar_venta, name='confirmar_venta'),
     path('extra_discount', views.extra_discount, name='extra_discount'),
-    path('presupuesto/<int:sale_id>', views.presupuesto, name='presupuesto'),
+    path('presupuesto/<int:sale>', views.presupuesto, name='presupuesto'),
 ]

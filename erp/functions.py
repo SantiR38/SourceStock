@@ -39,7 +39,7 @@ def venta_activa():
         nueva_venta = Sale.crear_venta_vacia(Sale.STATUS_WAITING)
         return [[], nueva_venta]
 
-    lista = SaleDetail.objects.filter(sale_id = nueva_venta)
+    lista = SaleDetail.objects.filter(sale = nueva_venta)
     nueva_venta.total = 0
     nueva_venta.discount = 0
     for i in lista:
@@ -57,7 +57,7 @@ def venta_activa_dict():
     for i in range(len(venta)):
         article = Article.objects.filter(id=venta[i]["id_producto_id"]).values()[0]
         venta[i]["discounted_price"] = venta[i]["unit_price"] - venta[i]["discount"]
-        venta[i]["product_id"] = article
+        venta[i]["article"] = article
     return venta
 
 def compra_activa():
@@ -74,7 +74,7 @@ def compra_activa():
             total=0,
             status=Purchase.STATUS_WAITING)
     else:
-        lista = DetalleEntrada.objects.filter(purchase_id = nueva_compra)
+        lista = DetalleEntrada.objects.filter(purchase = nueva_compra)
         nueva_compra.total = 0
         for i in lista:
             if i.is_in_dolar:
@@ -140,13 +140,13 @@ def final_price(costo_s_iva, porc_ganancia):
     final_price = porc_ganancia(costo_final, porc_ganancia)
     return final_price
 
-def emitir_recibo(sale_id):
+def emitir_recibo(sale):
 
     # Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
     # Utiliza la librería reportlab
 
-    venta = Sale.objects.get(id=sale_id)
-    detalle_venta = SaleDetail.objects.filter(sale_id=venta)
+    venta = Sale.objects.get(id=sale)
+    detalle_venta = SaleDetail.objects.filter(sale=venta)
     recibo_presupuesto = "Presupuesto" if venta.status == Sale.STATUS_WAITING else "Recibo"
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
@@ -224,7 +224,7 @@ def emitir_recibo(sale_id):
 
     for i in detalle_venta:
         p.drawString(50, alto, str(i.quantity))
-        p.drawString(150, alto, i.product_id.description)
+        p.drawString(150, alto, i.article.description)
         p.drawString(380, alto, "$")
         p.drawString(390, alto, str(i.unit_price))
         p.drawString(480, alto, "$")
@@ -266,12 +266,12 @@ def emitir_recibo(sale_id):
     return buffer
 
 
-def emitir_detalle_entrada(purchase_id):
+def emitir_detalle_entrada(purchase):
     """Esta funcion dibuja en modo canva todo el pdf que servirá como recibo.
     Utiliza la librería reportlab"""
 
-    entrada = Purchase.objects.get(id=purchase_id)
-    detalle_entrada = DetalleEntrada.objects.filter(purchase_id=entrada)
+    entrada = Purchase.objects.get(id=purchase)
+    detalle_entrada = DetalleEntrada.objects.filter(purchase=entrada)
 
     # Create a file-like buffer to receive PDF data.
     buffer = io.BytesIO()
@@ -331,7 +331,7 @@ def emitir_detalle_entrada(purchase_id):
 
     for i in detalle_entrada:
         p.drawString(50, alto, str(i.quantity))
-        p.drawString(150, alto, i.product_id.description)
+        p.drawString(150, alto, i.article.description)
         p.drawString(380, alto, "$")
         p.drawString(390, alto, str(i.unit_cost))
         p.drawString(460, alto, "$")

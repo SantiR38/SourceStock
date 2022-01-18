@@ -17,14 +17,14 @@ class DetalleDeCompra(DetailView):
         context['subtitulo'] = "Compra realizada"
         context['persona'] = "Proveedor"
         context['elementos_vendidos'] = DetalleEntrada.objects.filter(
-            purchase_id=self.kwargs.get("id"))
+            purchase=self.kwargs.get("id"))
 
         return context
     
     def post(self, request, *args, **kwargs):
         id_ = self.kwargs.get("id")
         DetalleEntrada.give_product_back()
-        DetalleEntrada.objects.filter(purchase_id=id_).delete()
+        DetalleEntrada.objects.filter(purchase=id_).delete()
         Purchase.objects.get(id=id_).delete()
 
         return HttpResponseRedirect('/historial_compras/')
@@ -42,14 +42,14 @@ class DetalleDeVenta(DetailView):
         context['subtitulo'] = "Venta realizada"
         context['persona'] = "Cliente"
         context['elementos_vendidos'] = SaleDetail.objects.filter(
-            sale_id=self.kwargs.get("id"))
+            sale=self.kwargs.get("id"))
 
         return context
     
     def post(self, request, *args, **kwargs):
         id_ = self.kwargs.get("id")
         SaleDetail.take_product_back(id_)
-        SaleDetail.objects.filter(sale_id=id_).delete()
+        SaleDetail.objects.filter(sale=id_).delete()
         Sale.objects.filter(id=id_).delete()
 
         return HttpResponseRedirect('/historial_ventas/')

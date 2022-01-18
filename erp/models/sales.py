@@ -36,19 +36,19 @@ class Sale(BaseOperationModel):
 
 
 class SaleDetail(SSBaseModel):
-    sale_id = models.ForeignKey('Sale', on_delete=models.CASCADE)
+    sale = models.ForeignKey('Sale', on_delete=models.CASCADE)
     unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)
     price_by_quantity = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     discount_percentage = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     discount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    product_id = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True)
+    article = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField()
 
     @classmethod
     def take_product_back(cls, param):
-        products = cls.objects.filter(sale_id=param)
+        products = cls.objects.filter(sale=param)
         for i in products:
-            if i.product_id.stock >= i.quantity:
-                i.product_id.stock += i.quantity
-                i.product_id.save()
+            if i.article.stock >= i.quantity:
+                i.article.stock += i.quantity
+                i.article.save()

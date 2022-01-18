@@ -87,7 +87,7 @@ Venta
 
             {% for i in articulo_a_vender %}
               <tr>
-                <td>{{ i.product_id }}</td>
+                <td>{{ i.article }}</td>
                 <td>${{ i.unit_price }}</td>
                 <td>{{ i.quantity }} </td>
                 <td><a href="cancelar_unidad/{{i.id}}"><img src="{% static '/dist/img/cancel.svg' %}" alt="Cancelar" /></a></td>

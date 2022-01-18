@@ -23,18 +23,18 @@ class Purchase(BaseOperationModel):
 
 
 class DetalleEntrada(SSBaseModel):
-    purchase_id = models.ForeignKey(Purchase, on_delete=models.CASCADE)
+    purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE)
     is_in_dolar = models.BooleanField(default=False, null=True)
     cost_no_taxes = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     unit_cost = models.DecimalField(max_digits=10, decimal_places=2)
     cost_by_quantity = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    product_id = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True)
+    article = models.ForeignKey(Article, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField()
 
     @classmethod
     def give_product_back(cls, param):
-        products = cls.objects.filter(purchase_id=param)
+        products = cls.objects.filter(purchase=param)
         for i in products:
-            if i.product_id.stock >= i.quantity:
-                i.product_id.stock -= i.quantity
-                i.product_id.save()
+            if i.article.stock >= i.quantity:
+                i.article.stock -= i.quantity
+                i.article.save()

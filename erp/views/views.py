@@ -61,12 +61,12 @@ def entrada(request):
                         unit_cost=comprar_articulo(cleaned_form)['cost'],
                         cost_by_quantity=comprar_articulo(cleaned_form)['cost'] * comprar_articulo(cleaned_form)['quantity'],
                         quantity=comprar_articulo(cleaned_form)['quantity'],
-                        purchase_id=new_sale,
+                        purchase=new_sale,
                         is_in_dolar=comprar_articulo(cleaned_form)['is_in_dolar'],
-                        product_id=new_article)
+                        article=new_article)
                     ctx['inexistente'] = ''
 
-            queryset = DetalleEntrada.objects.filter(purchase_id=new_sale)
+            queryset = DetalleEntrada.objects.filter(purchase=new_sale)
             new_sale.total = 0
             for i in queryset:
                 if i.is_in_dolar:
@@ -101,20 +101,20 @@ def transaccion_exitosa(request):
         return redirect('not_found')
 
     producto_leido = DetalleEntrada.objects.filter(
-        purchase_id=nueva_venta).select_related('product_id')
+        purchase=nueva_venta).select_related('article')
 
     try:
         for j in producto_leido:  # Esto es simplemente para que cancele la compra completa y no se actualicen el stock y price solo de algunos productos
-            j.product_id.profit_percentage * 1  # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
+            j.article.profit_percentage * 1  # Es una multiplicacion que solo sirve para poner en evidencia el error (porque un numero no se puede multiplicar por 'None')
         for i in producto_leido:  # Se actualiza el cost y el stock de cada objeto Article
-            i.product_id.is_in_dolar = i.is_in_dolar
-            i.product_id.cost_no_taxes = i.cost_no_taxes
-            i.product_id.cost = i.unit_cost
-            i.product_id.price_no_taxes = profit_percentage(i.cost_no_taxes, i.product_id.profit_percentage)
-            i.product_id.price = profit_percentage(i.unit_cost, i.product_id.profit_percentage)
-            i.product_id.discounted_price = profit_percentage(i.product_id.price, -i.product_id.discount_percentage)
-            i.product_id.stock += i.quantity
-            i.product_id.save()
+            i.article.is_in_dolar = i.is_in_dolar
+            i.article.cost_no_taxes = i.cost_no_taxes
+            i.article.cost = i.unit_cost
+            i.article.price_no_taxes = profit_percentage(i.cost_no_taxes, i.article.profit_percentage)
+            i.article.price = profit_percentage(i.unit_cost, i.article.profit_percentage)
+            i.article.discounted_price = profit_percentage(i.article.price, -i.article.discount_percentage)
+            i.article.stock += i.quantity
+            i.article.save()
 
         nueva_venta.status = Purchase.STATUS_FINISHED
         nueva_venta.save()  # Hace que esa entrada pase a estar inactiva
@@ -156,12 +156,12 @@ def historial_compras(request):
         
 
 @login_required
-def detalle_entrada(request, purchase_id):
-    purchase = Purchase.objects.filter(id=purchase_id).first()
+def detalle_entrada(request, purchase):
+    purchase = Purchase.objects.filter(id=purchase).first()
     if purchase is None:
         return redirect('not_found')
 
-    return FileResponse(emitir_detalle_entrada(purchase_id),
+    return FileResponse(emitir_detalle_entrada(purchase),
         as_attachment=False, filename=f'detalle_entrada_{purchase.datetime_created}.pdf')
 
 
@@ -366,8 +366,8 @@ def venta(request):
                         price_by_quantity=precio_peso_argentino * cleaned_form['quantity'],
                         discount=precio_peso_argentino * new_article.discount_percentage / 100,
                         quantity=cleaned_form['quantity'],
-                        sale_id=Sale.objects.get(status=Sale.STATUS_WAITING),
-                        product_id=Article.objects.get(code=cleaned_form['code']))
+                        sale=Sale.objects.get(status=Sale.STATUS_WAITING),
+                        article=Article.objects.get(code=cleaned_form['code']))
                 else:
                     ctx['inexistente'] = 'No hay suficiente stock del producto.'
 
@@ -375,7 +375,7 @@ def venta(request):
                 ctx['inexistente'] = 'Artículo inexistente, debe agregarlo en la sección "Control de inventario/Agregar artículo". El resto de la venta seguirá guardada.'
 
             # Se suman los precios unitarios al price total de la venta
-            lista = SaleDetail.objects.filter(sale_id=nueva_venta)
+            lista = SaleDetail.objects.filter(sale=nueva_venta)
             nueva_venta.total = 0
             nueva_venta.discount = 0
             for i in lista:
@@ -430,10 +430,10 @@ def historial_ventas(request):
 
 
 @login_required
-def recibo(request, sale_id):
+def recibo(request, sale):
     try:
-        sale_date = Sale.objects.get(id=sale_id).datetime_created
-        return FileResponse(emitir_recibo(sale_id), as_attachment=False,
+        sale_date = Sale.objects.get(id=sale).datetime_created
+        return FileResponse(emitir_recibo(sale), as_attachment=False,
             filename=f'recibo_{sale_date}.pdf')
     except Sale.DoesNotExist:
         return redirect('not_found')
@@ -449,19 +449,19 @@ def venta_exitosa(request):
     try:
         nueva_venta = Sale.objects.get(status=Sale.STATUS_WAITING)
 
-        producto_leido = SaleDetail.objects.filter(sale_id=nueva_venta)  # Se crea un QuerySet para sacar datos de cada producto comprado
+        producto_leido = SaleDetail.objects.filter(sale=nueva_venta)  # Se crea un QuerySet para sacar datos de cada producto comprado
 
         if producto_leido.exists():
             for i in producto_leido:  # Se actualiza  el stock de cada objeto Article
-                i.product_id.stock -= i.quantity
-                i.product_id.save()
+                i.article.stock -= i.quantity
+                i.article.save()
 
             nueva_venta.status = Sale.STATUS_FINISHED
             nueva_venta.save()
             ctx['hay_recibo'] = True
         else:
             return redirect('not_found')
-        ctx['sale_id'] = nueva_venta.id
+        ctx['sale'] = nueva_venta.id
     except Sale.DoesNotExist:
         return redirect('not_found')
 

@@ -55,8 +55,8 @@ def aniadir_al_carrito(request, code_param):
                                 price_by_quantity= precio_peso_argentino,
                                 discount=precio_peso_argentino * new_article.discount_percentage / 100,
                                 quantity=1,
-                                sale_id=nueva_venta,
-                                product_id=new_article)
+                                sale=nueva_venta,
+                                article=new_article)
 
     return redirect('venta_por_catalogo')
 
@@ -121,8 +121,8 @@ def extra_discount(request):
     return HttpResponse(template.render(ctx, request))
 
 @login_required
-def presupuesto(request, sale_id):
+def presupuesto(request, sale):
     try:
-        return FileResponse(emitir_recibo(sale_id), as_attachment=True, filename=f'presupuesto_{date.today()}.pdf')
+        return FileResponse(emitir_recibo(sale), as_attachment=True, filename=f'presupuesto_{date.today()}.pdf')
     except ObjectDoesNotExist as DoesNotExist:
         return redirect('not_found')

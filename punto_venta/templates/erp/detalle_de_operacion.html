@@ -57,7 +57,7 @@
 
               <tr class="intercalado">
                 <td>{{i.quantity}}</td>
-                <td>{{i.product_id.description}}</td>
+                <td>{{i.article.description}}</td>
                 {% if titulo == "Detalle de compra" %}
                 <td>{% if i.is_in_dolar %}U$D{% else %}${% endif %}{{i.unit_cost}}</td>
                 <td>{% if i.is_in_dolar %}U$D{% else %}${% endif %}{{i.cost_by_quantity}}</td>

@@ -9,7 +9,7 @@ class ArticleAdmin(admin.ModelAdmin):
 
 
 class DetalleEntradaAdmin(admin.ModelAdmin):
-    list_display = ("purchase_id", "product_id", "unit_cost", "quantity")
+    list_display = ("purchase", "article", "unit_cost", "quantity")
 
 
 admin.site.register(Article, ArticleAdmin)
