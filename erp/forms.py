@@ -54,10 +54,10 @@ class FormEntrada(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        if all(cleaned_data['cost'], cleaned_data['cost_no_taxes']):
+        if all([cleaned_data['cost'], cleaned_data['cost_no_taxes']]):
             cleaned_data['inexistente'] = "PROBLEMA: Los campos cost final y " \
                 "cost neto + IVA estan completados. Debes llenar solo uno de estos dos campos."
-        if not any(cleaned_data['cost'], cleaned_data['cost_no_taxes']):
+        if not any([cleaned_data['cost'], cleaned_data['cost_no_taxes']]):
             cleaned_data['inexistente'] = "Debes rellenar uno de los dos costos."
         
         return cleaned_data
