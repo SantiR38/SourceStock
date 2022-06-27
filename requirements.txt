@@ -1,5 +1,5 @@
 # Pdf handler
-reportlab==3.5
+reportlab==3.5.55
 
 # Django
 Django==3.1
