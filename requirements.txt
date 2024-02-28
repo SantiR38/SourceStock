@@ -2,7 +2,7 @@
 reportlab==3.5.55
 
 # Django
-Django==3.1.13
+Django==3.2.24
 
 # Postgres libraries
 psycopg2-binary==2.8.5
